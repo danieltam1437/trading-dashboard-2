@@ -3,104 +3,494 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>期權先生 2.0</title>
+  <title>期權先生 2.0 Pro</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
-      color: #111827;
+    :root{
+      --bg:#f3f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e2e8f0;
+      --good:#16a34a;
+      --warn:#d97706;
+      --bad:#dc2626;
+      --chip:#dbeafe;
+      --chipText:#1d4ed8;
+      --shadow:0 10px 30px rgba(15,23,42,0.08);
+      --radius:18px;
     }
-    .wrap {
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 24px;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,"Noto Sans TC",sans-serif;
+      background:var(--bg);
+      color:var(--text);
     }
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:24px;
     }
-    h1 {
-      margin: 0 0 12px 0;
-      font-size: 32px;
+    .header{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:24px;
+      margin-bottom:20px;
     }
-    .score {
-      font-size: 48px;
-      font-weight: bold;
-      margin: 12px 0;
+    .chip{
+      display:inline-block;
+      padding:8px 14px;
+      border-radius:999px;
+      background:var(--chip);
+      color:var(--chipText);
+      font-weight:700;
+      font-size:14px;
+      margin-bottom:12px;
     }
-    .tag {
-      display: inline-block;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: #e5f3ff;
-      color: #0f4c81;
-      font-weight: bold;
-      margin-bottom: 12px;
+    h1{
+      margin:0 0 10px 0;
+      font-size:44px;
+      line-height:1.1;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
+    .sub{
+      color:var(--muted);
+      font-size:18px;
+      margin-top:6px;
     }
-    .item {
-      background: #f9fafb;
-      border-radius: 12px;
-      padding: 16px;
-      border: 1px solid #e5e7eb;
+    .hero{
+      display:grid;
+      grid-template-columns:1.2fr 0.8fr;
+      gap:16px;
+      align-items:start;
     }
-    .label {
-      font-size: 14px;
-      color: #6b7280;
-      margin-bottom: 8px;
+    .scoreBox{
+      background:#f8fafc;
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
     }
-    .value {
-      font-size: 24px;
-      font-weight: bold;
+    .score{
+      font-size:72px;
+      font-weight:800;
+      line-height:1;
+      margin:8px 0 12px;
     }
-    .summary {
-      font-size: 18px;
-      line-height: 1.7;
+    .regime{
+      font-size:24px;
+      font-weight:800;
+    }
+    .summary{
+      margin-top:12px;
+      font-size:18px;
+      line-height:1.7;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+      margin-top:18px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+    .label{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:10px;
+    }
+    .value{
+      font-size:22px;
+      font-weight:800;
+    }
+    .big{
+      font-size:34px;
+    }
+    .panel{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      margin-top:18px;
+    }
+    .sectionTitle{
+      margin:0 0 14px 0;
+      font-size:22px;
+    }
+    .rows{
+      display:grid;
+      gap:10px;
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#f8fafc;
+    }
+    .badge{
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .up{background:#dcfce7;color:#166534}
+    .mid{background:#fef3c7;color:#92400e}
+    .down{background:#fee2e2;color:#991b1b}
+    .neutral{background:#e2e8f0;color:#334155}
+    .controls{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-top:18px;
+    }
+    .field{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:var(--shadow);
+    }
+    .field label{
+      display:block;
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .field input, .field select{
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      font-size:15px;
+      background:#fff;
+    }
+    .buttons{
+      display:flex;
+      gap:12px;
+      margin-top:16px;
+      flex-wrap:wrap;
+    }
+    button{
+      border:0;
+      border-radius:14px;
+      padding:12px 18px;
+      font-size:15px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:var(--shadow);
+    }
+    .primary{background:#111827;color:#fff}
+    .secondary{background:#fff;border:1px solid var(--line);color:#111827}
+    .footerNote{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.7;
+    }
+    @media (max-width: 960px){
+      .hero,.panel,.controls,.grid{grid-template-columns:1fr}
+      h1{font-size:34px}
+      .score{font-size:56px}
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card">
-      <div class="tag">期權先生 2.0</div>
-      <h1>Web 儀表板</h1>
-      <div class="score">+6</div>
-      <div>盤勢：強多</div>
+    <div class="header">
+      <div class="chip">期權先生 2.0 Pro</div>
+      <div class="hero">
+        <div>
+          <h1>完整專業版儀表板</h1>
+          <div class="sub">這一版已經不是單純展示，而是可手動輸入、即時重算、可驗證邏輯的策略雛形。</div>
+        </div>
+        <div class="scoreBox">
+          <div class="label">多空總分</div>
+          <div id="score" class="score">+0</div>
+          <div id="regime" class="regime">震盪</div>
+          <div id="headlineSummary" class="summary">等待資料輸入後自動判斷。</div>
+        </div>
+      </div>
     </div>
 
     <div class="grid">
-      <div class="item">
+      <div class="card">
         <div class="label">台指期</div>
-        <div class="value">偏強</div>
+        <div id="futView" class="value">—</div>
       </div>
-      <div class="item">
+      <div class="card">
         <div class="label">現貨指數</div>
-        <div class="value">偏強</div>
+        <div id="spotView" class="value">—</div>
       </div>
-      <div class="item">
-        <div class="label">權值股</div>
-        <div class="value">2 / 3 走強</div>
+      <div class="card">
+        <div class="label">權值股狀態</div>
+        <div id="weightedView" class="value">—</div>
       </div>
-      <div class="item">
+      <div class="card">
         <div class="label">家數比</div>
-        <div class="value">1.50</div>
+        <div id="breadthView" class="value">—</div>
+      </div>
+      <div class="card">
+        <div class="label">量能</div>
+        <div id="volumeView" class="value">—</div>
+      </div>
+      <div class="card">
+        <div class="label">期現關係</div>
+        <div id="syncView" class="value">—</div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="label">一句話結論</div>
-      <div class="summary">
-        多方結構完整，優先順勢做多。
+    <div class="panel">
+      <div class="card">
+        <h2 class="sectionTitle">策略輸入區</h2>
+        <div class="controls">
+          <div class="field">
+            <label>台指期方向</label>
+            <select id="futDir">
+              <option value="up">偏強</option>
+              <option value="flat">中性</option>
+              <option value="down">偏弱</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>現貨指數方向</label>
+            <select id="spotDir">
+              <option value="up">偏強</option>
+              <option value="flat">中性</option>
+              <option value="down">偏弱</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>權值股走強檔數（0-3）</label>
+            <input id="weightedCount" type="number" min="0" max="3" value="2" />
+          </div>
+          <div class="field">
+            <label>家數比</label>
+            <input id="breadthRatio" type="number" step="0.01" value="1.50" />
+          </div>
+          <div class="field">
+            <label>量能狀態</label>
+            <select id="volumeState">
+              <option value="up">放量</option>
+              <option value="flat">持平</option>
+              <option value="down">縮量</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>關鍵型態</label>
+            <select id="pattern">
+              <option value="none">無</option>
+              <option value="confirm">確認再確認</option>
+              <option value="fakeBreakdown">假跌破</option>
+              <option value="heavyVolume">大量</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>是否站上關鍵價</label>
+            <select id="keyLevel">
+              <option value="yes">是</option>
+              <option value="no">否</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>盤中風險</label>
+            <select id="riskState">
+              <option value="low">低</option>
+              <option value="mid">中</option>
+              <option value="high">高</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="primary" onclick="recalc()">重新計算</button>
+          <button class="secondary" onclick="loadBullCase()">載入強多範例</button>
+          <button class="secondary" onclick="loadBearCase()">載入強空範例</button>
+          <button class="secondary" onclick="loadRangeCase()">載入震盪範例</button>
+        </div>
+
+        <div class="footerNote">
+          這一版先用手動輸入，目的是先把你的盤勢判斷邏輯做穩。下一步再接真實數據，不會再重蹈前面一直部署失敗的路。
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="sectionTitle">判斷拆解</h2>
+        <div id="reasonRows" class="rows"></div>
       </div>
     </div>
+
+    <div class="card" style="margin-top:18px;">
+      <div class="label">一句話結論</div>
+      <div id="finalConclusion" class="big">等待計算。</div>
+    </div>
   </div>
+
+  <script>
+    function badgeClass(text){
+      if(text.includes("+")) return "badge up";
+      if(text.includes("-")) return "badge down";
+      if(text.includes("0")) return "badge neutral";
+      return "badge mid";
+    }
+
+    function directionText(v){
+      if(v === "up") return "偏強";
+      if(v === "down") return "偏弱";
+      return "中性";
+    }
+
+    function recalc(){
+      const futDir = document.getElementById("futDir").value;
+      const spotDir = document.getElementById("spotDir").value;
+      const weightedCount = Number(document.getElementById("weightedCount").value || 0);
+      const breadthRatio = Number(document.getElementById("breadthRatio").value || 1);
+      const volumeState = document.getElementById("volumeState").value;
+      const pattern = document.getElementById("pattern").value;
+      const keyLevel = document.getElementById("keyLevel").value;
+      const riskState = document.getElementById("riskState").value;
+
+      let score = 0;
+      const reasons = [];
+
+      // 1. 台指期
+      if(futDir === "up"){ score += 2; reasons.push(["台指期偏強", "+2"]); }
+      else if(futDir === "down"){ score -= 2; reasons.push(["台指期偏弱", "-2"]); }
+      else { reasons.push(["台指期中性", "0"]); }
+
+      // 2. 現貨
+      if(spotDir === "up"){ score += 2; reasons.push(["現貨指數偏強", "+2"]); }
+      else if(spotDir === "down"){ score -= 2; reasons.push(["現貨指數偏弱", "-2"]); }
+      else { reasons.push(["現貨指數中性", "0"]); }
+
+      // 3. 權值股
+      if(weightedCount >= 2){ score += 2; reasons.push([`權值股 ${weightedCount}/3 走強`, "+2"]); }
+      else if(weightedCount === 1){ reasons.push([`權值股 ${weightedCount}/3 走強`, "0"]); }
+      else { score -= 2; reasons.push(["權值股明顯轉弱", "-2"]); }
+
+      // 4. 家數比
+      if(breadthRatio >= 1.3){ score += 1; reasons.push([`家數比 ${breadthRatio.toFixed(2)}`, "+1"]); }
+      else if(breadthRatio <= 0.8){ score -= 1; reasons.push([`家數比 ${breadthRatio.toFixed(2)}`, "-1"]); }
+      else { reasons.push([`家數比 ${breadthRatio.toFixed(2)}`, "0"]); }
+
+      // 5. 量能
+      if(volumeState === "up"){ score += 1; reasons.push(["量能放大", "+1"]); }
+      else if(volumeState === "down"){ score -= 1; reasons.push(["量能縮小", "-1"]); }
+      else { reasons.push(["量能持平", "0"]); }
+
+      // 6. 期現同步
+      if((futDir === "up" && spotDir === "up") || (futDir === "down" && spotDir === "down")){
+        score += 1;
+        reasons.push(["期現同步", "+1"]);
+      } else if((futDir === "up" && spotDir === "down") || (futDir === "down" && spotDir === "up")){
+        score -= 2;
+        reasons.push(["期現背離", "-2"]);
+      } else {
+        reasons.push(["期現無明確同步", "0"]);
+      }
+
+      // 7. 關鍵型態
+      if(pattern === "confirm"){ score += 1; reasons.push(["確認再確認", "+1"]); }
+      if(pattern === "fakeBreakdown"){ score += 2; reasons.push(["假跌破後拉回", "+2"]); }
+      if(pattern === "heavyVolume"){ score += 1; reasons.push(["大量配合", "+1"]); }
+
+      // 8. 關鍵價
+      if(keyLevel === "yes"){ score += 1; reasons.push(["站上關鍵價", "+1"]); }
+      else { score -= 1; reasons.push(["未站上關鍵價", "-1"]); }
+
+      // 9. 風險狀態
+      if(riskState === "mid"){ score -= 1; reasons.push(["盤中風險中等", "-1"]); }
+      if(riskState === "high"){ score -= 2; reasons.push(["盤中風險偏高", "-2"]); }
+
+      let regime = "震盪";
+      let summary = "方向尚未完全一致，避免追價。";
+      if(score >= 6){
+        regime = "強多";
+        summary = "多方結構完整，優先順勢做多。";
+      }else if(score >= 3){
+        regime = "偏多";
+        summary = "盤勢偏多，拉回找買點。";
+      }else if(score >= -2){
+        regime = "震盪";
+        summary = "訊號分歧，先等確認，不追單。";
+      }else if(score >= -5){
+        regime = "偏空";
+        summary = "盤勢偏空，反彈找空點。";
+      }else{
+        regime = "強空";
+        summary = "空方結構完整，優先順勢放空。";
+      }
+
+      document.getElementById("score").textContent = (score > 0 ? "+" : "") + score;
+      document.getElementById("regime").textContent = regime;
+      document.getElementById("headlineSummary").textContent = summary;
+      document.getElementById("finalConclusion").textContent = summary;
+
+      document.getElementById("futView").textContent = directionText(futDir);
+      document.getElementById("spotView").textContent = directionText(spotDir);
+      document.getElementById("weightedView").textContent = weightedCount + " / 3 走強";
+      document.getElementById("breadthView").textContent = breadthRatio.toFixed(2);
+      document.getElementById("volumeView").textContent =
+        volumeState === "up" ? "放量" : volumeState === "down" ? "縮量" : "持平";
+      document.getElementById("syncView").textContent =
+        ((futDir === "up" && spotDir === "up") || (futDir === "down" && spotDir === "down")) ? "同步" :
+        ((futDir === "up" && spotDir === "down") || (futDir === "down" && spotDir === "up")) ? "背離" : "中性";
+
+      const reasonRows = document.getElementById("reasonRows");
+      reasonRows.innerHTML = "";
+      reasons.forEach(([name, val])=>{
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `<div>${name}</div><div class="${badgeClass(val)}">${val}</div>`;
+        reasonRows.appendChild(row);
+      });
+    }
+
+    function loadBullCase(){
+      document.getElementById("futDir").value = "up";
+      document.getElementById("spotDir").value = "up";
+      document.getElementById("weightedCount").value = 2;
+      document.getElementById("breadthRatio").value = 1.50;
+      document.getElementById("volumeState").value = "up";
+      document.getElementById("pattern").value = "confirm";
+      document.getElementById("keyLevel").value = "yes";
+      document.getElementById("riskState").value = "low";
+      recalc();
+    }
+
+    function loadBearCase(){
+      document.getElementById("futDir").value = "down";
+      document.getElementById("spotDir").value = "down";
+      document.getElementById("weightedCount").value = 0;
+      document.getElementById("breadthRatio").value = 0.72;
+      document.getElementById("volumeState").value = "up";
+      document.getElementById("pattern").value = "heavyVolume";
+      document.getElementById("keyLevel").value = "no";
+      document.getElementById("riskState").value = "mid";
+      recalc();
+    }
+
+    function loadRangeCase(){
+      document.getElementById("futDir").value = "flat";
+      document.getElementById("spotDir").value = "flat";
+      document.getElementById("weightedCount").value = 1;
+      document.getElementById("breadthRatio").value = 1.02;
+      document.getElementById("volumeState").value = "flat";
+      document.getElementById("pattern").value = "none";
+      document.getElementById("keyLevel").value = "no";
+      document.getElementById("riskState").value = "low";
+      recalc();
+    }
+
+    loadBullCase();
+  </script>
 </body>
 </html>
