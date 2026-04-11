@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>期權先生 2.0</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #111827;
+    }
+    .wrap {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 24px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+    h1 {
+      margin: 0 0 12px 0;
+      font-size: 32px;
+    }
+    .score {
+      font-size: 48px;
+      font-weight: bold;
+      margin: 12px 0;
+    }
+    .tag {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #e5f3ff;
+      color: #0f4c81;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .item {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+    }
+    .label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+    .value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .summary {
+      font-size: 18px;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="tag">期權先生 2.0</div>
+      <h1>Web 儀表板</h1>
+      <div class="score">+6</div>
+      <div>盤勢：強多</div>
+    </div>
+
+    <div class="grid">
+      <div class="item">
+        <div class="label">台指期</div>
+        <div class="value">偏強</div>
+      </div>
+      <div class="item">
+        <div class="label">現貨指數</div>
+        <div class="value">偏強</div>
+      </div>
+      <div class="item">
+        <div class="label">權值股</div>
+        <div class="value">2 / 3 走強</div>
+      </div>
+      <div class="item">
+        <div class="label">家數比</div>
+        <div class="value">1.50</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">一句話結論</div>
+      <div class="summary">
+        多方結構完整，優先順勢做多。
+      </div>
+    </div>
+  </div>
+</body>
+</html>
