@@ -3,31 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>[DT] Dr.Trader 2.0 - 內外盤 + 趨勢力道 2.0</title>
+  <title>[DT] Dr.Trader 2.0</title>
   <style>
     :root{
-      --bg:#f3f6fb;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --line:#e2e8f0;
-      --chip:#dbeafe;
-      --chipText:#1d4ed8;
-      --shadow:0 10px 30px rgba(15,23,42,0.08);
+      --bg:#050505;
+      --card:#111111;
+      --card2:#181818;
+      --text:#ffffff;
+      --muted:#b8b8b8;
+      --line:#2b2b2b;
+      --yellow:#ffd84d;
+      --orange:#ff8a00;
+      --pink:#ff4fa3;
+      --red:#ff3b30;
+      --green:#22c55e;
+      --gray:#94a3b8;
+      --shadow:0 12px 28px rgba(0,0,0,0.45);
       --radius:18px;
-      --redBg:#fee2e2;
-      --redText:#991b1b;
-      --greenBg:#dcfce7;
-      --greenText:#166534;
-      --grayBg:#e2e8f0;
-      --grayText:#334155;
-      --amberBg:#fef3c7;
-      --amberText:#92400e;
-      --blueBg:#dbeafe;
-      --blueText:#1d4ed8;
     }
 
-    *{ box-sizing:border-box; }
+    *{
+      box-sizing:border-box;
+    }
 
     body{
       margin:0;
@@ -43,7 +40,7 @@
     }
 
     .header{
-      background:var(--card);
+      background:linear-gradient(135deg, rgba(255,216,77,0.12), rgba(255,79,163,0.10));
       border:1px solid var(--line);
       border-radius:24px;
       box-shadow:var(--shadow);
@@ -55,8 +52,9 @@
       display:inline-block;
       padding:8px 14px;
       border-radius:999px;
-      background:var(--chip);
-      color:var(--chipText);
+      background:linear-gradient(90deg, rgba(255,216,77,0.18), rgba(255,79,163,0.18));
+      color:var(--yellow);
+      border:1px solid rgba(255,216,77,0.25);
       font-weight:700;
       font-size:14px;
       margin-bottom:12px;
@@ -64,13 +62,14 @@
 
     h1{
       margin:0 0 10px 0;
-      font-size:42px;
+      font-size:44px;
       line-height:1.1;
+      color:var(--yellow);
     }
 
     .sub{
-      color:var(--muted);
-      font-size:17px;
+      color:#f3f3f3;
+      font-size:18px;
       line-height:1.7;
       margin-top:6px;
     }
@@ -83,22 +82,24 @@
     }
 
     .scoreBox{
-      background:#f8fafc;
+      background:linear-gradient(135deg, rgba(255,138,0,0.14), rgba(255,79,163,0.12));
       border:1px solid var(--line);
       border-radius:20px;
       padding:18px;
     }
 
     .score{
-      font-size:68px;
+      font-size:76px;
       font-weight:800;
       line-height:1;
       margin:8px 0 12px;
+      color:#fff;
     }
 
     .regime{
-      font-size:26px;
+      font-size:28px;
       font-weight:800;
+      color:#fff;
     }
 
     .signalLight{
@@ -111,6 +112,7 @@
       margin-top:12px;
       font-size:18px;
       line-height:1.7;
+      color:#f5f5f5;
     }
 
     .tradePlan{
@@ -118,6 +120,7 @@
       font-size:17px;
       font-weight:700;
       line-height:1.7;
+      color:var(--yellow);
     }
 
     .grid{
@@ -142,13 +145,15 @@
     }
 
     .value{
-      font-size:22px;
+      font-size:24px;
       font-weight:800;
+      color:#fff;
     }
 
     .big{
-      font-size:32px;
+      font-size:34px;
       font-weight:800;
+      color:#fff;
     }
 
     .panel{
@@ -160,7 +165,8 @@
 
     .sectionTitle{
       margin:0 0 14px 0;
-      font-size:22px;
+      font-size:24px;
+      color:var(--orange);
     }
 
     .rows{
@@ -176,7 +182,7 @@
       padding:12px 14px;
       border:1px solid var(--line);
       border-radius:14px;
-      background:#f8fafc;
+      background:var(--card2);
     }
 
     .badge{
@@ -189,110 +195,23 @@
       text-align:center;
     }
 
-    /* 多方加分 = 紅色，空方扣分 = 綠色 */
+    /* 做多加分 = 紅 / 粉，做空扣分 = 綠 */
     .up{
-      background:var(--redBg);
-      color:var(--redText);
+      background:rgba(255,79,163,0.18);
+      color:#ff8fc3;
+      border:1px solid rgba(255,79,163,0.28);
     }
 
     .down{
-      background:var(--greenBg);
-      color:var(--greenText);
+      background:rgba(34,197,94,0.18);
+      color:#7ef0a6;
+      border:1px solid rgba(34,197,94,0.28);
     }
 
     .neutral{
-      background:var(--grayBg);
-      color:var(--grayText);
-    }
-
-    .mid{
-      background:var(--amberBg);
-      color:var(--amberText);
-    }
-
-    .blue{
-      background:var(--blueBg);
-      color:var(--blueText);
-    }
-
-    .controls{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:14px;
-      margin-top:18px;
-    }
-
-    .field{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:14px;
-      box-shadow:var(--shadow);
-    }
-
-    .field label{
-      display:block;
-      font-size:13px;
-      color:var(--muted);
-      margin-bottom:8px;
-      line-height:1.5;
-    }
-
-    .field input,
-    .field select{
-      width:100%;
-      padding:10px 12px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      font-size:15px;
-      background:#fff;
-    }
-
-    .buttons{
-      display:flex;
-      gap:12px;
-      margin-top:16px;
-      flex-wrap:wrap;
-    }
-
-    button{
-      border:0;
-      border-radius:14px;
-      padding:12px 18px;
-      font-size:15px;
-      font-weight:700;
-      cursor:pointer;
-      box-shadow:var(--shadow);
-    }
-
-    .primary{
-      background:#111827;
-      color:#fff;
-    }
-
-    .secondary{
-      background:#fff;
-      border:1px solid var(--line);
-      color:#111827;
-    }
-
-    .mini{
-      font-size:14px;
-      padding:10px 14px;
-    }
-
-    .footerNote{
-      margin-top:18px;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.7;
-    }
-
-    .twoCol{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-      margin-top:18px;
+      background:rgba(148,163,184,0.16);
+      color:#d1d5db;
+      border:1px solid rgba(148,163,184,0.2);
     }
 
     .metricTable{
@@ -304,27 +223,28 @@
     .metricTable td{
       padding:12px 14px;
       border:1px solid var(--line);
-      background:#f8fafc;
+      background:var(--card2);
     }
 
     .metricTable td:first-child{
       border-radius:12px 0 0 12px;
       color:var(--muted);
-      width:40%;
+      width:42%;
     }
 
     .metricTable td:last-child{
       border-radius:0 12px 12px 0;
       font-weight:800;
       text-align:right;
+      color:#fff;
     }
 
-    .goodText{ color:var(--redText); }
-    .badText{ color:var(--greenText); }
-    .muteText{ color:var(--grayText); }
+    .highlight{
+      color:var(--yellow);
+    }
 
     @media (max-width: 1024px){
-      .hero,.panel,.twoCol,.grid,.controls{
+      .hero,.panel,.grid{
         grid-template-columns:1fr;
       }
 
@@ -333,7 +253,7 @@
       }
 
       .score{
-        font-size:56px;
+        font-size:58px;
       }
     }
   </style>
@@ -344,15 +264,14 @@
       <div class="chip">[DT] Dr.Trader 2.0</div>
       <div class="hero">
         <div>
-          <h1>免費版內外盤 + 趨勢力道 2.0</h1>
+          <h1>完整專業版儀表板</h1>
           <div class="sub">
-            這一版使用免費公開資料做近似模型。<br>
-            內外盤差不是交易所原生值，而是用價格推進 + 成交量估算的免費版，可先用來建立盤中判斷系統。
+            盤中趨勢判斷核心：內外盤差、趨勢力道、15分K方向、連續推進與綜合決策燈號。
           </div>
         </div>
 
         <div class="scoreBox">
-          <div class="label">綜合決策分數</div>
+          <div class="label">多空總分</div>
           <div id="score" class="score">+0</div>
           <div id="regime" class="regime">⚪ 觀望</div>
           <div id="light" class="signalLight">⚪</div>
@@ -364,113 +283,50 @@
 
     <div class="grid">
       <div class="card">
-        <div class="label">資料來源</div>
-        <div id="sourceView" class="value">Binance BTCUSDT 1m</div>
+        <div class="label">15分K方向</div>
+        <div id="k15View" class="value">—</div>
       </div>
       <div class="card">
-        <div class="label">最新價格</div>
-        <div id="priceView" class="value">—</div>
+        <div class="label">內外盤差</div>
+        <div id="innerOuterView" class="value">—</div>
       </div>
       <div class="card">
-        <div class="label">1 分 K 方向</div>
-        <div id="klineDirView" class="value">—</div>
+        <div class="label">趨勢力道</div>
+        <div id="trendPowerView" class="value">—</div>
+      </div>
+      <div class="card">
+        <div class="label">更新時間</div>
+        <div id="updateTimeView" class="value">—</div>
       </div>
       <div class="card">
         <div class="label">量能狀態</div>
         <div id="volumeView" class="value">—</div>
       </div>
       <div class="card">
-        <div class="label">免費版內外盤差</div>
-        <div id="innerOuterView" class="value">—</div>
-      </div>
-      <div class="card">
-        <div class="label">免費版趨勢力道</div>
-        <div id="trendPowerView" class="value">—</div>
-      </div>
-      <div class="card">
-        <div class="label">連續方向</div>
+        <div class="label">連續推進</div>
         <div id="continuityView" class="value">—</div>
       </div>
       <div class="card">
-        <div class="label">更新時間</div>
-        <div id="updateTimeView" class="value">—</div>
+        <div class="label">波動區間</div>
+        <div id="rangeView" class="value">—</div>
+      </div>
+      <div class="card">
+        <div class="label">綜合燈號</div>
+        <div id="signalTextView" class="value">—</div>
       </div>
     </div>
 
     <div class="panel">
       <div class="card">
-        <h2 class="sectionTitle">控制區</h2>
-
-        <div class="controls">
-          <div class="field">
-            <label>商品</label>
-            <select id="symbolSelect">
-              <option value="BTCUSDT">BTCUSDT</option>
-              <option value="ETHUSDT">ETHUSDT</option>
-              <option value="BNBUSDT">BNBUSDT</option>
-              <option value="SOLUSDT">SOLUSDT</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>K 線週期</label>
-            <select id="intervalSelect">
-              <option value="1m">1m</option>
-              <option value="3m">3m</option>
-              <option value="5m">5m</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>更新秒數</label>
-            <select id="refreshSelect">
-              <option value="5000">5 秒</option>
-              <option value="10000">10 秒</option>
-              <option value="15000">15 秒</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>資料模式</label>
-            <select id="modeSelect">
-              <option value="live">免費即時版</option>
-              <option value="manual">手動測試版</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>手動價格（手動模式用）</label>
-            <input id="manualPrice" type="number" step="0.01" value="60000" />
-          </div>
-
-          <div class="field">
-            <label>手動漲跌幅 %（手動模式用）</label>
-            <input id="manualChange" type="number" step="0.01" value="0.80" />
-          </div>
-
-          <div class="field">
-            <label>手動量能倍率（手動模式用）</label>
-            <input id="manualVolRatio" type="number" step="0.01" value="1.40" />
-          </div>
-
-          <div class="field">
-            <label>手動內外盤差（手動模式用）</label>
-            <input id="manualIODiff" type="number" step="1" value="180" />
-          </div>
-        </div>
-
-        <div class="buttons">
-          <button class="primary" onclick="runNow()">立即更新</button>
-          <button class="secondary" onclick="toggleAuto()" id="autoBtn">停止自動更新</button>
-          <button class="secondary mini" onclick="loadBullManual()">載入強多範例</button>
-          <button class="secondary mini" onclick="loadBearManual()">載入強空範例</button>
-          <button class="secondary mini" onclick="loadRangeManual()">載入震盪範例</button>
-        </div>
-
-        <div class="footerNote">
-          免費版重點不是 100% 還原交易所內外盤，而是先建立：<br>
-          「免費資料 → 近似內外盤差 → 趨勢力道 → 做多/做空/觀望」的完整判斷系統。
-        </div>
+        <h2 class="sectionTitle">核心數值</h2>
+        <table class="metricTable">
+          <tr><td>15分K方向分數</td><td id="k15ScoreCell">—</td></tr>
+          <tr><td>量能分數</td><td id="volumeScoreCell">—</td></tr>
+          <tr><td>內外盤差分數</td><td id="ioScoreCell">—</td></tr>
+          <tr><td>趨勢力道分數</td><td id="powerScoreCell">—</td></tr>
+          <tr><td>連續推進分數</td><td id="continuityScoreCell">—</td></tr>
+          <tr><td class="highlight">總分</td><td id="totalScoreCell" class="highlight">—</td></tr>
+        </table>
       </div>
 
       <div class="card">
@@ -479,27 +335,13 @@
       </div>
     </div>
 
-    <div class="twoCol">
-      <div class="card">
-        <h2 class="sectionTitle">核心數值</h2>
-        <table class="metricTable">
-          <tr><td>價格動能分數</td><td id="momentumScoreCell">—</td></tr>
-          <tr><td>量能分數</td><td id="volumeScoreCell">—</td></tr>
-          <tr><td>內外盤差分數</td><td id="ioScoreCell">—</td></tr>
-          <tr><td>連續推進分數</td><td id="continuityScoreCell">—</td></tr>
-          <tr><td>總分</td><td id="totalScoreCell">—</td></tr>
-        </table>
-      </div>
-
-      <div class="card">
-        <div class="label">一句話結論</div>
-        <div id="finalConclusion" class="big">等待計算。</div>
-      </div>
+    <div class="card" style="margin-top:18px;">
+      <div class="label">一句話結論</div>
+      <div id="finalConclusion" class="big">等待計算。</div>
     </div>
   </div>
 
   <script>
-    let autoMode = true;
     let timer = null;
 
     function nowText(){
@@ -522,18 +364,6 @@
       return "中性";
     }
 
-    function numberFmt(v, digits = 2){
-      return Number(v).toFixed(digits);
-    }
-
-    function generateSignal(score){
-      if(score >= 6) return { text:"🔴 做多", light:"🔴" };
-      if(score >= 3) return { text:"🟠 偏多", light:"🟠" };
-      if(score > -2) return { text:"⚪ 觀望", light:"🟡" };
-      if(score > -6) return { text:"🟢 偏空", light:"🟢" };
-      return { text:"🟢 放空", light:"🟢" };
-    }
-
     function setCell(id, value){
       document.getElementById(id).textContent = value;
     }
@@ -545,38 +375,114 @@
       return row;
     }
 
-    function calcFromModel(model){
+    function generateSignal(score){
+      if(score >= 6) return { text:"🔴 做多", light:"🔴" };
+      if(score >= 3) return { text:"🟠 偏多", light:"🟠" };
+      if(score > -2) return { text:"⚪ 觀望", light:"🟡" };
+      if(score > -6) return { text:"🟢 偏空", light:"🟢" };
+      return { text:"🟢 放空", light:"🟢" };
+    }
+
+    async function fetchMarketModel(){
+      const symbol = "BTCUSDT";
+
+      const res15 = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=15m&limit=8`);
+      const data15 = await res15.json();
+
+      if(!Array.isArray(data15) || data15.length < 6){
+        throw new Error("資料抓取失敗");
+      }
+
+      const candles15 = data15.map(k => ({
+        openTime: k[0],
+        open: Number(k[1]),
+        high: Number(k[2]),
+        low: Number(k[3]),
+        close: Number(k[4]),
+        volume: Number(k[5])
+      }));
+
+      const last = candles15[candles15.length - 1];
+      const prev = candles15[candles15.length - 2];
+      const recent = candles15.slice(-5);
+
+      const avgVol = recent.reduce((a, b) => a + b.volume, 0) / recent.length;
+      const volumeRatio = avgVol > 0 ? last.volume / avgVol : 1;
+
+      const fullRange = Math.max(last.high - last.low, 0.0000001);
+      const body = last.close - last.open;
+      const directionalFactor = body / fullRange;
+
+      // 近似內外盤差：方向 * 量能 * 推進效率
+      const innerOuterDiff = directionalFactor * last.volume * 8;
+
+      // 趨勢力道：動能 + 量能 + 區間效率
+      const changePct = prev.close > 0 ? ((last.close - prev.close) / prev.close) * 100 : 0;
+      const trendPower = (changePct * 10) + (volumeRatio * 8 * directionalFactor);
+
+      // 連續推進
+      let continuity = 0;
+      candles15.slice(-4).forEach(c => {
+        if(c.close > c.open) continuity += 1;
+        else if(c.close < c.open) continuity -= 1;
+      });
+
+      const rangeStrength = fullRange / Math.max(Math.abs(prev.close) * 0.002, 0.0000001);
+
+      return {
+        symbol,
+        open: last.open,
+        close: last.close,
+        high: last.high,
+        low: last.low,
+        volumeRatio,
+        innerOuterDiff,
+        trendPower,
+        continuity,
+        changePct,
+        rangeStrength
+      };
+    }
+
+    function calcDecision(model){
       const reasons = [];
       let total = 0;
 
-      // 1. 價格動能
-      let momentumScore = 0;
-      if(model.changePct >= 0.35) momentumScore = 2;
-      else if(model.changePct >= 0.10) momentumScore = 1;
-      else if(model.changePct <= -0.35) momentumScore = -2;
-      else if(model.changePct <= -0.10) momentumScore = -1;
-      reasons.push(["價格動能", momentumScore]);
-      total += momentumScore;
+      // 15分K方向
+      let k15Score = 0;
+      if(model.close > model.open) k15Score = 2;
+      else if(model.close < model.open) k15Score = -2;
+      reasons.push(["15分K方向", k15Score]);
+      total += k15Score;
 
-      // 2. 量能
+      // 量能
       let volumeScore = 0;
-      if(model.volumeRatio >= 1.4) volumeScore = 2;
+      if(model.volumeRatio >= 1.35) volumeScore = 2;
       else if(model.volumeRatio >= 1.1) volumeScore = 1;
-      else if(model.volumeRatio <= 0.7) volumeScore = -2;
+      else if(model.volumeRatio <= 0.75) volumeScore = -2;
       else if(model.volumeRatio <= 0.9) volumeScore = -1;
-      reasons.push(["量能變化", volumeScore]);
+      reasons.push(["量能狀態", volumeScore]);
       total += volumeScore;
 
-      // 3. 內外盤差（免費近似版）
+      // 內外盤差
       let ioScore = 0;
       if(model.innerOuterDiff >= 120) ioScore = 2;
       else if(model.innerOuterDiff >= 30) ioScore = 1;
       else if(model.innerOuterDiff <= -120) ioScore = -2;
       else if(model.innerOuterDiff <= -30) ioScore = -1;
-      reasons.push(["免費版內外盤差", ioScore]);
+      reasons.push(["內外盤差", ioScore]);
       total += ioScore;
 
-      // 4. 連續推進
+      // 趨勢力道
+      let powerScore = 0;
+      if(model.trendPower >= 6) powerScore = 2;
+      else if(model.trendPower >= 2) powerScore = 1;
+      else if(model.trendPower <= -6) powerScore = -2;
+      else if(model.trendPower <= -2) powerScore = -1;
+      reasons.push(["趨勢力道", powerScore]);
+      total += powerScore;
+
+      // 連續推進
       let continuityScore = 0;
       if(model.continuity >= 3) continuityScore = 2;
       else if(model.continuity >= 2) continuityScore = 1;
@@ -585,39 +491,25 @@
       reasons.push(["連續推進", continuityScore]);
       total += continuityScore;
 
-      // 5. K棒方向加權
-      let klineScore = 0;
-      if(model.close > model.open) klineScore = 1;
-      else if(model.close < model.open) klineScore = -1;
-      reasons.push(["當前 K 棒方向", klineScore]);
-      total += klineScore;
-
-      // 6. 大區間加權
-      let rangeScore = 0;
-      if(model.rangeStrength >= 1.2) rangeScore = 1;
-      else if(model.rangeStrength <= 0.6) rangeScore = -1;
-      reasons.push(["波動區間", rangeScore]);
-      total += rangeScore;
-
       const signal = generateSignal(total);
 
-      let summary = "訊號分歧，先觀望。";
+      let summary = "方向不明，先觀望。";
       let tradePlan = "➡️ 建議：觀望，不進場";
 
       if(total >= 6){
-        summary = "多方結構完整，免費版模型顯示偏強。";
-        tradePlan = "➡️ 建議：順勢做多（紅燈），回檔找進場。";
+        summary = "多方結構完整，內外盤差與趨勢力道同步偏強。";
+        tradePlan = "➡️ 建議：順勢做多（紅燈），拉回找進場。";
       }else if(total >= 3){
-        summary = "盤勢偏多，建議偏多思考。";
-        tradePlan = "➡️ 建議：偏多操作，回檔分批試單。";
+        summary = "盤勢偏多，但仍需注意回檔。";
+        tradePlan = "➡️ 建議：偏多操作，小倉位試單。";
       }else if(total > -2){
-        summary = "方向不明，訊號混合。";
-        tradePlan = "➡️ 建議：觀望，不追單。";
+        summary = "訊號混合，暫不追單。";
+        tradePlan = "➡️ 建議：觀望，不進場。";
       }else if(total > -6){
-        summary = "盤勢偏空，反彈壓力較大。";
+        summary = "盤勢偏空，內外盤差與力道轉弱。";
         tradePlan = "➡️ 建議：偏空操作，反彈找空點。";
       }else{
-        summary = "空方結構完整，免費版模型顯示偏弱。";
+        summary = "空方結構完整，內外盤差與趨勢力道同步偏弱。";
         tradePlan = "➡️ 建議：強空（綠燈），優先順勢放空。";
       }
 
@@ -627,23 +519,15 @@
         summary,
         tradePlan,
         reasons,
-        momentumScore,
+        k15Score,
         volumeScore,
         ioScore,
+        powerScore,
         continuityScore
       };
     }
 
     function updateUI(model, result){
-      setCell("sourceView", `${model.source} / ${model.symbol} / ${model.interval}`);
-      setCell("priceView", numberFmt(model.close, 2));
-      setCell("klineDirView", directionText(model.close - model.open));
-      setCell("volumeView", model.volumeRatio >= 1.1 ? "放量" : model.volumeRatio <= 0.9 ? "縮量" : "持平");
-      setCell("innerOuterView", `${model.innerOuterDiff > 0 ? "+" : ""}${Math.round(model.innerOuterDiff)}`);
-      setCell("trendPowerView", result.total > 0 ? `+${result.total}` : `${result.total}`);
-      setCell("continuityView", model.continuity > 0 ? `多方 ${model.continuity}` : model.continuity < 0 ? `空方 ${Math.abs(model.continuity)}` : "中性");
-      setCell("updateTimeView", nowText());
-
       setCell("score", result.total > 0 ? `+${result.total}` : `${result.total}`);
       setCell("regime", result.signal.text);
       setCell("light", result.signal.light);
@@ -651,9 +535,19 @@
       setCell("tradePlan", result.tradePlan);
       setCell("finalConclusion", result.summary);
 
-      setCell("momentumScoreCell", result.momentumScore > 0 ? `+${result.momentumScore}` : `${result.momentumScore}`);
+      setCell("k15View", directionText(model.close - model.open));
+      setCell("innerOuterView", model.innerOuterDiff > 0 ? `+${Math.round(model.innerOuterDiff)}` : `${Math.round(model.innerOuterDiff)}`);
+      setCell("trendPowerView", model.trendPower > 0 ? `+${model.trendPower.toFixed(2)}` : `${model.trendPower.toFixed(2)}`);
+      setCell("updateTimeView", nowText());
+      setCell("volumeView", model.volumeRatio >= 1.1 ? "放量" : model.volumeRatio <= 0.9 ? "縮量" : "持平");
+      setCell("continuityView", model.continuity > 0 ? `多方 ${model.continuity}` : model.continuity < 0 ? `空方 ${Math.abs(model.continuity)}` : "中性");
+      setCell("rangeView", model.rangeStrength >= 1 ? "偏大" : "偏小");
+      setCell("signalTextView", result.signal.text);
+
+      setCell("k15ScoreCell", result.k15Score > 0 ? `+${result.k15Score}` : `${result.k15Score}`);
       setCell("volumeScoreCell", result.volumeScore > 0 ? `+${result.volumeScore}` : `${result.volumeScore}`);
       setCell("ioScoreCell", result.ioScore > 0 ? `+${result.ioScore}` : `${result.ioScore}`);
+      setCell("powerScoreCell", result.powerScore > 0 ? `+${result.powerScore}` : `${result.powerScore}`);
       setCell("continuityScoreCell", result.continuityScore > 0 ? `+${result.continuityScore}` : `${result.continuityScore}`);
       setCell("totalScoreCell", result.total > 0 ? `+${result.total}` : `${result.total}`);
 
@@ -664,161 +558,23 @@
       });
     }
 
-    async function fetchLiveModel(){
-      const symbol = document.getElementById("symbolSelect").value;
-      const interval = document.getElementById("intervalSelect").value;
-
-      const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=12`);
-      const data = await res.json();
-
-      if(!Array.isArray(data) || data.length < 6){
-        throw new Error("資料抓取失敗");
-      }
-
-      const candles = data.map(k => ({
-        openTime: k[0],
-        open: Number(k[1]),
-        high: Number(k[2]),
-        low: Number(k[3]),
-        close: Number(k[4]),
-        volume: Number(k[5])
-      }));
-
-      const last = candles[candles.length - 1];
-      const prev = candles[candles.length - 2];
-      const recent = candles.slice(-5);
-
-      const avgVol = recent.reduce((a, b) => a + b.volume, 0) / recent.length;
-      const volumeRatio = avgVol > 0 ? last.volume / avgVol : 1;
-
-      const body = Math.abs(last.close - last.open);
-      const fullRange = Math.max(last.high - last.low, 0.0000001);
-      const directionalFactor = (last.close - last.open) / fullRange;
-
-      // 免費版內外盤差近似：
-      // 用 K 棒推進方向 * 量能 * 區間效率 做近似
-      const innerOuterDiff = directionalFactor * last.volume * 10;
-
-      // 連續推進：最近 4 根收盤相對開盤方向累加
-      let continuity = 0;
-      candles.slice(-4).forEach(c => {
-        if(c.close > c.open) continuity += 1;
-        else if(c.close < c.open) continuity -= 1;
-      });
-
-      const changePct = prev.close > 0 ? ((last.close - prev.close) / prev.close) * 100 : 0;
-      const rangeStrength = fullRange / Math.max(Math.abs(prev.close) * 0.001, 0.0000001);
-
-      return {
-        source: "免費公開資料",
-        symbol,
-        interval,
-        open: last.open,
-        high: last.high,
-        low: last.low,
-        close: last.close,
-        volume: last.volume,
-        volumeRatio,
-        innerOuterDiff,
-        continuity,
-        changePct,
-        rangeStrength
-      };
-    }
-
-    function getManualModel(){
-      const price = Number(document.getElementById("manualPrice").value || 60000);
-      const change = Number(document.getElementById("manualChange").value || 0);
-      const volRatio = Number(document.getElementById("manualVolRatio").value || 1);
-      const ioDiff = Number(document.getElementById("manualIODiff").value || 0);
-
-      const prevClose = price / (1 + change / 100);
-      const open = prevClose;
-      const close = price;
-      const high = Math.max(open, close) * 1.0015;
-      const low = Math.min(open, close) * 0.9985;
-
-      let continuity = 0;
-      if(change >= 0.4) continuity = 3;
-      else if(change >= 0.1) continuity = 2;
-      else if(change <= -0.4) continuity = -3;
-      else if(change <= -0.1) continuity = -2;
-
-      return {
-        source: "手動測試",
-        symbol: document.getElementById("symbolSelect").value,
-        interval: document.getElementById("intervalSelect").value,
-        open,
-        high,
-        low,
-        close,
-        volume: 1000,
-        volumeRatio: volRatio,
-        innerOuterDiff: ioDiff,
-        continuity,
-        changePct: change,
-        rangeStrength: 1.0
-      };
-    }
-
     async function runNow(){
       try{
-        const mode = document.getElementById("modeSelect").value;
-        const model = mode === "manual" ? getManualModel() : await fetchLiveModel();
-        const result = calcFromModel(model);
+        const model = await fetchMarketModel();
+        const result = calcDecision(model);
         updateUI(model, result);
       }catch(err){
-        document.getElementById("headlineSummary").textContent = "資料抓取失敗，請稍後再試或切換手動模式。";
-        document.getElementById("tradePlan").textContent = "➡️ 建議：先切換手動模式測試。";
+        document.getElementById("headlineSummary").textContent = "資料抓取失敗，請稍後重新整理。";
+        document.getElementById("tradePlan").textContent = "➡️ 建議：暫時觀望。";
       }
     }
 
-    function resetTimer(){
+    function startAuto(){
       if(timer) clearInterval(timer);
-      const ms = Number(document.getElementById("refreshSelect").value || 5000);
-      timer = setInterval(() => {
-        if(autoMode) runNow();
-      }, ms);
+      timer = setInterval(runNow, 10000);
     }
 
-    function toggleAuto(){
-      autoMode = !autoMode;
-      document.getElementById("autoBtn").textContent = autoMode ? "停止自動更新" : "恢復自動更新";
-    }
-
-    function loadBullManual(){
-      document.getElementById("modeSelect").value = "manual";
-      document.getElementById("manualPrice").value = 60250;
-      document.getElementById("manualChange").value = 0.85;
-      document.getElementById("manualVolRatio").value = 1.55;
-      document.getElementById("manualIODiff").value = 220;
-      runNow();
-    }
-
-    function loadBearManual(){
-      document.getElementById("modeSelect").value = "manual";
-      document.getElementById("manualPrice").value = 59280;
-      document.getElementById("manualChange").value = -0.92;
-      document.getElementById("manualVolRatio").value = 1.48;
-      document.getElementById("manualIODiff").value = -240;
-      runNow();
-    }
-
-    function loadRangeManual(){
-      document.getElementById("modeSelect").value = "manual";
-      document.getElementById("manualPrice").value = 59880;
-      document.getElementById("manualChange").value = 0.03;
-      document.getElementById("manualVolRatio").value = 0.98;
-      document.getElementById("manualIODiff").value = 5;
-      runNow();
-    }
-
-    document.getElementById("refreshSelect").addEventListener("change", resetTimer);
-    document.getElementById("symbolSelect").addEventListener("change", runNow);
-    document.getElementById("intervalSelect").addEventListener("change", runNow);
-    document.getElementById("modeSelect").addEventListener("change", runNow);
-
-    resetTimer();
+    startAuto();
     runNow();
   </script>
 </body>
