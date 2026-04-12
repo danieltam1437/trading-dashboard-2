@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>[DT] Dr.Trader 2.0</title>
+  <title>[DT] Dr.Trader 2.0 - 內外盤 + 趨勢力道 2.0</title>
   <style>
     :root{
       --bg:#f3f6fb;
@@ -15,11 +15,19 @@
       --chipText:#1d4ed8;
       --shadow:0 10px 30px rgba(15,23,42,0.08);
       --radius:18px;
+      --redBg:#fee2e2;
+      --redText:#991b1b;
+      --greenBg:#dcfce7;
+      --greenText:#166534;
+      --grayBg:#e2e8f0;
+      --grayText:#334155;
+      --amberBg:#fef3c7;
+      --amberText:#92400e;
+      --blueBg:#dbeafe;
+      --blueText:#1d4ed8;
     }
 
-    *{
-      box-sizing:border-box;
-    }
+    *{ box-sizing:border-box; }
 
     body{
       margin:0;
@@ -29,7 +37,7 @@
     }
 
     .wrap{
-      max-width:1200px;
+      max-width:1280px;
       margin:0 auto;
       padding:24px;
     }
@@ -56,20 +64,20 @@
 
     h1{
       margin:0 0 10px 0;
-      font-size:44px;
+      font-size:42px;
       line-height:1.1;
     }
 
     .sub{
       color:var(--muted);
-      font-size:18px;
+      font-size:17px;
+      line-height:1.7;
       margin-top:6px;
-      line-height:1.6;
     }
 
     .hero{
       display:grid;
-      grid-template-columns:1.2fr 0.8fr;
+      grid-template-columns:1.1fr 0.9fr;
       gap:16px;
       align-items:start;
     }
@@ -82,21 +90,15 @@
     }
 
     .score{
-      font-size:72px;
+      font-size:68px;
       font-weight:800;
       line-height:1;
       margin:8px 0 12px;
     }
 
     .regime{
-      font-size:24px;
+      font-size:26px;
       font-weight:800;
-    }
-
-    .summary{
-      margin-top:12px;
-      font-size:18px;
-      line-height:1.7;
     }
 
     .signalLight{
@@ -105,16 +107,22 @@
       line-height:1;
     }
 
-    .tradePlan{
+    .summary{
       margin-top:12px;
       font-size:18px;
+      line-height:1.7;
+    }
+
+    .tradePlan{
+      margin-top:12px;
+      font-size:17px;
       font-weight:700;
-      line-height:1.6;
+      line-height:1.7;
     }
 
     .grid{
       display:grid;
-      grid-template-columns:repeat(3,1fr);
+      grid-template-columns:repeat(4,1fr);
       gap:16px;
       margin-top:18px;
     }
@@ -139,7 +147,8 @@
     }
 
     .big{
-      font-size:34px;
+      font-size:32px;
+      font-weight:800;
     }
 
     .panel{
@@ -176,29 +185,34 @@
       font-size:13px;
       font-weight:700;
       white-space:nowrap;
-      min-width:42px;
+      min-width:52px;
       text-align:center;
     }
 
-    /* 這裡已改成：多方加分 = 紅色，空方減分 = 綠色 */
+    /* 多方加分 = 紅色，空方扣分 = 綠色 */
     .up{
-      background:#fee2e2;
-      color:#991b1b;
-    }
-
-    .mid{
-      background:#fef3c7;
-      color:#92400e;
+      background:var(--redBg);
+      color:var(--redText);
     }
 
     .down{
-      background:#dcfce7;
-      color:#166534;
+      background:var(--greenBg);
+      color:var(--greenText);
     }
 
     .neutral{
-      background:#e2e8f0;
-      color:#334155;
+      background:var(--grayBg);
+      color:var(--grayText);
+    }
+
+    .mid{
+      background:var(--amberBg);
+      color:var(--amberText);
+    }
+
+    .blue{
+      background:var(--blueBg);
+      color:var(--blueText);
     }
 
     .controls{
@@ -262,6 +276,11 @@
       color:#111827;
     }
 
+    .mini{
+      font-size:14px;
+      padding:10px 14px;
+    }
+
     .footerNote{
       margin-top:18px;
       color:var(--muted);
@@ -269,11 +288,43 @@
       line-height:1.7;
     }
 
-    @media (max-width: 960px){
-      .hero,
-      .panel,
-      .controls,
-      .grid{
+    .twoCol{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      margin-top:18px;
+    }
+
+    .metricTable{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 10px;
+    }
+
+    .metricTable td{
+      padding:12px 14px;
+      border:1px solid var(--line);
+      background:#f8fafc;
+    }
+
+    .metricTable td:first-child{
+      border-radius:12px 0 0 12px;
+      color:var(--muted);
+      width:40%;
+    }
+
+    .metricTable td:last-child{
+      border-radius:0 12px 12px 0;
+      font-weight:800;
+      text-align:right;
+    }
+
+    .goodText{ color:var(--redText); }
+    .badText{ color:var(--greenText); }
+    .muteText{ color:var(--grayText); }
+
+    @media (max-width: 1024px){
+      .hero,.panel,.twoCol,.grid,.controls{
         grid-template-columns:1fr;
       }
 
@@ -293,15 +344,19 @@
       <div class="chip">[DT] Dr.Trader 2.0</div>
       <div class="hero">
         <div>
-          <h1>完整專業版儀表板</h1>
-          <div class="sub">這一版已經不是單純展示，而是可手動輸入、即時重算、可驗證邏輯的策略雛形。</div>
+          <h1>免費版內外盤 + 趨勢力道 2.0</h1>
+          <div class="sub">
+            這一版使用免費公開資料做近似模型。<br>
+            內外盤差不是交易所原生值，而是用價格推進 + 成交量估算的免費版，可先用來建立盤中判斷系統。
+          </div>
         </div>
+
         <div class="scoreBox">
-          <div class="label">多空總分</div>
+          <div class="label">綜合決策分數</div>
           <div id="score" class="score">+0</div>
-          <div id="regime" class="regime">震盪</div>
+          <div id="regime" class="regime">⚪ 觀望</div>
           <div id="light" class="signalLight">⚪</div>
-          <div id="headlineSummary" class="summary">等待資料輸入後自動判斷。</div>
+          <div id="headlineSummary" class="summary">等待資料更新中。</div>
           <div id="tradePlan" class="tradePlan">➡️ 建議：觀望，不進場</div>
         </div>
       </div>
@@ -309,109 +364,112 @@
 
     <div class="grid">
       <div class="card">
-        <div class="label">台指期</div>
-        <div id="futView" class="value">—</div>
+        <div class="label">資料來源</div>
+        <div id="sourceView" class="value">Binance BTCUSDT 1m</div>
       </div>
       <div class="card">
-        <div class="label">現貨指數</div>
-        <div id="spotView" class="value">—</div>
+        <div class="label">最新價格</div>
+        <div id="priceView" class="value">—</div>
       </div>
       <div class="card">
-        <div class="label">權值股狀態</div>
-        <div id="weightedView" class="value">—</div>
+        <div class="label">1 分 K 方向</div>
+        <div id="klineDirView" class="value">—</div>
       </div>
       <div class="card">
-        <div class="label">家數比</div>
-        <div id="breadthView" class="value">—</div>
-      </div>
-      <div class="card">
-        <div class="label">量能</div>
+        <div class="label">量能狀態</div>
         <div id="volumeView" class="value">—</div>
       </div>
       <div class="card">
-        <div class="label">期現關係</div>
-        <div id="syncView" class="value">—</div>
+        <div class="label">免費版內外盤差</div>
+        <div id="innerOuterView" class="value">—</div>
+      </div>
+      <div class="card">
+        <div class="label">免費版趨勢力道</div>
+        <div id="trendPowerView" class="value">—</div>
+      </div>
+      <div class="card">
+        <div class="label">連續方向</div>
+        <div id="continuityView" class="value">—</div>
+      </div>
+      <div class="card">
+        <div class="label">更新時間</div>
+        <div id="updateTimeView" class="value">—</div>
       </div>
     </div>
 
     <div class="panel">
       <div class="card">
-        <h2 class="sectionTitle">策略輸入區</h2>
+        <h2 class="sectionTitle">控制區</h2>
+
         <div class="controls">
           <div class="field">
-            <label>台指期方向</label>
-            <select id="futDir">
-              <option value="up">偏強</option>
-              <option value="flat">中性</option>
-              <option value="down">偏弱</option>
+            <label>商品</label>
+            <select id="symbolSelect">
+              <option value="BTCUSDT">BTCUSDT</option>
+              <option value="ETHUSDT">ETHUSDT</option>
+              <option value="BNBUSDT">BNBUSDT</option>
+              <option value="SOLUSDT">SOLUSDT</option>
             </select>
           </div>
 
           <div class="field">
-            <label>現貨指數方向</label>
-            <select id="spotDir">
-              <option value="up">偏強</option>
-              <option value="flat">中性</option>
-              <option value="down">偏弱</option>
+            <label>K 線週期</label>
+            <select id="intervalSelect">
+              <option value="1m">1m</option>
+              <option value="3m">3m</option>
+              <option value="5m">5m</option>
             </select>
           </div>
 
           <div class="field">
-            <label>權值股走強檔數（0-3）</label>
-            <input id="weightedCount" type="number" min="0" max="3" value="2" />
-          </div>
-
-          <div class="field">
-            <label>家數比</label>
-            <input id="breadthRatio" type="number" step="0.01" value="1.50" />
-          </div>
-
-          <div class="field">
-            <label>量能狀態</label>
-            <select id="volumeState">
-              <option value="up">放量</option>
-              <option value="flat">持平</option>
-              <option value="down">縮量</option>
+            <label>更新秒數</label>
+            <select id="refreshSelect">
+              <option value="5000">5 秒</option>
+              <option value="10000">10 秒</option>
+              <option value="15000">15 秒</option>
             </select>
           </div>
 
           <div class="field">
-            <label>關鍵型態</label>
-            <select id="pattern">
-              <option value="none">無</option>
-              <option value="confirm">確認再確認</option>
-              <option value="fakeBreakdown">假跌破</option>
-              <option value="heavyVolume">大量</option>
+            <label>資料模式</label>
+            <select id="modeSelect">
+              <option value="live">免費即時版</option>
+              <option value="manual">手動測試版</option>
             </select>
           </div>
 
           <div class="field">
-            <label>是否站上關鍵價</label>
-            <select id="keyLevel">
-              <option value="yes">是</option>
-              <option value="no">否</option>
-            </select>
+            <label>手動價格（手動模式用）</label>
+            <input id="manualPrice" type="number" step="0.01" value="60000" />
           </div>
 
           <div class="field">
-            <label>盤中風險</label>
-            <select id="riskState">
-              <option value="low">低</option>
-              <option value="mid">中</option>
-              <option value="high">高</option>
-            </select>
+            <label>手動漲跌幅 %（手動模式用）</label>
+            <input id="manualChange" type="number" step="0.01" value="0.80" />
+          </div>
+
+          <div class="field">
+            <label>手動量能倍率（手動模式用）</label>
+            <input id="manualVolRatio" type="number" step="0.01" value="1.40" />
+          </div>
+
+          <div class="field">
+            <label>手動內外盤差（手動模式用）</label>
+            <input id="manualIODiff" type="number" step="1" value="180" />
           </div>
         </div>
 
         <div class="buttons">
-          <button class="primary" onclick="recalc()">重新計算</button>
-          <button class="secondary" onclick="loadBullCase()">載入強多範例</button>
-          <button class="secondary" onclick="loadBearCase()">載入強空範例</button>
-          <button class="secondary" onclick="loadRangeCase()">載入震盪範例</button>
+          <button class="primary" onclick="runNow()">立即更新</button>
+          <button class="secondary" onclick="toggleAuto()" id="autoBtn">停止自動更新</button>
+          <button class="secondary mini" onclick="loadBullManual()">載入強多範例</button>
+          <button class="secondary mini" onclick="loadBearManual()">載入強空範例</button>
+          <button class="secondary mini" onclick="loadRangeManual()">載入震盪範例</button>
         </div>
 
         <div class="footerNote">
-          這一版先用手動輸入，目的是先把你的盤勢判斷邏輯做穩。下一步再接真實數據，不會再重蹈前面一直部署失敗的路。
+          免費版重點不是 100% 還原交易所內外盤，而是先建立：<br>
+          「免費資料 → 近似內外盤差 → 趨勢力道 → 做多/做空/觀望」的完整判斷系統。
         </div>
       </div>
 
@@ -421,240 +479,347 @@
       </div>
     </div>
 
-    <div class="card" style="margin-top:18px;">
-      <div class="label">一句話結論</div>
-      <div id="finalConclusion" class="big">等待計算。</div>
+    <div class="twoCol">
+      <div class="card">
+        <h2 class="sectionTitle">核心數值</h2>
+        <table class="metricTable">
+          <tr><td>價格動能分數</td><td id="momentumScoreCell">—</td></tr>
+          <tr><td>量能分數</td><td id="volumeScoreCell">—</td></tr>
+          <tr><td>內外盤差分數</td><td id="ioScoreCell">—</td></tr>
+          <tr><td>連續推進分數</td><td id="continuityScoreCell">—</td></tr>
+          <tr><td>總分</td><td id="totalScoreCell">—</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="label">一句話結論</div>
+        <div id="finalConclusion" class="big">等待計算。</div>
+      </div>
     </div>
   </div>
 
   <script>
-    function badgeClass(text){
-      if(text.includes("+")) return "badge up";
-      if(text.includes("-")) return "badge down";
-      if(text.includes("0")) return "badge neutral";
-      return "badge mid";
+    let autoMode = true;
+    let timer = null;
+
+    function nowText(){
+      const d = new Date();
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      const ss = String(d.getSeconds()).padStart(2, "0");
+      return `${hh}:${mm}:${ss}`;
     }
 
-    function directionText(v){
-      if(v === "up") return "偏強";
-      if(v === "down") return "偏弱";
+    function badgeClass(value){
+      if(value > 0) return "badge up";
+      if(value < 0) return "badge down";
+      return "badge neutral";
+    }
+
+    function directionText(value){
+      if(value > 0) return "偏強";
+      if(value < 0) return "偏弱";
       return "中性";
     }
 
-    function generateSignal(score){
-      if(score >= 6) return { text:"🔴 做多", color:"red" };
-      if(score >= 3) return { text:"🟠 偏多（等回檔）", color:"orange" };
-      if(score > -2) return { text:"⚪ 觀望", color:"gray" };
-      if(score > -6) return { text:"🟢 偏空", color:"green" };
-      return { text:"🟢 放空", color:"green" };
+    function numberFmt(v, digits = 2){
+      return Number(v).toFixed(digits);
     }
 
-    function recalc(){
-      const futDir = document.getElementById("futDir").value;
-      const spotDir = document.getElementById("spotDir").value;
-      const weightedCount = Number(document.getElementById("weightedCount").value || 0);
-      const breadthRatio = Number(document.getElementById("breadthRatio").value || 1);
-      const volumeState = document.getElementById("volumeState").value;
-      const pattern = document.getElementById("pattern").value;
-      const keyLevel = document.getElementById("keyLevel").value;
-      const riskState = document.getElementById("riskState").value;
+    function generateSignal(score){
+      if(score >= 6) return { text:"🔴 做多", light:"🔴" };
+      if(score >= 3) return { text:"🟠 偏多", light:"🟠" };
+      if(score > -2) return { text:"⚪ 觀望", light:"🟡" };
+      if(score > -6) return { text:"🟢 偏空", light:"🟢" };
+      return { text:"🟢 放空", light:"🟢" };
+    }
 
-      let score = 0;
+    function setCell(id, value){
+      document.getElementById(id).textContent = value;
+    }
+
+    function buildReasonRow(name, value){
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `<div>${name}</div><div class="${badgeClass(value)}">${value > 0 ? "+" + value : value}</div>`;
+      return row;
+    }
+
+    function calcFromModel(model){
       const reasons = [];
+      let total = 0;
 
-      if(futDir === "up"){
-        score += 2;
-        reasons.push(["台指期偏強", "+2"]);
-      } else if(futDir === "down"){
-        score -= 2;
-        reasons.push(["台指期偏弱", "-2"]);
-      } else {
-        reasons.push(["台指期中性", "0"]);
-      }
+      // 1. 價格動能
+      let momentumScore = 0;
+      if(model.changePct >= 0.35) momentumScore = 2;
+      else if(model.changePct >= 0.10) momentumScore = 1;
+      else if(model.changePct <= -0.35) momentumScore = -2;
+      else if(model.changePct <= -0.10) momentumScore = -1;
+      reasons.push(["價格動能", momentumScore]);
+      total += momentumScore;
 
-      if(spotDir === "up"){
-        score += 2;
-        reasons.push(["現貨指數偏強", "+2"]);
-      } else if(spotDir === "down"){
-        score -= 2;
-        reasons.push(["現貨指數偏弱", "-2"]);
-      } else {
-        reasons.push(["現貨指數中性", "0"]);
-      }
+      // 2. 量能
+      let volumeScore = 0;
+      if(model.volumeRatio >= 1.4) volumeScore = 2;
+      else if(model.volumeRatio >= 1.1) volumeScore = 1;
+      else if(model.volumeRatio <= 0.7) volumeScore = -2;
+      else if(model.volumeRatio <= 0.9) volumeScore = -1;
+      reasons.push(["量能變化", volumeScore]);
+      total += volumeScore;
 
-      if(weightedCount >= 2){
-        score += 2;
-        reasons.push([`權值股 ${weightedCount}/3 走強`, "+2"]);
-      } else if(weightedCount === 1){
-        reasons.push([`權值股 ${weightedCount}/3 走強`, "0"]);
-      } else {
-        score -= 2;
-        reasons.push(["權值股明顯轉弱", "-2"]);
-      }
+      // 3. 內外盤差（免費近似版）
+      let ioScore = 0;
+      if(model.innerOuterDiff >= 120) ioScore = 2;
+      else if(model.innerOuterDiff >= 30) ioScore = 1;
+      else if(model.innerOuterDiff <= -120) ioScore = -2;
+      else if(model.innerOuterDiff <= -30) ioScore = -1;
+      reasons.push(["免費版內外盤差", ioScore]);
+      total += ioScore;
 
-      if(breadthRatio >= 1.3){
-        score += 1;
-        reasons.push([`家數比 ${breadthRatio.toFixed(2)}`, "+1"]);
-      } else if(breadthRatio <= 0.8){
-        score -= 1;
-        reasons.push([`家數比 ${breadthRatio.toFixed(2)}`, "-1"]);
-      } else {
-        reasons.push([`家數比 ${breadthRatio.toFixed(2)}`, "0"]);
-      }
+      // 4. 連續推進
+      let continuityScore = 0;
+      if(model.continuity >= 3) continuityScore = 2;
+      else if(model.continuity >= 2) continuityScore = 1;
+      else if(model.continuity <= -3) continuityScore = -2;
+      else if(model.continuity <= -2) continuityScore = -1;
+      reasons.push(["連續推進", continuityScore]);
+      total += continuityScore;
 
-      if(volumeState === "up"){
-        score += 1;
-        reasons.push(["量能放大", "+1"]);
-      } else if(volumeState === "down"){
-        score -= 1;
-        reasons.push(["量能縮小", "-1"]);
-      } else {
-        reasons.push(["量能持平", "0"]);
-      }
+      // 5. K棒方向加權
+      let klineScore = 0;
+      if(model.close > model.open) klineScore = 1;
+      else if(model.close < model.open) klineScore = -1;
+      reasons.push(["當前 K 棒方向", klineScore]);
+      total += klineScore;
 
-      if(
-        (futDir === "up" && spotDir === "up") ||
-        (futDir === "down" && spotDir === "down")
-      ){
-        score += 1;
-        reasons.push(["期現同步", "+1"]);
-      } else if(
-        (futDir === "up" && spotDir === "down") ||
-        (futDir === "down" && spotDir === "up")
-      ){
-        score -= 2;
-        reasons.push(["期現背離", "-2"]);
-      } else {
-        reasons.push(["期現無明確同步", "0"]);
-      }
+      // 6. 大區間加權
+      let rangeScore = 0;
+      if(model.rangeStrength >= 1.2) rangeScore = 1;
+      else if(model.rangeStrength <= 0.6) rangeScore = -1;
+      reasons.push(["波動區間", rangeScore]);
+      total += rangeScore;
 
-      if(pattern === "confirm"){
-        score += 1;
-        reasons.push(["確認再確認", "+1"]);
-      } else if(pattern === "fakeBreakdown"){
-        score += 2;
-        reasons.push(["假跌破後拉回", "+2"]);
-      } else if(pattern === "heavyVolume"){
-        score += 1;
-        reasons.push(["大量配合", "+1"]);
-      } else {
-        reasons.push(["無額外型態加分", "0"]);
-      }
+      const signal = generateSignal(total);
 
-      if(keyLevel === "yes"){
-        score += 1;
-        reasons.push(["站上關鍵價", "+1"]);
-      } else {
-        score -= 1;
-        reasons.push(["未站上關鍵價", "-1"]);
-      }
-
-      if(riskState === "mid"){
-        score -= 1;
-        reasons.push(["盤中風險中等", "-1"]);
-      } else if(riskState === "high"){
-        score -= 2;
-        reasons.push(["盤中風險偏高", "-2"]);
-      } else {
-        reasons.push(["盤中風險低", "0"]);
-      }
-
-      const signal = generateSignal(score);
-
-      let summary = "訊號分歧，先等確認，不追單。";
+      let summary = "訊號分歧，先觀望。";
       let tradePlan = "➡️ 建議：觀望，不進場";
-      let light = "🟡";
 
-      if(score >= 6){
-        summary = "多方結構完整，優先順勢做多。";
-        tradePlan = "➡️ 建議：順勢做多（紅燈），回檔進場";
-        light = "🔴";
-      } else if(score >= 3){
-        summary = "盤勢偏多，拉回找買點。";
-        tradePlan = "➡️ 建議：偏多操作，小倉位試單";
-        light = "🟠";
-      } else if(score > -2){
-        summary = "訊號分歧，先等確認，不追單。";
-        tradePlan = "➡️ 建議：觀望，不進場";
-        light = "🟡";
-      } else if(score > -6){
-        summary = "盤勢偏空，反彈找空點。";
-        tradePlan = "➡️ 建議：偏空操作，反彈放空";
-        light = "🟢";
-      } else {
-        summary = "空方結構完整，優先順勢放空。";
-        tradePlan = "➡️ 建議：強空（綠燈），直接找空點";
-        light = "🟢";
+      if(total >= 6){
+        summary = "多方結構完整，免費版模型顯示偏強。";
+        tradePlan = "➡️ 建議：順勢做多（紅燈），回檔找進場。";
+      }else if(total >= 3){
+        summary = "盤勢偏多，建議偏多思考。";
+        tradePlan = "➡️ 建議：偏多操作，回檔分批試單。";
+      }else if(total > -2){
+        summary = "方向不明，訊號混合。";
+        tradePlan = "➡️ 建議：觀望，不追單。";
+      }else if(total > -6){
+        summary = "盤勢偏空，反彈壓力較大。";
+        tradePlan = "➡️ 建議：偏空操作，反彈找空點。";
+      }else{
+        summary = "空方結構完整，免費版模型顯示偏弱。";
+        tradePlan = "➡️ 建議：強空（綠燈），優先順勢放空。";
       }
 
-      document.getElementById("score").textContent = (score > 0 ? "+" : "") + score;
-      document.getElementById("regime").textContent = signal.text;
-      document.getElementById("light").textContent = light;
-      document.getElementById("headlineSummary").textContent = summary;
-      document.getElementById("tradePlan").textContent = tradePlan;
-      document.getElementById("finalConclusion").textContent = summary;
+      return {
+        total,
+        signal,
+        summary,
+        tradePlan,
+        reasons,
+        momentumScore,
+        volumeScore,
+        ioScore,
+        continuityScore
+      };
+    }
 
-      document.getElementById("futView").textContent = directionText(futDir);
-      document.getElementById("spotView").textContent = directionText(spotDir);
-      document.getElementById("weightedView").textContent = weightedCount + " / 3 走強";
-      document.getElementById("breadthView").textContent = breadthRatio.toFixed(2);
-      document.getElementById("volumeView").textContent =
-        volumeState === "up" ? "放量" : volumeState === "down" ? "縮量" : "持平";
-      document.getElementById("syncView").textContent =
-        ((futDir === "up" && spotDir === "up") || (futDir === "down" && spotDir === "down"))
-          ? "同步"
-          : ((futDir === "up" && spotDir === "down") || (futDir === "down" && spotDir === "up"))
-            ? "背離"
-            : "中性";
+    function updateUI(model, result){
+      setCell("sourceView", `${model.source} / ${model.symbol} / ${model.interval}`);
+      setCell("priceView", numberFmt(model.close, 2));
+      setCell("klineDirView", directionText(model.close - model.open));
+      setCell("volumeView", model.volumeRatio >= 1.1 ? "放量" : model.volumeRatio <= 0.9 ? "縮量" : "持平");
+      setCell("innerOuterView", `${model.innerOuterDiff > 0 ? "+" : ""}${Math.round(model.innerOuterDiff)}`);
+      setCell("trendPowerView", result.total > 0 ? `+${result.total}` : `${result.total}`);
+      setCell("continuityView", model.continuity > 0 ? `多方 ${model.continuity}` : model.continuity < 0 ? `空方 ${Math.abs(model.continuity)}` : "中性");
+      setCell("updateTimeView", nowText());
+
+      setCell("score", result.total > 0 ? `+${result.total}` : `${result.total}`);
+      setCell("regime", result.signal.text);
+      setCell("light", result.signal.light);
+      setCell("headlineSummary", result.summary);
+      setCell("tradePlan", result.tradePlan);
+      setCell("finalConclusion", result.summary);
+
+      setCell("momentumScoreCell", result.momentumScore > 0 ? `+${result.momentumScore}` : `${result.momentumScore}`);
+      setCell("volumeScoreCell", result.volumeScore > 0 ? `+${result.volumeScore}` : `${result.volumeScore}`);
+      setCell("ioScoreCell", result.ioScore > 0 ? `+${result.ioScore}` : `${result.ioScore}`);
+      setCell("continuityScoreCell", result.continuityScore > 0 ? `+${result.continuityScore}` : `${result.continuityScore}`);
+      setCell("totalScoreCell", result.total > 0 ? `+${result.total}` : `${result.total}`);
 
       const reasonRows = document.getElementById("reasonRows");
       reasonRows.innerHTML = "";
-
-      reasons.forEach(([name, val]) => {
-        const row = document.createElement("div");
-        row.className = "row";
-        row.innerHTML = `<div>${name}</div><div class="${badgeClass(val)}">${val}</div>`;
-        reasonRows.appendChild(row);
+      result.reasons.forEach(([name, value]) => {
+        reasonRows.appendChild(buildReasonRow(name, value));
       });
     }
 
-    function loadBullCase(){
-      document.getElementById("futDir").value = "up";
-      document.getElementById("spotDir").value = "up";
-      document.getElementById("weightedCount").value = 2;
-      document.getElementById("breadthRatio").value = 1.50;
-      document.getElementById("volumeState").value = "up";
-      document.getElementById("pattern").value = "confirm";
-      document.getElementById("keyLevel").value = "yes";
-      document.getElementById("riskState").value = "low";
-      recalc();
+    async function fetchLiveModel(){
+      const symbol = document.getElementById("symbolSelect").value;
+      const interval = document.getElementById("intervalSelect").value;
+
+      const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=12`);
+      const data = await res.json();
+
+      if(!Array.isArray(data) || data.length < 6){
+        throw new Error("資料抓取失敗");
+      }
+
+      const candles = data.map(k => ({
+        openTime: k[0],
+        open: Number(k[1]),
+        high: Number(k[2]),
+        low: Number(k[3]),
+        close: Number(k[4]),
+        volume: Number(k[5])
+      }));
+
+      const last = candles[candles.length - 1];
+      const prev = candles[candles.length - 2];
+      const recent = candles.slice(-5);
+
+      const avgVol = recent.reduce((a, b) => a + b.volume, 0) / recent.length;
+      const volumeRatio = avgVol > 0 ? last.volume / avgVol : 1;
+
+      const body = Math.abs(last.close - last.open);
+      const fullRange = Math.max(last.high - last.low, 0.0000001);
+      const directionalFactor = (last.close - last.open) / fullRange;
+
+      // 免費版內外盤差近似：
+      // 用 K 棒推進方向 * 量能 * 區間效率 做近似
+      const innerOuterDiff = directionalFactor * last.volume * 10;
+
+      // 連續推進：最近 4 根收盤相對開盤方向累加
+      let continuity = 0;
+      candles.slice(-4).forEach(c => {
+        if(c.close > c.open) continuity += 1;
+        else if(c.close < c.open) continuity -= 1;
+      });
+
+      const changePct = prev.close > 0 ? ((last.close - prev.close) / prev.close) * 100 : 0;
+      const rangeStrength = fullRange / Math.max(Math.abs(prev.close) * 0.001, 0.0000001);
+
+      return {
+        source: "免費公開資料",
+        symbol,
+        interval,
+        open: last.open,
+        high: last.high,
+        low: last.low,
+        close: last.close,
+        volume: last.volume,
+        volumeRatio,
+        innerOuterDiff,
+        continuity,
+        changePct,
+        rangeStrength
+      };
     }
 
-    function loadBearCase(){
-      document.getElementById("futDir").value = "down";
-      document.getElementById("spotDir").value = "down";
-      document.getElementById("weightedCount").value = 0;
-      document.getElementById("breadthRatio").value = 0.72;
-      document.getElementById("volumeState").value = "up";
-      document.getElementById("pattern").value = "heavyVolume";
-      document.getElementById("keyLevel").value = "no";
-      document.getElementById("riskState").value = "mid";
-      recalc();
+    function getManualModel(){
+      const price = Number(document.getElementById("manualPrice").value || 60000);
+      const change = Number(document.getElementById("manualChange").value || 0);
+      const volRatio = Number(document.getElementById("manualVolRatio").value || 1);
+      const ioDiff = Number(document.getElementById("manualIODiff").value || 0);
+
+      const prevClose = price / (1 + change / 100);
+      const open = prevClose;
+      const close = price;
+      const high = Math.max(open, close) * 1.0015;
+      const low = Math.min(open, close) * 0.9985;
+
+      let continuity = 0;
+      if(change >= 0.4) continuity = 3;
+      else if(change >= 0.1) continuity = 2;
+      else if(change <= -0.4) continuity = -3;
+      else if(change <= -0.1) continuity = -2;
+
+      return {
+        source: "手動測試",
+        symbol: document.getElementById("symbolSelect").value,
+        interval: document.getElementById("intervalSelect").value,
+        open,
+        high,
+        low,
+        close,
+        volume: 1000,
+        volumeRatio: volRatio,
+        innerOuterDiff: ioDiff,
+        continuity,
+        changePct: change,
+        rangeStrength: 1.0
+      };
     }
 
-    function loadRangeCase(){
-      document.getElementById("futDir").value = "flat";
-      document.getElementById("spotDir").value = "flat";
-      document.getElementById("weightedCount").value = 1;
-      document.getElementById("breadthRatio").value = 1.02;
-      document.getElementById("volumeState").value = "flat";
-      document.getElementById("pattern").value = "none";
-      document.getElementById("keyLevel").value = "no";
-      document.getElementById("riskState").value = "low";
-      recalc();
+    async function runNow(){
+      try{
+        const mode = document.getElementById("modeSelect").value;
+        const model = mode === "manual" ? getManualModel() : await fetchLiveModel();
+        const result = calcFromModel(model);
+        updateUI(model, result);
+      }catch(err){
+        document.getElementById("headlineSummary").textContent = "資料抓取失敗，請稍後再試或切換手動模式。";
+        document.getElementById("tradePlan").textContent = "➡️ 建議：先切換手動模式測試。";
+      }
     }
 
-    loadBullCase();
+    function resetTimer(){
+      if(timer) clearInterval(timer);
+      const ms = Number(document.getElementById("refreshSelect").value || 5000);
+      timer = setInterval(() => {
+        if(autoMode) runNow();
+      }, ms);
+    }
+
+    function toggleAuto(){
+      autoMode = !autoMode;
+      document.getElementById("autoBtn").textContent = autoMode ? "停止自動更新" : "恢復自動更新";
+    }
+
+    function loadBullManual(){
+      document.getElementById("modeSelect").value = "manual";
+      document.getElementById("manualPrice").value = 60250;
+      document.getElementById("manualChange").value = 0.85;
+      document.getElementById("manualVolRatio").value = 1.55;
+      document.getElementById("manualIODiff").value = 220;
+      runNow();
+    }
+
+    function loadBearManual(){
+      document.getElementById("modeSelect").value = "manual";
+      document.getElementById("manualPrice").value = 59280;
+      document.getElementById("manualChange").value = -0.92;
+      document.getElementById("manualVolRatio").value = 1.48;
+      document.getElementById("manualIODiff").value = -240;
+      runNow();
+    }
+
+    function loadRangeManual(){
+      document.getElementById("modeSelect").value = "manual";
+      document.getElementById("manualPrice").value = 59880;
+      document.getElementById("manualChange").value = 0.03;
+      document.getElementById("manualVolRatio").value = 0.98;
+      document.getElementById("manualIODiff").value = 5;
+      runNow();
+    }
+
+    document.getElementById("refreshSelect").addEventListener("change", resetTimer);
+    document.getElementById("symbolSelect").addEventListener("change", runNow);
+    document.getElementById("intervalSelect").addEventListener("change", runNow);
+    document.getElementById("modeSelect").addEventListener("change", runNow);
+
+    resetTimer();
+    runNow();
   </script>
 </body>
 </html>
