@@ -11,9 +11,6 @@
       --text:#0f172a;
       --muted:#64748b;
       --line:#e2e8f0;
-      --good:#16a34a;
-      --warn:#d97706;
-      --bad:#dc2626;
       --chip:#dbeafe;
       --chipText:#1d4ed8;
       --shadow:0 10px 30px rgba(15,23,42,0.08);
@@ -67,6 +64,7 @@
       color:var(--muted);
       font-size:18px;
       margin-top:6px;
+      line-height:1.6;
     }
 
     .hero{
@@ -99,6 +97,19 @@
       margin-top:12px;
       font-size:18px;
       line-height:1.7;
+    }
+
+    .signalLight{
+      margin-top:10px;
+      font-size:34px;
+      line-height:1;
+    }
+
+    .tradePlan{
+      margin-top:12px;
+      font-size:18px;
+      font-weight:700;
+      line-height:1.6;
     }
 
     .grid{
@@ -207,6 +218,7 @@
       font-size:13px;
       color:var(--muted);
       margin-bottom:8px;
+      line-height:1.5;
     }
 
     .field input,
@@ -285,7 +297,9 @@
           <div class="label">多空總分</div>
           <div id="score" class="score">+0</div>
           <div id="regime" class="regime">震盪</div>
+          <div id="light" class="signalLight">⚪</div>
           <div id="headlineSummary" class="summary">等待資料輸入後自動判斷。</div>
+          <div id="tradePlan" class="tradePlan">➡️ 建議：觀望，不進場</div>
         </div>
       </div>
     </div>
@@ -514,16 +528,13 @@
       if(pattern === "confirm"){
         score += 1;
         reasons.push(["確認再確認", "+1"]);
-      }
-      if(pattern === "fakeBreakdown"){
+      } else if(pattern === "fakeBreakdown"){
         score += 2;
         reasons.push(["假跌破後拉回", "+2"]);
-      }
-      if(pattern === "heavyVolume"){
+      } else if(pattern === "heavyVolume"){
         score += 1;
         reasons.push(["大量配合", "+1"]);
-      }
-      if(pattern === "none"){
+      } else {
         reasons.push(["無額外型態加分", "0"]);
       }
 
@@ -548,21 +559,36 @@
       const signal = generateSignal(score);
 
       let summary = "訊號分歧，先等確認，不追單。";
+      let tradePlan = "➡️ 建議：觀望，不進場";
+      let light = "🟡";
+
       if(score >= 6){
         summary = "多方結構完整，優先順勢做多。";
+        tradePlan = "➡️ 建議：順勢做多（紅燈），回檔進場";
+        light = "🔴";
       } else if(score >= 3){
         summary = "盤勢偏多，拉回找買點。";
-      } else if(score >= -2){
+        tradePlan = "➡️ 建議：偏多操作，小倉位試單";
+        light = "🟠";
+      } else if(score > -2){
         summary = "訊號分歧，先等確認，不追單。";
-      } else if(score >= -5){
+        tradePlan = "➡️ 建議：觀望，不進場";
+        light = "🟡";
+      } else if(score > -6){
         summary = "盤勢偏空，反彈找空點。";
+        tradePlan = "➡️ 建議：偏空操作，反彈放空";
+        light = "🟢";
       } else {
         summary = "空方結構完整，優先順勢放空。";
+        tradePlan = "➡️ 建議：強空（綠燈），直接找空點";
+        light = "🟢";
       }
 
       document.getElementById("score").textContent = (score > 0 ? "+" : "") + score;
       document.getElementById("regime").textContent = signal.text;
+      document.getElementById("light").textContent = light;
       document.getElementById("headlineSummary").textContent = summary;
+      document.getElementById("tradePlan").textContent = tradePlan;
       document.getElementById("finalConclusion").textContent = summary;
 
       document.getElementById("futView").textContent = directionText(futDir);
