@@ -1,42 +1,12 @@
-[
-  {
-    "time": "09:00",
-    "support": "偏多",
-    "weight50": "轉強",
-    "mid100": "中性",
-    "electronic": "偏多",
-    "finance": "偏空"
-  },
-  {
-    "time": "09:05",
-    "support": "續強",
-    "weight50": "偏多",
-    "mid100": "轉強",
-    "electronic": "偏多",
-    "finance": "中性"
-  },
-  {
-    "time": "09:10",
-    "support": "中性",
-    "weight50": "中性",
-    "mid100": "偏多",
-    "electronic": "偏多",
-    "finance": "偏弱"
-  },
-  {
-    "time": "09:15",
-    "support": "偏空",
-    "weight50": "轉弱",
-    "mid100": "偏空",
-    "electronic": "中性",
-    "finance": "偏弱"
-  },
-  {
-    "time": "09:20",
-    "support": "震盪",
-    "weight50": "中性",
-    "mid100": "中性",
-    "electronic": "偏多",
-    "finance": "中性"
-  }
-]
+{
+  "source": "local-json",
+  "index_name": "加權指數",
+  "last_update": "10:10",
+  "next_update_in_sec": 28,
+  "latest_support_structure": "短多延續",
+  "rows": [
+    { "time": "09:00", "support": 65, "weight50": 70, "mid100": 50, "elec": 68, "fin": 40 },
+    { "time": "09:05", "support": 68, "weight50": 72, "mid100": 55, "elec": 70, "fin": 45 },
+    { "time": "09:10", "support": 60, "weight50": 60, "mid100": 48, "elec": 65, "fin": 42 }
+  ]
+}
