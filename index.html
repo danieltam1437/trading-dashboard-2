@@ -20,9 +20,10 @@
       --muted: #9ecbff;
       --danger: #ff5b5b;
       --warn: #ffd166;
-      --up: #ff6b6b;
-      --down: #4cd97b;
+      --up: #ff5b5b;
+      --down: #39d98a;
       --flat: #d7e8ff;
+      --panel-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
     }
 
     body {
@@ -34,18 +35,17 @@
 
     .wrap {
       width: 100%;
-      padding: 12px;
+      padding: 8px;
     }
 
     .panel {
       width: 100%;
       border-radius: 18px;
       border: 1px solid rgba(90, 120, 180, 0.35);
-      background:
-        linear-gradient(180deg, rgba(5, 15, 40, 0.96) 0%, rgba(1, 8, 24, 0.98) 100%);
+      background: linear-gradient(180deg, rgba(5, 15, 40, 0.96) 0%, rgba(1, 8, 24, 0.98) 100%);
       box-shadow:
         0 0 0 1px rgba(60, 90, 140, 0.18) inset,
-        0 12px 30px rgba(0, 0, 0, 0.35);
+        var(--panel-shadow);
       overflow: hidden;
     }
 
@@ -54,14 +54,14 @@
       justify-content: space-between;
       align-items: center;
       gap: 16px;
-      padding: 16px 20px 8px 20px;
+      padding: 14px 18px 8px 18px;
       flex-wrap: wrap;
     }
 
     .title {
       margin: 0;
       font-size: 22px;
-      font-weight: 800;
+      font-weight: 900;
       color: var(--gold);
       letter-spacing: 1px;
     }
@@ -84,8 +84,95 @@
       flex-shrink: 0;
     }
 
-    .table-wrap {
+    .content {
       padding: 8px 16px 16px 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .card {
+      border-radius: 16px;
+      border: 1px solid rgba(100, 140, 200, 0.22);
+      background: rgba(2, 10, 26, 0.92);
+      box-shadow: inset 0 0 0 1px rgba(40, 70, 120, 0.15);
+      padding: 14px 16px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .card-value {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .card-sub {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #c8dbff;
+      line-height: 1.5;
+    }
+
+    .summary-main {
+      min-height: 92px;
+    }
+
+    .summary-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: rgba(255, 191, 0, 0.12);
+      color: var(--gold);
+      border: 1px solid rgba(255, 191, 0, 0.25);
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .chart-box {
+      border-radius: 16px;
+      border: 1px solid rgba(100, 140, 200, 0.22);
+      background: rgba(2, 10, 26, 0.92);
+      box-shadow: inset 0 0 0 1px rgba(40, 70, 120, 0.15);
+      padding: 12px 14px 14px 14px;
+    }
+
+    .chart-title {
+      color: var(--gold);
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .chart-wrap {
+      width: 100%;
+      height: 240px;
+      position: relative;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(8, 18, 42, 0.55), rgba(5, 12, 28, 0.55));
     }
 
     .table-box {
@@ -138,20 +225,59 @@
 
     .up {
       color: var(--up);
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .down {
       color: var(--down);
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .flat {
       color: var(--flat);
-      font-weight: 700;
+      font-weight: 800;
     }
 
-    @media (max-width: 900px) {
+    .mini-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .mini-kpi {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(10, 24, 58, 0.5);
+      border: 1px solid rgba(100, 140, 200, 0.16);
+    }
+
+    .mini-kpi-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .mini-kpi-value {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 1200px) {
+      .summary-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .summary-grid,
+      .mini-kpis {
+        grid-template-columns: 1fr;
+      }
+
       .title {
         font-size: 20px;
       }
@@ -164,6 +290,10 @@
 
       .status {
         font-size: 12px;
+      }
+
+      .card-value {
+        font-size: 18px;
       }
     }
   </style>
@@ -180,7 +310,64 @@
         </div>
       </div>
 
-      <div class="table-wrap">
+      <div class="content">
+        <div class="summary-grid">
+          <div class="card summary-main">
+            <div class="summary-badge">盤勢總結</div>
+            <div class="card-value" id="marketSummary">讀取中...</div>
+            <div class="card-sub" id="marketAdvice">操作建議：讀取中...</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">三核心判斷</div>
+            <div class="card-value" id="coreSummary">讀取中...</div>
+            <div class="card-sub" id="coreSub">權值 / 電子 / 金融</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">最新支撐結構</div>
+            <div class="card-value" id="latestSupport">--</div>
+            <div class="card-sub" id="latestTime">時間：--</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">族群主導</div>
+            <div class="card-value" id="leaderSector">--</div>
+            <div class="card-sub" id="leaderReason">電子 / 金融 / 權值</div>
+          </div>
+        </div>
+
+        <div class="mini-kpis">
+          <div class="mini-kpi">
+            <div class="mini-kpi-label">權值50 分數</div>
+            <div class="mini-kpi-value" id="scoreWeight50">--</div>
+          </div>
+          <div class="mini-kpi">
+            <div class="mini-kpi-label">電子 分數</div>
+            <div class="mini-kpi-value" id="scoreElectronic">--</div>
+          </div>
+          <div class="mini-kpi">
+            <div class="mini-kpi-label">金融 分數</div>
+            <div class="mini-kpi-value" id="scoreFinance">--</div>
+          </div>
+        </div>
+
+        <div class="chart-grid">
+          <div class="chart-box">
+            <div class="chart-title">盤勢量能柱狀圖</div>
+            <div class="chart-wrap">
+              <canvas id="strengthChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-box">
+            <div class="chart-title">電子 / 金融 分離柱狀圖</div>
+            <div class="chart-wrap">
+              <canvas id="sectorChart"></canvas>
+            </div>
+          </div>
+        </div>
+
         <div class="table-box">
           <table>
             <thead>
@@ -264,16 +451,27 @@
     }
 
     function getTrendClass(value) {
+      const score = scoreText(value);
+      if (score > 0) return "up";
+      if (score < 0) return "down";
+      return "flat";
+    }
+
+    function scoreText(value) {
       const text = String(value ?? "").trim();
 
-      const upKeywords = ["偏多", "轉強", "續強", "多方", "上攻", "走強", "強", "紅"];
-      const downKeywords = ["偏空", "轉弱", "續弱", "空方", "下殺", "走弱", "弱", "綠"];
-      const flatKeywords = ["中性", "震盪", "盤整", "持平", "--", "無"];
+      const strongUp = ["極強", "爆強", "大多", "強多"];
+      const up = ["偏多", "轉強", "續強", "多方", "上攻", "走強", "強", "紅"];
+      const strongDown = ["極弱", "爆弱", "大空", "強空"];
+      const down = ["偏空", "轉弱", "續弱", "空方", "下殺", "走弱", "弱", "綠"];
+      const flat = ["中性", "震盪", "盤整", "持平", "--", "無"];
 
-      if (upKeywords.some(keyword => text.includes(keyword))) return "up";
-      if (downKeywords.some(keyword => text.includes(keyword))) return "down";
-      if (flatKeywords.some(keyword => text.includes(keyword))) return "flat";
-      return "";
+      if (strongUp.some(k => text.includes(k))) return 2;
+      if (strongDown.some(k => text.includes(k))) return -2;
+      if (up.some(k => text.includes(k))) return 1;
+      if (down.some(k => text.includes(k))) return -1;
+      if (flat.some(k => text.includes(k))) return 0;
+      return 0;
     }
 
     function renderTable(rows) {
@@ -337,6 +535,261 @@
       }, 1000);
     }
 
+    function sumScores(row) {
+      return (
+        scoreText(row.support) +
+        scoreText(row.weight50) +
+        scoreText(row.mid100) +
+        scoreText(row.electronic) +
+        scoreText(row.finance)
+      );
+    }
+
+    function getLatestRow(rows) {
+      return rows[rows.length - 1] || null;
+    }
+
+    function summarizeMarket(rows) {
+      const latest = getLatestRow(rows);
+      if (!latest) {
+        return {
+          summary: "無資料",
+          advice: "操作建議：無資料",
+          core: "無資料",
+          coreSub: "權值 / 電子 / 金融",
+          support: "--",
+          latestTime: "--",
+          leader: "--",
+          leaderReason: "無資料",
+          scores: {
+            weight50: 0,
+            electronic: 0,
+            finance: 0
+          }
+        };
+      }
+
+      const weight50Score = scoreText(latest.weight50);
+      const electronicScore = scoreText(latest.electronic);
+      const financeScore = scoreText(latest.finance);
+      const supportScore = scoreText(latest.support);
+      const mid100Score = scoreText(latest.mid100);
+
+      const total = weight50Score + electronicScore + financeScore + supportScore + mid100Score;
+
+      let summary = "⚖️ 震盪盤";
+      let advice = "操作建議：先觀望，等方向更清楚";
+      if (total >= 3) {
+        summary = "🔥 偏多盤";
+        advice = "操作建議：偏多思考，拉回再找買點";
+      } else if (total <= -3) {
+        summary = "❄️ 偏空盤";
+        advice = "操作建議：偏空思考，反彈再看壓力";
+      }
+
+      let core = "三核心中性";
+      const threeCoreTotal = weight50Score + electronicScore + financeScore;
+      if (threeCoreTotal >= 2) core = "三核心偏多";
+      else if (threeCoreTotal <= -2) core = "三核心偏空";
+
+      const sectors = [
+        { name: "權值50", score: weight50Score, text: latest.weight50 ?? "--" },
+        { name: "電子", score: electronicScore, text: latest.electronic ?? "--" },
+        { name: "金融", score: financeScore, text: latest.finance ?? "--" }
+      ].sort((a, b) => Math.abs(b.score) - Math.abs(a.score));
+
+      const leader = sectors[0]?.name ?? "--";
+      const leaderReason = `${leader}主導：${sectors[0]?.text ?? "--"}`;
+
+      return {
+        summary,
+        advice,
+        core,
+        coreSub: `權值:${latest.weight50 ?? "--"} / 電子:${latest.electronic ?? "--"} / 金融:${latest.finance ?? "--"}`,
+        support: latest.support ?? "--",
+        latestTime: latest.time ?? "--",
+        leader,
+        leaderReason,
+        scores: {
+          weight50: weight50Score,
+          electronic: electronicScore,
+          finance: financeScore
+        }
+      };
+    }
+
+    function applySummary(summaryData) {
+      document.getElementById("marketSummary").textContent = summaryData.summary;
+      document.getElementById("marketAdvice").textContent = summaryData.advice;
+      document.getElementById("coreSummary").textContent = summaryData.core;
+      document.getElementById("coreSub").textContent = summaryData.coreSub;
+      document.getElementById("latestSupport").textContent = summaryData.support;
+      document.getElementById("latestTime").textContent = `時間：${summaryData.latestTime}`;
+      document.getElementById("leaderSector").textContent = summaryData.leader;
+      document.getElementById("leaderReason").textContent = summaryData.leaderReason;
+      document.getElementById("scoreWeight50").textContent = formatScore(summaryData.scores.weight50);
+      document.getElementById("scoreElectronic").textContent = formatScore(summaryData.scores.electronic);
+      document.getElementById("scoreFinance").textContent = formatScore(summaryData.scores.finance);
+
+      setKpiClass("scoreWeight50", summaryData.scores.weight50);
+      setKpiClass("scoreElectronic", summaryData.scores.electronic);
+      setKpiClass("scoreFinance", summaryData.scores.finance);
+    }
+
+    function formatScore(score) {
+      if (score > 0) return `+${score}`;
+      return `${score}`;
+    }
+
+    function setKpiClass(id, score) {
+      const el = document.getElementById(id);
+      el.className = "mini-kpi-value";
+      if (score > 0) el.classList.add("up");
+      else if (score < 0) el.classList.add("down");
+      else el.classList.add("flat");
+    }
+
+    function getStrengthSeries(rows) {
+      return rows.map(row => ({
+        time: row.time ?? "--",
+        total: sumScores(row),
+        electronic: scoreText(row.electronic),
+        finance: scoreText(row.finance),
+        weight50: scoreText(row.weight50)
+      }));
+    }
+
+    function resizeCanvas(canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(rect.width * ratio);
+      canvas.height = Math.floor(rect.height * ratio);
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      return { ctx, width: rect.width, height: rect.height };
+    }
+
+    function drawAxes(ctx, width, height, top, right, bottom, left) {
+      ctx.strokeStyle = "rgba(180, 210, 255, 0.18)";
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      ctx.moveTo(left, top);
+      ctx.lineTo(left, height - bottom);
+      ctx.lineTo(width - right, height - bottom);
+      ctx.stroke();
+
+      const gridCount = 4;
+      for (let i = 0; i <= gridCount; i++) {
+        const y = top + ((height - top - bottom) / gridCount) * i;
+        ctx.beginPath();
+        ctx.moveTo(left, y);
+        ctx.lineTo(width - right, y);
+        ctx.strokeStyle = "rgba(180, 210, 255, 0.08)";
+        ctx.stroke();
+      }
+    }
+
+    function drawBarChart(canvasId, data, options) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+
+      const { ctx, width, height } = resizeCanvas(canvas);
+      ctx.clearRect(0, 0, width, height);
+
+      const padding = { top: 18, right: 18, bottom: 36, left: 36 };
+      drawAxes(ctx, width, height, padding.top, padding.right, padding.bottom, padding.left);
+
+      const plotWidth = width - padding.left - padding.right;
+      const plotHeight = height - padding.top - padding.bottom;
+      const zeroY = padding.top + plotHeight / 2;
+      const maxAbs = Math.max(2, options.maxAbs ?? 4);
+
+      ctx.font = "12px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+
+      const groupWidth = plotWidth / Math.max(data.length, 1);
+      const barWidth = Math.min(24, groupWidth * 0.28);
+
+      data.forEach((item, index) => {
+        const xCenter = padding.left + groupWidth * index + groupWidth / 2;
+
+        options.keys.forEach((key, keyIndex) => {
+          const value = Number(item[key] ?? 0);
+          const offset = (keyIndex - (options.keys.length - 1) / 2) * (barWidth + 6);
+          const x = xCenter + offset - barWidth / 2;
+          const barHeight = Math.abs(value / maxAbs) * (plotHeight / 2 - 6);
+          const y = value >= 0 ? zeroY - barHeight : zeroY;
+
+          ctx.fillStyle = options.colors[keyIndex % options.colors.length];
+          ctx.fillRect(x, y, barWidth, Math.max(2, barHeight));
+        });
+
+        ctx.fillStyle = "#cfe4ff";
+        ctx.fillText(item.label, xCenter, height - padding.bottom + 10);
+      });
+
+      ctx.strokeStyle = "rgba(255,255,255,0.22)";
+      ctx.beginPath();
+      ctx.moveTo(padding.left, zeroY);
+      ctx.lineTo(width - padding.right, zeroY);
+      ctx.stroke();
+
+      ctx.font = "11px Arial";
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      const yMarks = [maxAbs, 0, -maxAbs];
+      yMarks.forEach(mark => {
+        const y = zeroY - (mark / maxAbs) * (plotHeight / 2);
+        ctx.fillStyle = "#9ecbff";
+        ctx.fillText(String(mark), padding.left - 6, y);
+      });
+
+      if (options.legend?.length) {
+        ctx.textAlign = "left";
+        ctx.textBaseline = "top";
+        let lx = padding.left;
+        const ly = 4;
+        options.legend.forEach((name, i) => {
+          ctx.fillStyle = options.colors[i % options.colors.length];
+          ctx.fillRect(lx, ly + 3, 10, 10);
+          ctx.fillStyle = "#d7e8ff";
+          ctx.fillText(name, lx + 15, ly);
+          lx += 72;
+        });
+      }
+    }
+
+    function renderCharts(rows) {
+      const series = getStrengthSeries(rows);
+
+      const chart1Data = series.map(item => ({
+        label: item.time,
+        total: item.total
+      }));
+
+      drawBarChart("strengthChart", chart1Data, {
+        keys: ["total"],
+        colors: ["#ffbf00"],
+        legend: ["盤勢量能"],
+        maxAbs: 6
+      });
+
+      const chart2Data = series.map(item => ({
+        label: item.time,
+        electronic: item.electronic,
+        finance: item.finance
+      }));
+
+      drawBarChart("sectorChart", chart2Data, {
+        keys: ["electronic", "finance"],
+        colors: ["#ff5b5b", "#39d98a"],
+        legend: ["電子", "金融"],
+        maxAbs: 3
+      });
+    }
+
     async function updateSpotStructureTable() {
       setStatus("更新中...　下次更新：--");
       showLoading();
@@ -344,7 +797,12 @@
       try {
         const raw = await fetchSpotData();
         const rows = normalizeRows(raw);
+
         renderTable(rows);
+
+        const summaryData = summarizeMarket(rows);
+        applySummary(summaryData);
+        renderCharts(rows);
 
         const now = new Date();
         const lastUpdateText = `最後更新：${formatTime(now)}　更新成功`;
@@ -371,6 +829,13 @@
         updateSpotStructureTable();
       }, REFRESH_SECONDS * 1000);
     }
+
+    window.addEventListener("resize", () => {
+      fetchSpotData()
+        .then(normalizeRows)
+        .then(renderCharts)
+        .catch(() => {});
+    });
 
     startAutoRefresh();
   </script>
