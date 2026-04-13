@@ -5,806 +5,841 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>現貨結構時間表｜自動抓資料版</title>
   <style>
-    * { box-sizing: border-box; }
-
-    :root {
-      --bg: #000000;
-      --panel: #041126;
-      --line-soft: rgba(110, 150, 220, 0.08);
-      --gold: #ffbf00;
-      --text: #eaf4ff;
-      --muted: #9ecbff;
-      --danger: #ff5b5b;
-      --warn: #ffd166;
-      --up: #ff5b5b;
-      --down: #39d98a;
-      --flat: #d7e8ff;
+    :root{
+      --bg:#020b1a;
+      --panel:#041631;
+      --panel-2:#031126;
+      --line:#11386e;
+      --text:#e8f1ff;
+      --muted:#8fb3e8;
+      --yellow:#ffcc00;
+      --red:#ff4d57;
+      --green:#22c55e;
+      --blue:#3aa0ff;
+      --cyan:#21d4fd;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: "Segoe UI","Microsoft JhengHei",Arial,sans-serif;
+      background:#000;
+      color:var(--text);
+    }
+    .wrap{
+      width:100%;
+      min-height:100vh;
+      padding:8px;
+      background:linear-gradient(180deg,#000 0%, #010714 100%);
+    }
+    .board{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:10px;
+      background:var(--bg);
+      box-shadow:0 0 0 1px rgba(58,160,255,.08) inset, 0 0 30px rgba(0,0,0,.35);
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      margin-bottom:10px;
+    }
+    .title{
+      color:var(--yellow);
+      font-weight:900;
+      font-size:18px;
+      letter-spacing:1px;
+    }
+    .status-right{
+      text-align:right;
+      font-size:13px;
+      line-height:1.5;
+      color:#ff8f8f;
+      white-space:nowrap;
+    }
+    .status-right.ok{ color:#85ffb0; }
+    .dot{
+      display:inline-block;
+      width:10px;height:10px;border-radius:50%;
+      background:var(--red);
+      margin-right:8px;
+      vertical-align:middle;
+      box-shadow:0 0 10px rgba(255,77,87,.7);
+    }
+    .status-right.ok .dot{
+      background:var(--green);
+      box-shadow:0 0 10px rgba(34,197,94,.7);
     }
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: #fff;
-      font-family: Arial, "Microsoft JhengHei", sans-serif;
+    .grid-top{
+      display:grid;
+      grid-template-columns: 1.25fr .95fr .95fr 1fr;
+      gap:10px;
+      margin-bottom:10px;
     }
-
-    .wrap {
-      width: 100%;
-      padding: 8px;
+    .grid-mid{
+      display:grid;
+      grid-template-columns: repeat(5,1fr);
+      gap:10px;
+      margin-bottom:12px;
     }
-
-    .panel {
-      width: 100%;
-      border-radius: 18px;
-      border: 1px solid rgba(90, 120, 180, 0.35);
-      background: linear-gradient(180deg, rgba(5, 15, 40, 0.96) 0%, rgba(1, 8, 24, 0.98) 100%);
-      box-shadow:
-        0 0 0 1px rgba(60, 90, 140, 0.18) inset,
-        0 12px 30px rgba(0, 0, 0, 0.35);
-      overflow: hidden;
-    }
-
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding: 14px 18px 8px 18px;
-      flex-wrap: wrap;
-    }
-
-    .title {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 900;
-      color: var(--gold);
-      letter-spacing: 1px;
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      color: #d7e8ff;
-      white-space: nowrap;
-    }
-
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--danger);
-      box-shadow: 0 0 10px rgba(255, 91, 91, 0.85);
-      flex-shrink: 0;
-    }
-
-    .content {
-      padding: 8px 16px 16px 16px;
-      display: grid;
-      gap: 12px;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: 1.3fr 1fr 1fr 1fr;
-      gap: 12px;
-    }
-
-    .card {
-      border-radius: 16px;
-      border: 1px solid rgba(100, 140, 200, 0.22);
-      background: rgba(2, 10, 26, 0.92);
-      box-shadow: inset 0 0 0 1px rgba(40, 70, 120, 0.15);
-      padding: 14px 16px;
-    }
-
-    .card-title {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 8px;
-      letter-spacing: 0.5px;
-    }
-
-    .card-value {
-      font-size: 22px;
-      font-weight: 800;
-      line-height: 1.35;
-    }
-
-    .card-sub {
-      margin-top: 8px;
-      font-size: 13px;
-      color: #c8dbff;
-      line-height: 1.5;
-      word-break: break-word;
-    }
-
-    .summary-main {
-      min-height: 92px;
-    }
-
-    .summary-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      background: rgba(255, 191, 0, 0.12);
-      color: var(--gold);
-      border: 1px solid rgba(255, 191, 0, 0.25);
-    }
-
-    .mini-kpis {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-    }
-
-    .mini-kpi {
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: rgba(10, 24, 58, 0.5);
-      border: 1px solid rgba(100, 140, 200, 0.16);
-    }
-
-    .mini-kpi-label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .mini-kpi-value {
-      font-size: 18px;
-      font-weight: 800;
-    }
-
-    .chart-grid {
-      display: grid;
+    .grid-chart{
+      display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap:10px;
+      margin-bottom:10px;
     }
 
-    .chart-box {
-      border-radius: 16px;
-      border: 1px solid rgba(100, 140, 200, 0.22);
-      background: rgba(2, 10, 26, 0.92);
-      box-shadow: inset 0 0 0 1px rgba(40, 70, 120, 0.15);
-      padding: 12px 14px 14px 14px;
+    .card{
+      background:linear-gradient(180deg,var(--panel) 0%, var(--panel-2) 100%);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      min-height:92px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card h3{
+      margin:0 0 8px;
+      font-size:13px;
+      color:#d7e7ff;
+      font-weight:700;
+    }
+    .card .label-yellow{
+      display:inline-block;
+      color:var(--yellow);
+      font-size:12px;
+      font-weight:900;
+      margin-bottom:10px;
+    }
+    .big{
+      font-size:18px;
+      font-weight:900;
+      color:#fff;
+      margin-bottom:6px;
+    }
+    .sub{
+      font-size:13px;
+      color:#bcd2f6;
     }
 
-    .chart-title {
-      color: var(--gold);
-      font-size: 16px;
-      font-weight: 800;
-      margin-bottom: 10px;
+    .chart-card{
+      background:linear-gradient(180deg,var(--panel) 0%, var(--panel-2) 100%);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 12px 18px;
+      min-height:270px;
+    }
+    .chart-title{
+      color:var(--yellow);
+      font-weight:900;
+      font-size:14px;
+      margin-bottom:10px;
+    }
+    .chart-box{
+      height:210px;
+      border-radius:12px;
+      background:#02112b;
+      border:1px solid rgba(17,56,110,.55);
+      padding:8px;
+      position:relative;
+    }
+    canvas{
+      width:100%;
+      height:100%;
+      display:block;
     }
 
-    .chart-wrap {
-      width: 100%;
-      height: 240px;
-      position: relative;
+    .table-card{
+      background:linear-gradient(180deg,var(--panel) 0%, var(--panel-2) 100%);
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      margin-top:8px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+    }
+    thead th{
+      background:#061a3a;
+      color:var(--yellow);
+      padding:14px 8px;
+      font-size:16px;
+      border-bottom:1px solid rgba(17,56,110,.8);
+    }
+    tbody td{
+      text-align:center;
+      padding:16px 8px;
+      border-bottom:1px solid rgba(17,56,110,.35);
+      color:#d9e8ff;
+      font-size:15px;
+    }
+    tbody tr:last-child td{ border-bottom:none; }
+
+    .error-row td{
+      color:var(--red);
+      font-weight:800;
     }
 
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      border-radius: 10px;
-      background: linear-gradient(180deg, rgba(8, 18, 42, 0.55), rgba(5, 12, 28, 0.55));
+    .up{ color:var(--red); font-weight:800; }
+    .down{ color:var(--green); font-weight:800; }
+    .flat{ color:#fff; font-weight:800; }
+
+    .tiny{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .mini-note{
+      margin-top:6px;
+      font-size:12px;
+      color:#89a9d9;
+      word-break:break-all;
     }
 
-    .table-box {
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid rgba(100, 140, 200, 0.22);
-      background: rgba(2, 10, 26, 0.92);
-      box-shadow: inset 0 0 0 1px rgba(40, 70, 120, 0.15);
+    @media (max-width: 1200px){
+      .grid-top{ grid-template-columns:1fr 1fr; }
+      .grid-mid{ grid-template-columns: repeat(2,1fr); }
+      .grid-chart{ grid-template-columns:1fr; }
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-    }
-
-    thead th {
-      background: linear-gradient(180deg, rgba(10, 24, 58, 0.95), rgba(8, 18, 42, 0.95));
-      color: var(--gold);
-      font-size: 18px;
-      font-weight: 800;
-      padding: 14px 10px;
-      border-bottom: 1px solid rgba(120, 160, 220, 0.15);
-      text-align: center;
-    }
-
-    tbody td {
-      padding: 14px 10px;
-      text-align: center;
-      color: var(--text);
-      font-size: 16px;
-      border-bottom: 1px solid var(--line-soft);
-    }
-
-    tbody tr:hover {
-      background: rgba(30, 60, 110, 0.15);
-    }
-
-    .muted { color: var(--muted); }
-    .error-text { color: var(--danger); }
-    .warn-text { color: var(--warn); }
-
-    .up {
-      color: var(--up);
-      font-weight: 800;
-    }
-
-    .down {
-      color: var(--down);
-      font-weight: 800;
-    }
-
-    .flat {
-      color: var(--flat);
-      font-weight: 800;
-    }
-
-    @media (max-width: 1200px) {
-      .summary-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .chart-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .mini-kpis {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .summary-grid,
-      .mini-kpis {
-        grid-template-columns: 1fr;
-      }
-
-      .title {
-        font-size: 20px;
-      }
-
-      thead th,
-      tbody td {
-        font-size: 14px;
-        padding: 12px 6px;
-      }
-
-      .status {
-        font-size: 12px;
-      }
-
-      .card-value {
-        font-size: 18px;
-      }
+    @media (max-width: 768px){
+      .topbar{ flex-direction:column; align-items:flex-start; }
+      .grid-top, .grid-mid{ grid-template-columns:1fr; }
+      thead th, tbody td{ font-size:13px; padding:10px 6px; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="panel">
-      <div class="panel-header">
-        <h1 class="title">現貨結構時間表｜自動抓資料版</h1>
-
-        <div class="status">
-          <span class="dot"></span>
-          <span id="updateStatus">最後更新：--　下次更新：--</span>
-        </div>
-      </div>
-
-      <div class="content">
-        <div class="summary-grid">
-          <div class="card summary-main">
-            <div class="summary-badge">盤勢總結</div>
-            <div class="card-value" id="marketSummary">讀取中...</div>
-            <div class="card-sub" id="marketAdvice">操作建議：讀取中...</div>
-          </div>
-
-          <div class="card">
-            <div class="card-title">三核心判斷</div>
-            <div class="card-value" id="coreSummary">讀取中...</div>
-            <div class="card-sub" id="coreSub">權值 / 電子 / 金融</div>
-          </div>
-
-          <div class="card">
-            <div class="card-title">最新支撐結構</div>
-            <div class="card-value" id="latestSupport">--</div>
-            <div class="card-sub" id="latestTime">時間：--</div>
-          </div>
-
-          <div class="card">
-            <div class="card-title">資料來源 / 指數</div>
-            <div class="card-value" id="leaderSector">--</div>
-            <div class="card-sub" id="leaderReason">--</div>
-          </div>
-        </div>
-
-        <div class="mini-kpis">
-          <div class="mini-kpi">
-            <div class="mini-kpi-label">支撐 分數</div>
-            <div class="mini-kpi-value" id="scoreSupport">--</div>
-          </div>
-          <div class="mini-kpi">
-            <div class="mini-kpi-label">權值50 分數</div>
-            <div class="mini-kpi-value" id="scoreWeight50">--</div>
-          </div>
-          <div class="mini-kpi">
-            <div class="mini-kpi-label">中型100 分數</div>
-            <div class="mini-kpi-value" id="scoreMid100">--</div>
-          </div>
-          <div class="mini-kpi">
-            <div class="mini-kpi-label">電子 分數</div>
-            <div class="mini-kpi-value" id="scoreElectronic">--</div>
-          </div>
-          <div class="mini-kpi">
-            <div class="mini-kpi-label">金融 分數</div>
-            <div class="mini-kpi-value" id="scoreFinance">--</div>
-          </div>
-        </div>
-
-        <div class="chart-grid">
-          <div class="chart-box">
-            <div class="chart-title">盤勢量能柱狀圖</div>
-            <div class="chart-wrap">
-              <canvas id="strengthChart"></canvas>
-            </div>
-          </div>
-
-          <div class="chart-box">
-            <div class="chart-title">電子 / 金融 分離柱狀圖</div>
-            <div class="chart-wrap">
-              <canvas id="sectorChart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <div class="table-box">
-          <table>
-            <thead>
-              <tr>
-                <th>時間</th>
-                <th>支撐</th>
-                <th>權值50</th>
-                <th>中型100</th>
-                <th>電子</th>
-                <th>金融</th>
-              </tr>
-            </thead>
-            <tbody id="spotTimeTableBody">
-              <tr>
-                <td colspan="6" class="muted" style="padding:28px;">載入中...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+<div class="wrap">
+  <div class="board">
+    <div class="topbar">
+      <div class="title">現貨結構時間表｜自動抓資料版</div>
+      <div id="statusBox" class="status-right">
+        <span class="dot"></span>
+        <span id="statusText">初始化中...</span>
       </div>
     </div>
-  </div>
 
-  <script>
-    const statusEl = document.getElementById("updateStatus");
-    const tbodyEl = document.getElementById("spotTimeTableBody");
+    <div class="grid-top">
+      <div class="card">
+        <div class="label-yellow">盤勢總結</div>
+        <div class="big" id="summaryMain">讀取中...</div>
+        <div class="sub" id="summarySub">操作建議：讀取中...</div>
+      </div>
+      <div class="card">
+        <h3>三核心判斷</h3>
+        <div class="big" id="coreMain">讀取中...</div>
+        <div class="sub" id="coreSub">權值 / 電子 / 金融</div>
+      </div>
+      <div class="card">
+        <h3>最新支撐結構</h3>
+        <div class="big" id="supportMain">--</div>
+        <div class="sub" id="supportTime">時間：--</div>
+      </div>
+      <div class="card">
+        <h3>資料來源 / 指數</h3>
+        <div class="big" id="sourceMain">--</div>
+        <div class="sub" id="indexMain">--</div>
+        <div class="mini-note" id="debugUrl">目前 URL：--</div>
+      </div>
+    </div>
 
-    const REFRESH_SECONDS = 30;
-    const HISTORY_KEY = "spotStructureHistoryV2";
-    const MAX_HISTORY = 24;
+    <div class="grid-mid">
+      <div class="card">
+        <h3>支撐 分數</h3>
+        <div class="big" id="scoreSupport">--</div>
+      </div>
+      <div class="card">
+        <h3>權值50 分數</h3>
+        <div class="big" id="scoreWeight">--</div>
+      </div>
+      <div class="card">
+        <h3>中型100 分數</h3>
+        <div class="big" id="scoreMid">--</div>
+      </div>
+      <div class="card">
+        <h3>電子 分數</h3>
+        <div class="big" id="scoreElec">--</div>
+      </div>
+      <div class="card">
+        <h3>金融 分數</h3>
+        <div class="big" id="scoreFin">--</div>
+      </div>
+    </div>
 
-    let refreshIntervalId = null;
-    let countdownIntervalId = null;
-    let nextRefreshTime = null;
-    let historyRows = loadHistory();
+    <div class="grid-chart">
+      <div class="chart-card">
+        <div class="chart-title">趨勢量能柱狀圖</div>
+        <div class="chart-box"><canvas id="powerChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">電子 / 金融 分離柱狀圖</div>
+        <div class="chart-box"><canvas id="sectorChart"></canvas></div>
+      </div>
+    </div>
 
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function loadHistory() {
-      try {
-        const raw = localStorage.getItem(HISTORY_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
-    }
-
-    function saveHistory(rows) {
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.slice(-MAX_HISTORY)));
-    }
-
-    function formatTime(date) {
-      return date.toLocaleTimeString("zh-TW", { hour12: false });
-    }
-
-    function setStatus(message, isError = false) {
-      statusEl.textContent = message;
-      statusEl.style.color = isError ? "#ff6b6b" : "#d7e8ff";
-    }
-
-    function showLoading() {
-      if (historyRows.length > 0) return;
-      tbodyEl.innerHTML = `
-        <tr>
-          <td colspan="6" class="muted" style="padding:28px;">載入中...</td>
-        </tr>
-      `;
-    }
-
-    function showError(message) {
-      if (historyRows.length > 0) return;
-      tbodyEl.innerHTML = `
-        <tr>
-          <td colspan="6" class="error-text" style="padding:28px;">${escapeHtml(message)}</td>
-        </tr>
-      `;
-    }
-
-    function showNoData() {
-      tbodyEl.innerHTML = `
-        <tr>
-          <td colspan="6" class="warn-text" style="padding:28px;">沒有可顯示的資料</td>
-        </tr>
-      `;
-    }
-
-    function scoreText(value) {
-      const text = String(value ?? "").trim();
-
-      const strongUp = ["極強", "爆強", "大多", "強多"];
-      const up = ["偏多", "轉強", "續強", "多方", "上攻", "走強", "強", "紅"];
-      const strongDown = ["極弱", "爆弱", "大空", "強空"];
-      const down = ["偏空", "轉弱", "續弱", "空方", "下殺", "走弱", "弱", "綠"];
-      const flat = ["中性", "震盪", "盤整", "持平", "--", "無"];
-
-      if (strongUp.some(k => text.includes(k))) return 2;
-      if (strongDown.some(k => text.includes(k))) return -2;
-      if (up.some(k => text.includes(k))) return 1;
-      if (down.some(k => text.includes(k))) return -1;
-      if (flat.some(k => text.includes(k))) return 0;
-      return 0;
-    }
-
-    function getTrendClass(value) {
-      const score = scoreText(value);
-      if (score > 0) return "up";
-      if (score < 0) return "down";
-      return "flat";
-    }
-
-    function renderTable(rows) {
-      if (!Array.isArray(rows) || rows.length === 0) {
-        showNoData();
-        return;
-      }
-
-      tbodyEl.innerHTML = rows.slice().reverse().map((row) => {
-        const time = escapeHtml(row.time ?? "--");
-        const support = escapeHtml(row.support ?? "--");
-        const weight50 = escapeHtml(row.weight50 ?? "--");
-        const mid100 = escapeHtml(row.mid100 ?? "--");
-        const electronic = escapeHtml(row.electronic ?? "--");
-        const finance = escapeHtml(row.finance ?? "--");
-
-        return `
+    <div class="table-card">
+      <table>
+        <thead>
           <tr>
-            <td>${time}</td>
-            <td class="${getTrendClass(support)}">${support}</td>
-            <td class="${getTrendClass(weight50)}">${weight50}</td>
-            <td class="${getTrendClass(mid100)}">${mid100}</td>
-            <td class="${getTrendClass(electronic)}">${electronic}</td>
-            <td class="${getTrendClass(finance)}">${finance}</td>
+            <th>時間</th>
+            <th>支撐</th>
+            <th>權值50</th>
+            <th>中型100</th>
+            <th>電子</th>
+            <th>金融</th>
           </tr>
-        `;
-      }).join("");
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td colspan="6">讀取中...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   你只要改這裡
+   ========================= */
+const CONFIG = {
+  AUTO_REFRESH_MS: 28000,
+
+  // 先用 local-json 最穩定，確認畫面正常後，再切 api
+  DATA_MODE: "local-json", // "local-json" | "api" | "demo"
+
+  // local JSON 路徑：請確認真的有這個檔案
+  LOCAL_JSON_URLS: [
+    "./data/market.json",
+    "data/market.json"
+  ],
+
+  // 如果你未來有自己的 API，再放這裡
+  API_URLS: [
+    "./api/market",
+    "/api/market",
+    "http://127.0.0.1:3000/api/market"
+  ]
+};
+
+/* =========================
+   畫面元素
+   ========================= */
+const el = {
+  statusBox: document.getElementById("statusBox"),
+  statusText: document.getElementById("statusText"),
+  summaryMain: document.getElementById("summaryMain"),
+  summarySub: document.getElementById("summarySub"),
+  coreMain: document.getElementById("coreMain"),
+  coreSub: document.getElementById("coreSub"),
+  supportMain: document.getElementById("supportMain"),
+  supportTime: document.getElementById("supportTime"),
+  sourceMain: document.getElementById("sourceMain"),
+  indexMain: document.getElementById("indexMain"),
+  debugUrl: document.getElementById("debugUrl"),
+  scoreSupport: document.getElementById("scoreSupport"),
+  scoreWeight: document.getElementById("scoreWeight"),
+  scoreMid: document.getElementById("scoreMid"),
+  scoreElec: document.getElementById("scoreElec"),
+  scoreFin: document.getElementById("scoreFin"),
+  tableBody: document.getElementById("tableBody"),
+};
+
+let powerChartCanvas = document.getElementById("powerChart");
+let sectorChartCanvas = document.getElementById("sectorChart");
+
+let historyRows = [];
+let refreshTimer = null;
+
+/* =========================
+   Demo 資料
+   ========================= */
+function getDemoData() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  const ss = String(now.getSeconds()).padStart(2, "0");
+
+  const rows = [
+    { time:`${hh}:${mm}:${ss}`, support:72, weight50:66, mid100:58, elec:64, fin:43 },
+    { time:`${hh}:${String((now.getMinutes()+1)%60).padStart(2,"0")}:${ss}`, support:75, weight50:69, mid100:60, elec:67, fin:45 },
+    { time:`${hh}:${String((now.getMinutes()+2)%60).padStart(2,"0")}:${ss}`, support:77, weight50:71, mid100:62, elec:68, fin:47 }
+  ];
+
+  return {
+    source: "demo",
+    index_name: "加權指數",
+    last_update: `${hh}:${mm}:${ss}`,
+    next_update_in_sec: Math.floor(CONFIG.AUTO_REFRESH_MS / 1000),
+    latest_support_structure: "短多支撐續強",
+    rows
+  };
+}
+
+/* =========================
+   工具
+   ========================= */
+function scoreClassText(v){
+  if (v > 0) return `<span class="up">${v}</span>`;
+  if (v < 0) return `<span class="down">${v}</span>`;
+  return `<span class="flat">${v}</span>`;
+}
+
+function signalText(v){
+  if (v >= 70) return "強多";
+  if (v >= 55) return "偏多";
+  if (v >= 45) return "震盪";
+  if (v >= 30) return "偏空";
+  return "弱空";
+}
+
+function suggestText(avg){
+  if (avg >= 70) return "順勢偏多，可找拉回承接點";
+  if (avg >= 55) return "多方略優，避免過度追價";
+  if (avg >= 45) return "盤勢混沌，先觀察再出手";
+  if (avg >= 30) return "偏空看待，反彈偏保守";
+  return "空方主導，避免逆勢搶短";
+}
+
+function calcCore(row){
+  const weight = Number(row.weight50 || 0);
+  const elec = Number(row.elec || 0);
+  const fin = Number(row.fin || 0);
+  const avg = (weight + elec + fin) / 3;
+  return {
+    avg: Math.round(avg),
+    text: signalText(avg)
+  };
+}
+
+function setStatus(ok, text){
+  el.statusBox.classList.toggle("ok", ok);
+  el.statusText.textContent = text;
+}
+
+function safeRows(raw){
+  if (!raw) return [];
+  if (Array.isArray(raw.rows)) return raw.rows;
+  if (Array.isArray(raw.data)) return raw.data;
+  if (Array.isArray(raw.items)) return raw.items;
+  return [];
+}
+
+function normalizeData(raw){
+  const rows = safeRows(raw).map(item => ({
+    time: item.time ?? item.t ?? "--:--",
+    support: Number(item.support ?? item.support_score ?? item.s ?? 0),
+    weight50: Number(item.weight50 ?? item.weight ?? item.top50 ?? item.w ?? 0),
+    mid100: Number(item.mid100 ?? item.mid ?? item.m ?? 0),
+    elec: Number(item.elec ?? item.electronics ?? item.e ?? 0),
+    fin: Number(item.fin ?? item.finance ?? item.f ?? 0),
+  }));
+
+  return {
+    source: raw.source ?? raw.provider ?? "unknown",
+    index_name: raw.index_name ?? raw.index ?? "加權指數",
+    last_update: raw.last_update ?? raw.update_time ?? "--:--:--",
+    next_update_in_sec: Number(raw.next_update_in_sec ?? Math.floor(CONFIG.AUTO_REFRESH_MS / 1000)),
+    latest_support_structure: raw.latest_support_structure ?? raw.support_structure ?? "--",
+    rows
+  };
+}
+
+/* =========================
+   取資料：重點修正 404 問題
+   ========================= */
+async function fetchJsonWithDetail(url){
+  const res = await fetch(url, {
+    method: "GET",
+    cache: "no-store"
+  });
+
+  if (!res.ok) {
+    const err = new Error(`HTTP ${res.status}`);
+    err.status = res.status;
+    err.url = url;
+    throw err;
+  }
+
+  const json = await res.json();
+  return { json, url };
+}
+
+async function tryManyUrls(urls){
+  let lastErr = null;
+  for (const url of urls){
+    try{
+      const result = await fetchJsonWithDetail(url);
+      return result;
+    }catch(err){
+      lastErr = err;
     }
+  }
+  throw lastErr || new Error("全部 URL 嘗試失敗");
+}
 
-    async function fetchSpotData() {
-      const url = `/api/spot-structure?t=${Date.now()}`;
-      const response = await fetch(url, {
-        method: "GET",
-        cache: "no-store"
-      });
+async function loadData(){
+  if (CONFIG.DATA_MODE === "demo"){
+    const demo = getDemoData();
+    return { data: normalizeData(demo), url: "demo://local" };
+  }
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
+  if (CONFIG.DATA_MODE === "local-json"){
+    const { json, url } = await tryManyUrls(CONFIG.LOCAL_JSON_URLS);
+    return { data: normalizeData(json), url };
+  }
 
-      return await response.json();
-    }
+  if (CONFIG.DATA_MODE === "api"){
+    const { json, url } = await tryManyUrls(CONFIG.API_URLS);
+    return { data: normalizeData(json), url };
+  }
 
-    function updateCountdown(lastUpdateText, isError = false) {
-      if (!nextRefreshTime) {
-        setStatus(`${lastUpdateText}　下次更新：--`, isError);
-        return;
-      }
+  throw new Error("未知的 DATA_MODE");
+}
 
-      const diffMs = Math.max(0, nextRefreshTime - Date.now());
-      const remainSeconds = Math.ceil(diffMs / 1000);
-      setStatus(`${lastUpdateText}　下次更新：${remainSeconds}秒後`, isError);
-    }
+/* =========================
+   渲染
+   ========================= */
+function renderCards(data){
+  const latest = data.rows[0] || { support:0, weight50:0, mid100:0, elec:0, fin:0, time:"--:--" };
+  const core = calcCore(latest);
+  const allAvg = Math.round((latest.support + latest.weight50 + latest.mid100 + latest.elec + latest.fin) / 5);
 
-    function startCountdown(lastUpdateText, isError = false) {
-      clearInterval(countdownIntervalId);
-      updateCountdown(lastUpdateText, isError);
+  el.summaryMain.textContent = signalText(allAvg);
+  el.summarySub.textContent = `操作建議：${suggestText(allAvg)}`;
 
-      countdownIntervalId = setInterval(() => {
-        updateCountdown(lastUpdateText, isError);
-      }, 1000);
-    }
+  el.coreMain.textContent = core.text;
+  el.coreSub.textContent = `權值 / 電子 / 金融：${core.avg} 分`;
 
-    function formatScore(score) {
-      if (score > 0) return `+${score}`;
-      return `${score}`;
-    }
+  el.supportMain.textContent = data.latest_support_structure || "--";
+  el.supportTime.textContent = `時間：${latest.time || "--:--"}`;
 
-    function setKpiClass(id, score) {
-      const el = document.getElementById(id);
-      el.className = "mini-kpi-value";
-      if (score > 0) el.classList.add("up");
-      else if (score < 0) el.classList.add("down");
-      else el.classList.add("flat");
-    }
+  el.sourceMain.textContent = `來源：${data.source}`;
+  el.indexMain.textContent = `${data.index_name}｜更新 ${data.last_update}`;
 
-    function upsertHistory(snapshot) {
-      const row = snapshot.row;
-      const scores = snapshot.metrics?.scores ?? {};
+  el.scoreSupport.innerHTML = scoreClassText(latest.support);
+  el.scoreWeight.innerHTML = scoreClassText(latest.weight50);
+  el.scoreMid.innerHTML = scoreClassText(latest.mid100);
+  el.scoreElec.innerHTML = scoreClassText(latest.elec);
+  el.scoreFin.innerHTML = scoreClassText(latest.fin);
+}
 
-      const item = {
-        time: row.time,
-        support: row.support,
-        weight50: row.weight50,
-        mid100: row.mid100,
-        electronic: row.electronic,
-        finance: row.finance,
-        supportScore: scores.support ?? 0,
-        weight50Score: scores.weight50 ?? 0,
-        mid100Score: scores.mid100 ?? 0,
-        electronicScore: scores.electronic ?? 0,
-        financeScore: scores.finance ?? 0,
-        totalScore: scores.total ?? 0,
-        fetchedAt: snapshot.fetchedAt
-      };
+function renderTable(rows){
+  if (!rows.length){
+    el.tableBody.innerHTML = `
+      <tr class="error-row">
+        <td colspan="6">沒有可顯示的資料</td>
+      </tr>
+    `;
+    return;
+  }
 
-      const last = historyRows[historyRows.length - 1];
-      if (last && last.time === item.time) {
-        historyRows[historyRows.length - 1] = item;
-      } else {
-        historyRows.push(item);
-      }
+  el.tableBody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.time}</td>
+      <td>${scoreClassText(r.support)}</td>
+      <td>${scoreClassText(r.weight50)}</td>
+      <td>${scoreClassText(r.mid100)}</td>
+      <td>${scoreClassText(r.elec)}</td>
+      <td>${scoreClassText(r.fin)}</td>
+    </tr>
+  `).join("");
+}
 
-      historyRows = historyRows.slice(-MAX_HISTORY);
-      saveHistory(historyRows);
-    }
+function clearCanvas(canvas){
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
 
-    function applySummary(snapshot) {
-      const summary = snapshot.summary || {};
-      const metrics = snapshot.metrics || {};
-      const scores = metrics.scores || {};
+function setupCanvasHiDPI(canvas){
+  const rect = canvas.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = Math.max(300, Math.floor(rect.width * ratio));
+  canvas.height = Math.max(180, Math.floor(rect.height * ratio));
+}
 
-      document.getElementById("marketSummary").textContent = summary.marketSummary ?? "無資料";
-      document.getElementById("marketAdvice").textContent = summary.marketAdvice ?? "操作建議：無資料";
-      document.getElementById("coreSummary").textContent = summary.coreSummary ?? "無資料";
-      document.getElementById("coreSub").textContent = summary.coreSub ?? "無資料";
-      document.getElementById("latestSupport").textContent = snapshot.row?.support ?? "--";
-      document.getElementById("latestTime").textContent = `時間：${snapshot.row?.time ?? "--"}`;
-      document.getElementById("leaderSector").textContent = metrics.index?.name ?? snapshot.source ?? "--";
-      document.getElementById("leaderReason").textContent =
-        `指數:${metrics.index?.price ?? "--"} / 漲跌幅:${metrics.index?.changePctText ?? "--"} / 來源:${snapshot.source ?? "--"}`;
+function drawAxes(ctx, w, h, left, top, right, bottom, yMax, yMin, yTitle, xLabels){
+  ctx.save();
+  ctx.strokeStyle = "rgba(143,179,232,.35)";
+  ctx.fillStyle = "#9cc0ef";
+  ctx.lineWidth = 1;
 
-      document.getElementById("scoreSupport").textContent = formatScore(scores.support ?? 0);
-      document.getElementById("scoreWeight50").textContent = formatScore(scores.weight50 ?? 0);
-      document.getElementById("scoreMid100").textContent = formatScore(scores.mid100 ?? 0);
-      document.getElementById("scoreElectronic").textContent = formatScore(scores.electronic ?? 0);
-      document.getElementById("scoreFinance").textContent = formatScore(scores.finance ?? 0);
+  // Y 軸
+  ctx.beginPath();
+  ctx.moveTo(left, top);
+  ctx.lineTo(left, h - bottom);
+  ctx.stroke();
 
-      setKpiClass("scoreSupport", scores.support ?? 0);
-      setKpiClass("scoreWeight50", scores.weight50 ?? 0);
-      setKpiClass("scoreMid100", scores.mid100 ?? 0);
-      setKpiClass("scoreElectronic", scores.electronic ?? 0);
-      setKpiClass("scoreFinance", scores.finance ?? 0);
-    }
+  // X 軸
+  ctx.beginPath();
+  ctx.moveTo(left, h - bottom);
+  ctx.lineTo(w - right, h - bottom);
+  ctx.stroke();
 
-    function resizeCanvas(canvas) {
-      const rect = canvas.getBoundingClientRect();
-      const ratio = window.devicePixelRatio || 1;
-      canvas.width = Math.floor(rect.width * ratio);
-      canvas.height = Math.floor(rect.height * ratio);
-      const ctx = canvas.getContext("2d");
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      return { ctx, width: rect.width, height: rect.height };
-    }
+  // Y 刻度
+  const steps = 5;
+  for(let i=0;i<=steps;i++){
+    const y = top + ((h - top - bottom) / steps) * i;
+    const value = Math.round(yMax - ((yMax - yMin) / steps) * i);
 
-    function drawAxes(ctx, width, height, top, right, bottom, left) {
-      ctx.strokeStyle = "rgba(180, 210, 255, 0.18)";
-      ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(143,179,232,.12)";
+    ctx.beginPath();
+    ctx.moveTo(left, y);
+    ctx.lineTo(w - right, y);
+    ctx.stroke();
 
-      ctx.beginPath();
-      ctx.moveTo(left, top);
-      ctx.lineTo(left, height - bottom);
-      ctx.lineTo(width - right, height - bottom);
-      ctx.stroke();
+    ctx.fillStyle = "#89a9d9";
+    ctx.font = "12px Segoe UI, Microsoft JhengHei";
+    ctx.textAlign = "right";
+    ctx.fillText(String(value), left - 8, y + 4);
+  }
 
-      const gridCount = 4;
-      for (let i = 0; i <= gridCount; i++) {
-        const y = top + ((height - top - bottom) / gridCount) * i;
-        ctx.beginPath();
-        ctx.moveTo(left, y);
-        ctx.lineTo(width - right, y);
-        ctx.strokeStyle = "rgba(180, 210, 255, 0.08)";
-        ctx.stroke();
-      }
-    }
+  // X labels
+  ctx.fillStyle = "#89a9d9";
+  ctx.font = "12px Segoe UI, Microsoft JhengHei";
+  ctx.textAlign = "center";
 
-    function drawBarChart(canvasId, data, options) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
+  const count = xLabels.length || 1;
+  const plotW = (w - left - right);
+  xLabels.forEach((lb, i)=>{
+    const x = left + plotW * ((i + 0.5) / count);
+    ctx.fillText(lb, x, h - bottom + 18);
+  });
 
-      const { ctx, width, height } = resizeCanvas(canvas);
-      ctx.clearRect(0, 0, width, height);
+  // Y title
+  ctx.save();
+  ctx.translate(18, h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = "#c7ddff";
+  ctx.font = "13px Segoe UI, Microsoft JhengHei";
+  ctx.textAlign = "center";
+  ctx.fillText(yTitle, 0, 0);
+  ctx.restore();
 
-      const padding = { top: 18, right: 18, bottom: 36, left: 36 };
-      drawAxes(ctx, width, height, padding.top, padding.right, padding.bottom, padding.left);
+  // X title
+  ctx.fillStyle = "#c7ddff";
+  ctx.font = "13px Segoe UI, Microsoft JhengHei";
+  ctx.textAlign = "center";
+  ctx.fillText("時間", (left + (w - right)) / 2, h - 6);
 
-      const plotWidth = width - padding.left - padding.right;
-      const plotHeight = height - padding.top - padding.bottom;
-      const zeroY = padding.top + plotHeight / 2;
-      const maxAbs = Math.max(2, options.maxAbs ?? 4);
+  ctx.restore();
+}
 
-      ctx.font = "12px Arial";
+function drawBars(canvas, labels, values, options = {}){
+  setupCanvasHiDPI(canvas);
+  const ctx = canvas.getContext("2d");
+  clearCanvas(canvas);
+
+  const w = canvas.width;
+  const h = canvas.height;
+  const left = 46;
+  const right = 14;
+  const top = 12;
+  const bottom = 34;
+
+  const maxVal = Math.max(...values, 100);
+  const minVal = Math.min(0, ...values);
+  drawAxes(ctx, w, h, left, top, right, bottom, maxVal, minVal, options.yTitle || "分數", labels);
+
+  const plotW = w - left - right;
+  const plotH = h - top - bottom;
+  const count = values.length || 1;
+  const groupW = plotW / count;
+  const barW = Math.min(42 * (window.devicePixelRatio || 1), groupW * 0.55);
+
+  values.forEach((v, i)=>{
+    const x = left + groupW * i + (groupW - barW) / 2;
+    const y0 = top + (maxVal / (maxVal - minVal)) * plotH;
+    const yv = top + ((maxVal - v) / (maxVal - minVal)) * plotH;
+    const barTop = Math.min(y0, yv);
+    const barH = Math.abs(yv - y0);
+
+    ctx.save();
+    ctx.fillStyle = v >= 0 ? "rgba(255,77,87,.9)" : "rgba(34,197,94,.9)";
+    roundRect(ctx, x, barTop, barW, Math.max(barH, 2), 6, true, false);
+
+    ctx.fillStyle = "#e8f1ff";
+    ctx.font = `${12 * (window.devicePixelRatio || 1)}px Segoe UI, Microsoft JhengHei`;
+    ctx.textAlign = "center";
+    ctx.fillText(String(v), x + barW/2, barTop - 6);
+    ctx.restore();
+  });
+}
+
+function drawDualBars(canvas, labels, seriesA, seriesB, nameA="電子", nameB="金融"){
+  setupCanvasHiDPI(canvas);
+  const ctx = canvas.getContext("2d");
+  clearCanvas(canvas);
+
+  const w = canvas.width;
+  const h = canvas.height;
+  const left = 46;
+  const right = 14;
+  const top = 12;
+  const bottom = 34;
+
+  const allValues = [...seriesA, ...seriesB];
+  const maxVal = Math.max(...allValues, 100);
+  const minVal = Math.min(0, ...allValues);
+  drawAxes(ctx, w, h, left, top, right, bottom, maxVal, minVal, "分數", labels);
+
+  const plotW = w - left - right;
+  const plotH = h - top - bottom;
+  const count = labels.length || 1;
+  const groupW = plotW / count;
+  const barW = Math.min(18 * (window.devicePixelRatio || 1), groupW * 0.24);
+
+  labels.forEach((lb, i)=>{
+    const centerX = left + groupW * (i + 0.5);
+
+    [
+      { v: seriesA[i], dx: -barW*0.7, color: "rgba(58,160,255,.95)" },
+      { v: seriesB[i], dx:  barW*0.7, color: "rgba(255,204,0,.95)" }
+    ].forEach(item=>{
+      const x = centerX + item.dx - barW/2;
+      const y0 = top + (maxVal / (maxVal - minVal)) * plotH;
+      const yv = top + ((maxVal - item.v) / (maxVal - minVal)) * plotH;
+      const barTop = Math.min(y0, yv);
+      const barH = Math.abs(yv - y0);
+
+      ctx.save();
+      ctx.fillStyle = item.color;
+      roundRect(ctx, x, barTop, barW, Math.max(barH, 2), 4, true, false);
+
+      ctx.fillStyle = "#dcecff";
+      ctx.font = `${11 * (window.devicePixelRatio || 1)}px Segoe UI, Microsoft JhengHei`;
       ctx.textAlign = "center";
-      ctx.textBaseline = "top";
-
-      const groupWidth = plotWidth / Math.max(data.length, 1);
-      const barWidth = Math.min(22, groupWidth * 0.24);
-
-      data.forEach((item, index) => {
-        const xCenter = padding.left + groupWidth * index + groupWidth / 2;
-
-        options.keys.forEach((key, keyIndex) => {
-          const value = Number(item[key] ?? 0);
-          const offset = (keyIndex - (options.keys.length - 1) / 2) * (barWidth + 6);
-          const x = xCenter + offset - barWidth / 2;
-          const barHeight = Math.abs(value / maxAbs) * (plotHeight / 2 - 6);
-          const y = value >= 0 ? zeroY - barHeight : zeroY;
-
-          ctx.fillStyle = options.colors[keyIndex % options.colors.length];
-          ctx.fillRect(x, y, barWidth, Math.max(2, barHeight));
-        });
-
-        ctx.fillStyle = "#cfe4ff";
-        ctx.fillText(item.label, xCenter, height - padding.bottom + 10);
-      });
-
-      ctx.strokeStyle = "rgba(255,255,255,0.22)";
-      ctx.beginPath();
-      ctx.moveTo(padding.left, zeroY);
-      ctx.lineTo(width - padding.right, zeroY);
-      ctx.stroke();
-
-      ctx.font = "11px Arial";
-      ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
-      const yMarks = [maxAbs, 0, -maxAbs];
-      yMarks.forEach(mark => {
-        const y = zeroY - (mark / maxAbs) * (plotHeight / 2);
-        ctx.fillStyle = "#9ecbff";
-        ctx.fillText(String(mark), padding.left - 6, y);
-      });
-
-      if (options.legend?.length) {
-        ctx.textAlign = "left";
-        ctx.textBaseline = "top";
-        let lx = padding.left;
-        const ly = 4;
-        options.legend.forEach((name, i) => {
-          ctx.fillStyle = options.colors[i % options.colors.length];
-          ctx.fillRect(lx, ly + 3, 10, 10);
-          ctx.fillStyle = "#d7e8ff";
-          ctx.fillText(name, lx + 15, ly);
-          lx += 72;
-        });
-      }
-    }
-
-    function renderCharts(rows) {
-      const chart1Data = rows.map(item => ({
-        label: item.time.slice(0, 5),
-        total: item.totalScore ?? 0
-      }));
-
-      drawBarChart("strengthChart", chart1Data, {
-        keys: ["total"],
-        colors: ["#ffbf00"],
-        legend: ["盤勢量能"],
-        maxAbs: 8
-      });
-
-      const chart2Data = rows.map(item => ({
-        label: item.time.slice(0, 5),
-        electronic: item.electronicScore ?? 0,
-        finance: item.financeScore ?? 0
-      }));
-
-      drawBarChart("sectorChart", chart2Data, {
-        keys: ["electronic", "finance"],
-        colors: ["#ff5b5b", "#39d98a"],
-        legend: ["電子", "金融"],
-        maxAbs: 4
-      });
-    }
-
-    async function updateSpotStructureTable() {
-      setStatus("更新中...　下次更新：--");
-      showLoading();
-
-      try {
-        const snapshot = await fetchSpotData();
-        upsertHistory(snapshot);
-
-        renderTable(historyRows);
-        applySummary(snapshot);
-        renderCharts(historyRows);
-
-        const now = new Date();
-        const lastUpdateText = `最後更新：${formatTime(now)}　更新成功`;
-
-        nextRefreshTime = Date.now() + REFRESH_SECONDS * 1000;
-        startCountdown(lastUpdateText, false);
-      } catch (error) {
-        console.error("updateSpotStructureTable error:", error);
-
-        if (historyRows.length > 0) {
-          renderTable(historyRows);
-          renderCharts(historyRows);
-        } else {
-          showError(`資料讀取失敗：${error.message}`);
-        }
-
-        const now = new Date();
-        const lastUpdateText = `最後更新：${formatTime(now)}　更新失敗：${error.message}`;
-        nextRefreshTime = Date.now() + REFRESH_SECONDS * 1000;
-        startCountdown(lastUpdateText, true);
-      }
-    }
-
-    function startAutoRefresh() {
-      clearInterval(refreshIntervalId);
-
-      if (historyRows.length > 0) {
-        renderTable(historyRows);
-        renderCharts(historyRows);
-      }
-
-      updateSpotStructureTable();
-
-      refreshIntervalId = setInterval(() => {
-        updateSpotStructureTable();
-      }, REFRESH_SECONDS * 1000);
-    }
-
-    window.addEventListener("resize", () => {
-      if (historyRows.length > 0) {
-        renderCharts(historyRows);
-      }
+      ctx.fillText(String(item.v), x + barW/2, barTop - 6);
+      ctx.restore();
     });
+  });
 
-    startAutoRefresh();
-  </script>
+  // legend
+  ctx.save();
+  ctx.font = `${12 * (window.devicePixelRatio || 1)}px Segoe UI, Microsoft JhengHei`;
+  ctx.textAlign = "left";
+
+  ctx.fillStyle = "rgba(58,160,255,.95)";
+  ctx.fillRect(left, top + 2, 14, 8);
+  ctx.fillStyle = "#cfe2ff";
+  ctx.fillText(nameA, left + 20, top + 10);
+
+  ctx.fillStyle = "rgba(255,204,0,.95)";
+  ctx.fillRect(left + 70, top + 2, 14, 8);
+  ctx.fillStyle = "#cfe2ff";
+  ctx.fillText(nameB, left + 90, top + 10);
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, w, h, r, fill, stroke){
+  if (w < 2 * r) r = w / 2;
+  if (h < 2 * r) r = h / 2;
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y,   x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x,   y+h, r);
+  ctx.arcTo(x,   y+h, x,   y,   r);
+  ctx.arcTo(x,   y,   x+w, y,   r);
+  ctx.closePath();
+  if (fill) ctx.fill();
+  if (stroke) ctx.stroke();
+}
+
+function renderCharts(rows){
+  const latestRows = rows.slice(0, 6).reverse();
+  const labels = latestRows.map(r => r.time);
+  const supportValues = latestRows.map(r => r.support);
+  const elecValues = latestRows.map(r => r.elec);
+  const finValues = latestRows.map(r => r.fin);
+
+  drawBars(powerChartCanvas, labels, supportValues, { yTitle: "支撐分數" });
+  drawDualBars(sectorChartCanvas, labels, elecValues, finValues, "電子", "金融");
+}
+
+/* =========================
+   失敗顯示
+   ========================= */
+function renderError(err){
+  const msg = err?.message || "未知錯誤";
+  const url = err?.url || "未取得";
+
+  el.summaryMain.textContent = "更新失敗";
+  el.summarySub.textContent = "操作建議：先修正資料路徑";
+  el.coreMain.textContent = "讀取失敗";
+  el.coreSub.textContent = "請檢查 API / JSON 路徑";
+  el.supportMain.textContent = "--";
+  el.supportTime.textContent = "時間：--";
+  el.sourceMain.textContent = "來源：失敗";
+  el.indexMain.textContent = msg;
+  el.debugUrl.textContent = `失敗 URL：${url}`;
+
+  el.scoreSupport.textContent = "--";
+  el.scoreWeight.textContent = "--";
+  el.scoreMid.textContent = "--";
+  el.scoreElec.textContent = "--";
+  el.scoreFin.textContent = "--";
+
+  el.tableBody.innerHTML = `
+    <tr class="error-row">
+      <td colspan="6">資料讀取失敗：${msg}</td>
+    </tr>
+  `;
+
+  setupCanvasHiDPI(powerChartCanvas);
+  setupCanvasHiDPI(sectorChartCanvas);
+  clearCanvas(powerChartCanvas);
+  clearCanvas(sectorChartCanvas);
+}
+
+/* =========================
+   主流程
+   ========================= */
+async function refreshData(){
+  const start = new Date();
+  try{
+    setStatus(false, "更新中...");
+    const { data, url } = await loadData();
+
+    historyRows = data.rows;
+    renderCards(data);
+    renderTable(data.rows);
+    renderCharts(data.rows);
+
+    const sec = Math.floor(CONFIG.AUTO_REFRESH_MS / 1000);
+    el.debugUrl.textContent = `成功 URL：${url}`;
+    setStatus(true, `最後更新：${data.last_update}　下次更新：${sec}秒後`);
+  }catch(err){
+    console.error("refreshData failed:", err);
+    renderError(err);
+
+    const sec = Math.floor(CONFIG.AUTO_REFRESH_MS / 1000);
+    setStatus(false, `更新失敗：${err.message}　下次更新：${sec}秒後`);
+  }finally{
+    const end = new Date();
+    // 可留著 debug
+    // console.log("refresh cost ms =", end - start);
+  }
+}
+
+function startAutoRefresh(){
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(refreshData, CONFIG.AUTO_REFRESH_MS);
+}
+
+window.addEventListener("resize", () => {
+  if (historyRows.length){
+    renderCharts(historyRows);
+  }
+});
+
+(async function init(){
+  await refreshData();
+  startAutoRefresh();
+})();
+</script>
 </body>
 </html>
