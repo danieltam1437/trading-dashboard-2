@@ -3,17 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>現貨結構時間表</title>
+  <title>現貨結構時間表｜自動抓資料版</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #000000;
       --panel: #041126;
-      --panel-2: #071a39;
-      --line: rgba(110, 150, 220, 0.18);
       --line-soft: rgba(110, 150, 220, 0.08);
       --gold: #ffbf00;
       --text: #eaf4ff;
@@ -23,7 +19,6 @@
       --up: #ff5b5b;
       --down: #39d98a;
       --flat: #d7e8ff;
-      --panel-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
     }
 
     body {
@@ -45,7 +40,7 @@
       background: linear-gradient(180deg, rgba(5, 15, 40, 0.96) 0%, rgba(1, 8, 24, 0.98) 100%);
       box-shadow:
         0 0 0 1px rgba(60, 90, 140, 0.18) inset,
-        var(--panel-shadow);
+        0 12px 30px rgba(0, 0, 0, 0.35);
       overflow: hidden;
     }
 
@@ -122,6 +117,7 @@
       font-size: 13px;
       color: #c8dbff;
       line-height: 1.5;
+      word-break: break-word;
     }
 
     .summary-main {
@@ -138,6 +134,30 @@
       background: rgba(255, 191, 0, 0.12);
       color: var(--gold);
       border: 1px solid rgba(255, 191, 0, 0.25);
+    }
+
+    .mini-kpis {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .mini-kpi {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(10, 24, 58, 0.5);
+      border: 1px solid rgba(100, 140, 200, 0.16);
+    }
+
+    .mini-kpi-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .mini-kpi-value {
+      font-size: 18px;
+      font-weight: 800;
     }
 
     .chart-grid {
@@ -211,17 +231,9 @@
       background: rgba(30, 60, 110, 0.15);
     }
 
-    .muted {
-      color: var(--muted);
-    }
-
-    .error-text {
-      color: var(--danger);
-    }
-
-    .warn-text {
-      color: var(--warn);
-    }
+    .muted { color: var(--muted); }
+    .error-text { color: var(--danger); }
+    .warn-text { color: var(--warn); }
 
     .up {
       color: var(--up);
@@ -238,30 +250,6 @@
       font-weight: 800;
     }
 
-    .mini-kpis {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .mini-kpi {
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: rgba(10, 24, 58, 0.5);
-      border: 1px solid rgba(100, 140, 200, 0.16);
-    }
-
-    .mini-kpi-label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .mini-kpi-value {
-      font-size: 18px;
-      font-weight: 800;
-    }
-
     @media (max-width: 1200px) {
       .summary-grid {
         grid-template-columns: 1fr 1fr;
@@ -269,6 +257,10 @@
 
       .chart-grid {
         grid-template-columns: 1fr;
+      }
+
+      .mini-kpis {
+        grid-template-columns: repeat(3, 1fr);
       }
     }
 
@@ -302,7 +294,7 @@
   <div class="wrap">
     <div class="panel">
       <div class="panel-header">
-        <h1 class="title">現貨結構時間表</h1>
+        <h1 class="title">現貨結構時間表｜自動抓資料版</h1>
 
         <div class="status">
           <span class="dot"></span>
@@ -331,16 +323,24 @@
           </div>
 
           <div class="card">
-            <div class="card-title">族群主導</div>
+            <div class="card-title">資料來源 / 指數</div>
             <div class="card-value" id="leaderSector">--</div>
-            <div class="card-sub" id="leaderReason">電子 / 金融 / 權值</div>
+            <div class="card-sub" id="leaderReason">--</div>
           </div>
         </div>
 
         <div class="mini-kpis">
           <div class="mini-kpi">
+            <div class="mini-kpi-label">支撐 分數</div>
+            <div class="mini-kpi-value" id="scoreSupport">--</div>
+          </div>
+          <div class="mini-kpi">
             <div class="mini-kpi-label">權值50 分數</div>
             <div class="mini-kpi-value" id="scoreWeight50">--</div>
+          </div>
+          <div class="mini-kpi">
+            <div class="mini-kpi-label">中型100 分數</div>
+            <div class="mini-kpi-value" id="scoreMid100">--</div>
           </div>
           <div class="mini-kpi">
             <div class="mini-kpi-label">電子 分數</div>
@@ -396,9 +396,13 @@
     const tbodyEl = document.getElementById("spotTimeTableBody");
 
     const REFRESH_SECONDS = 30;
+    const HISTORY_KEY = "spotStructureHistoryV2";
+    const MAX_HISTORY = 24;
+
     let refreshIntervalId = null;
     let countdownIntervalId = null;
     let nextRefreshTime = null;
+    let historyRows = loadHistory();
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -407,6 +411,21 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+    }
+
+    function loadHistory() {
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveHistory(rows) {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(rows.slice(-MAX_HISTORY)));
     }
 
     function formatTime(date) {
@@ -419,6 +438,7 @@
     }
 
     function showLoading() {
+      if (historyRows.length > 0) return;
       tbodyEl.innerHTML = `
         <tr>
           <td colspan="6" class="muted" style="padding:28px;">載入中...</td>
@@ -427,6 +447,7 @@
     }
 
     function showError(message) {
+      if (historyRows.length > 0) return;
       tbodyEl.innerHTML = `
         <tr>
           <td colspan="6" class="error-text" style="padding:28px;">${escapeHtml(message)}</td>
@@ -440,21 +461,6 @@
           <td colspan="6" class="warn-text" style="padding:28px;">沒有可顯示的資料</td>
         </tr>
       `;
-    }
-
-    function normalizeRows(raw) {
-      if (Array.isArray(raw)) return raw;
-      if (Array.isArray(raw?.data)) return raw.data;
-      if (Array.isArray(raw?.rows)) return raw.rows;
-      if (Array.isArray(raw?.result)) return raw.result;
-      return [];
-    }
-
-    function getTrendClass(value) {
-      const score = scoreText(value);
-      if (score > 0) return "up";
-      if (score < 0) return "down";
-      return "flat";
     }
 
     function scoreText(value) {
@@ -474,19 +480,26 @@
       return 0;
     }
 
+    function getTrendClass(value) {
+      const score = scoreText(value);
+      if (score > 0) return "up";
+      if (score < 0) return "down";
+      return "flat";
+    }
+
     function renderTable(rows) {
       if (!Array.isArray(rows) || rows.length === 0) {
         showNoData();
         return;
       }
 
-      tbodyEl.innerHTML = rows.map((row) => {
-        const time = escapeHtml(row.time ?? row.時間 ?? "--");
-        const support = escapeHtml(row.support ?? row.支撐 ?? "--");
-        const weight50 = escapeHtml(row.weight50 ?? row.權值50 ?? "--");
-        const mid100 = escapeHtml(row.mid100 ?? row.中型100 ?? "--");
-        const electronic = escapeHtml(row.electronic ?? row.電子 ?? "--");
-        const finance = escapeHtml(row.finance ?? row.金融 ?? "--");
+      tbodyEl.innerHTML = rows.slice().reverse().map((row) => {
+        const time = escapeHtml(row.time ?? "--");
+        const support = escapeHtml(row.support ?? "--");
+        const weight50 = escapeHtml(row.weight50 ?? "--");
+        const mid100 = escapeHtml(row.mid100 ?? "--");
+        const electronic = escapeHtml(row.electronic ?? "--");
+        const finance = escapeHtml(row.finance ?? "--");
 
         return `
           <tr>
@@ -502,7 +515,7 @@
     }
 
     async function fetchSpotData() {
-      const url = `./data/spot_structure_time.json?t=${Date.now()}`;
+      const url = `/api/spot-structure?t=${Date.now()}`;
       const response = await fetch(url, {
         method: "GET",
         cache: "no-store"
@@ -535,107 +548,6 @@
       }, 1000);
     }
 
-    function sumScores(row) {
-      return (
-        scoreText(row.support) +
-        scoreText(row.weight50) +
-        scoreText(row.mid100) +
-        scoreText(row.electronic) +
-        scoreText(row.finance)
-      );
-    }
-
-    function getLatestRow(rows) {
-      return rows[rows.length - 1] || null;
-    }
-
-    function summarizeMarket(rows) {
-      const latest = getLatestRow(rows);
-      if (!latest) {
-        return {
-          summary: "無資料",
-          advice: "操作建議：無資料",
-          core: "無資料",
-          coreSub: "權值 / 電子 / 金融",
-          support: "--",
-          latestTime: "--",
-          leader: "--",
-          leaderReason: "無資料",
-          scores: {
-            weight50: 0,
-            electronic: 0,
-            finance: 0
-          }
-        };
-      }
-
-      const weight50Score = scoreText(latest.weight50);
-      const electronicScore = scoreText(latest.electronic);
-      const financeScore = scoreText(latest.finance);
-      const supportScore = scoreText(latest.support);
-      const mid100Score = scoreText(latest.mid100);
-
-      const total = weight50Score + electronicScore + financeScore + supportScore + mid100Score;
-
-      let summary = "⚖️ 震盪盤";
-      let advice = "操作建議：先觀望，等方向更清楚";
-      if (total >= 3) {
-        summary = "🔥 偏多盤";
-        advice = "操作建議：偏多思考，拉回再找買點";
-      } else if (total <= -3) {
-        summary = "❄️ 偏空盤";
-        advice = "操作建議：偏空思考，反彈再看壓力";
-      }
-
-      let core = "三核心中性";
-      const threeCoreTotal = weight50Score + electronicScore + financeScore;
-      if (threeCoreTotal >= 2) core = "三核心偏多";
-      else if (threeCoreTotal <= -2) core = "三核心偏空";
-
-      const sectors = [
-        { name: "權值50", score: weight50Score, text: latest.weight50 ?? "--" },
-        { name: "電子", score: electronicScore, text: latest.electronic ?? "--" },
-        { name: "金融", score: financeScore, text: latest.finance ?? "--" }
-      ].sort((a, b) => Math.abs(b.score) - Math.abs(a.score));
-
-      const leader = sectors[0]?.name ?? "--";
-      const leaderReason = `${leader}主導：${sectors[0]?.text ?? "--"}`;
-
-      return {
-        summary,
-        advice,
-        core,
-        coreSub: `權值:${latest.weight50 ?? "--"} / 電子:${latest.electronic ?? "--"} / 金融:${latest.finance ?? "--"}`,
-        support: latest.support ?? "--",
-        latestTime: latest.time ?? "--",
-        leader,
-        leaderReason,
-        scores: {
-          weight50: weight50Score,
-          electronic: electronicScore,
-          finance: financeScore
-        }
-      };
-    }
-
-    function applySummary(summaryData) {
-      document.getElementById("marketSummary").textContent = summaryData.summary;
-      document.getElementById("marketAdvice").textContent = summaryData.advice;
-      document.getElementById("coreSummary").textContent = summaryData.core;
-      document.getElementById("coreSub").textContent = summaryData.coreSub;
-      document.getElementById("latestSupport").textContent = summaryData.support;
-      document.getElementById("latestTime").textContent = `時間：${summaryData.latestTime}`;
-      document.getElementById("leaderSector").textContent = summaryData.leader;
-      document.getElementById("leaderReason").textContent = summaryData.leaderReason;
-      document.getElementById("scoreWeight50").textContent = formatScore(summaryData.scores.weight50);
-      document.getElementById("scoreElectronic").textContent = formatScore(summaryData.scores.electronic);
-      document.getElementById("scoreFinance").textContent = formatScore(summaryData.scores.finance);
-
-      setKpiClass("scoreWeight50", summaryData.scores.weight50);
-      setKpiClass("scoreElectronic", summaryData.scores.electronic);
-      setKpiClass("scoreFinance", summaryData.scores.finance);
-    }
-
     function formatScore(score) {
       if (score > 0) return `+${score}`;
       return `${score}`;
@@ -649,14 +561,63 @@
       else el.classList.add("flat");
     }
 
-    function getStrengthSeries(rows) {
-      return rows.map(row => ({
-        time: row.time ?? "--",
-        total: sumScores(row),
-        electronic: scoreText(row.electronic),
-        finance: scoreText(row.finance),
-        weight50: scoreText(row.weight50)
-      }));
+    function upsertHistory(snapshot) {
+      const row = snapshot.row;
+      const scores = snapshot.metrics?.scores ?? {};
+
+      const item = {
+        time: row.time,
+        support: row.support,
+        weight50: row.weight50,
+        mid100: row.mid100,
+        electronic: row.electronic,
+        finance: row.finance,
+        supportScore: scores.support ?? 0,
+        weight50Score: scores.weight50 ?? 0,
+        mid100Score: scores.mid100 ?? 0,
+        electronicScore: scores.electronic ?? 0,
+        financeScore: scores.finance ?? 0,
+        totalScore: scores.total ?? 0,
+        fetchedAt: snapshot.fetchedAt
+      };
+
+      const last = historyRows[historyRows.length - 1];
+      if (last && last.time === item.time) {
+        historyRows[historyRows.length - 1] = item;
+      } else {
+        historyRows.push(item);
+      }
+
+      historyRows = historyRows.slice(-MAX_HISTORY);
+      saveHistory(historyRows);
+    }
+
+    function applySummary(snapshot) {
+      const summary = snapshot.summary || {};
+      const metrics = snapshot.metrics || {};
+      const scores = metrics.scores || {};
+
+      document.getElementById("marketSummary").textContent = summary.marketSummary ?? "無資料";
+      document.getElementById("marketAdvice").textContent = summary.marketAdvice ?? "操作建議：無資料";
+      document.getElementById("coreSummary").textContent = summary.coreSummary ?? "無資料";
+      document.getElementById("coreSub").textContent = summary.coreSub ?? "無資料";
+      document.getElementById("latestSupport").textContent = snapshot.row?.support ?? "--";
+      document.getElementById("latestTime").textContent = `時間：${snapshot.row?.time ?? "--"}`;
+      document.getElementById("leaderSector").textContent = metrics.index?.name ?? snapshot.source ?? "--";
+      document.getElementById("leaderReason").textContent =
+        `指數:${metrics.index?.price ?? "--"} / 漲跌幅:${metrics.index?.changePctText ?? "--"} / 來源:${snapshot.source ?? "--"}`;
+
+      document.getElementById("scoreSupport").textContent = formatScore(scores.support ?? 0);
+      document.getElementById("scoreWeight50").textContent = formatScore(scores.weight50 ?? 0);
+      document.getElementById("scoreMid100").textContent = formatScore(scores.mid100 ?? 0);
+      document.getElementById("scoreElectronic").textContent = formatScore(scores.electronic ?? 0);
+      document.getElementById("scoreFinance").textContent = formatScore(scores.finance ?? 0);
+
+      setKpiClass("scoreSupport", scores.support ?? 0);
+      setKpiClass("scoreWeight50", scores.weight50 ?? 0);
+      setKpiClass("scoreMid100", scores.mid100 ?? 0);
+      setKpiClass("scoreElectronic", scores.electronic ?? 0);
+      setKpiClass("scoreFinance", scores.finance ?? 0);
     }
 
     function resizeCanvas(canvas) {
@@ -710,7 +671,7 @@
       ctx.textBaseline = "top";
 
       const groupWidth = plotWidth / Math.max(data.length, 1);
-      const barWidth = Math.min(24, groupWidth * 0.28);
+      const barWidth = Math.min(22, groupWidth * 0.24);
 
       data.forEach((item, index) => {
         const xCenter = padding.left + groupWidth * index + groupWidth / 2;
@@ -762,31 +723,29 @@
     }
 
     function renderCharts(rows) {
-      const series = getStrengthSeries(rows);
-
-      const chart1Data = series.map(item => ({
-        label: item.time,
-        total: item.total
+      const chart1Data = rows.map(item => ({
+        label: item.time.slice(0, 5),
+        total: item.totalScore ?? 0
       }));
 
       drawBarChart("strengthChart", chart1Data, {
         keys: ["total"],
         colors: ["#ffbf00"],
         legend: ["盤勢量能"],
-        maxAbs: 6
+        maxAbs: 8
       });
 
-      const chart2Data = series.map(item => ({
-        label: item.time,
-        electronic: item.electronic,
-        finance: item.finance
+      const chart2Data = rows.map(item => ({
+        label: item.time.slice(0, 5),
+        electronic: item.electronicScore ?? 0,
+        finance: item.financeScore ?? 0
       }));
 
       drawBarChart("sectorChart", chart2Data, {
         keys: ["electronic", "finance"],
         colors: ["#ff5b5b", "#39d98a"],
         legend: ["電子", "金融"],
-        maxAbs: 3
+        maxAbs: 4
       });
     }
 
@@ -795,14 +754,12 @@
       showLoading();
 
       try {
-        const raw = await fetchSpotData();
-        const rows = normalizeRows(raw);
+        const snapshot = await fetchSpotData();
+        upsertHistory(snapshot);
 
-        renderTable(rows);
-
-        const summaryData = summarizeMarket(rows);
-        applySummary(summaryData);
-        renderCharts(rows);
+        renderTable(historyRows);
+        applySummary(snapshot);
+        renderCharts(historyRows);
 
         const now = new Date();
         const lastUpdateText = `最後更新：${formatTime(now)}　更新成功`;
@@ -812,10 +769,15 @@
       } catch (error) {
         console.error("updateSpotStructureTable error:", error);
 
+        if (historyRows.length > 0) {
+          renderTable(historyRows);
+          renderCharts(historyRows);
+        } else {
+          showError(`資料讀取失敗：${error.message}`);
+        }
+
         const now = new Date();
         const lastUpdateText = `最後更新：${formatTime(now)}　更新失敗：${error.message}`;
-
-        showError(`資料讀取失敗：${error.message}`);
         nextRefreshTime = Date.now() + REFRESH_SECONDS * 1000;
         startCountdown(lastUpdateText, true);
       }
@@ -823,6 +785,12 @@
 
     function startAutoRefresh() {
       clearInterval(refreshIntervalId);
+
+      if (historyRows.length > 0) {
+        renderTable(historyRows);
+        renderCharts(historyRows);
+      }
+
       updateSpotStructureTable();
 
       refreshIntervalId = setInterval(() => {
@@ -831,10 +799,9 @@
     }
 
     window.addEventListener("resize", () => {
-      fetchSpotData()
-        .then(normalizeRows)
-        .then(renderCharts)
-        .catch(() => {});
+      if (historyRows.length > 0) {
+        renderCharts(historyRows);
+      }
     });
 
     startAutoRefresh();
