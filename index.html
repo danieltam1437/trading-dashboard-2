@@ -9,9 +9,25 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --bg: #000000;
+      --panel: #041126;
+      --panel-2: #071a39;
+      --line: rgba(110, 150, 220, 0.18);
+      --line-soft: rgba(110, 150, 220, 0.08);
+      --gold: #ffbf00;
+      --text: #eaf4ff;
+      --muted: #9ecbff;
+      --danger: #ff5b5b;
+      --warn: #ffd166;
+      --up: #ff6b6b;
+      --down: #4cd97b;
+      --flat: #d7e8ff;
+    }
+
     body {
       margin: 0;
-      background: #000;
+      background: var(--bg);
       color: #fff;
       font-family: Arial, "Microsoft JhengHei", sans-serif;
     }
@@ -46,7 +62,7 @@
       margin: 0;
       font-size: 22px;
       font-weight: 800;
-      color: #ffbf00;
+      color: var(--gold);
       letter-spacing: 1px;
     }
 
@@ -63,8 +79,8 @@
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: #ff5b5b;
-      box-shadow: 0 0 10px rgba(255, 91, 91, 0.8);
+      background: var(--danger);
+      box-shadow: 0 0 10px rgba(255, 91, 91, 0.85);
       flex-shrink: 0;
     }
 
@@ -88,7 +104,7 @@
 
     thead th {
       background: linear-gradient(180deg, rgba(10, 24, 58, 0.95), rgba(8, 18, 42, 0.95));
-      color: #ffbf00;
+      color: var(--gold);
       font-size: 18px;
       font-weight: 800;
       padding: 14px 10px;
@@ -99,9 +115,9 @@
     tbody td {
       padding: 14px 10px;
       text-align: center;
-      color: #eaf4ff;
+      color: var(--text);
       font-size: 16px;
-      border-bottom: 1px solid rgba(120, 160, 220, 0.08);
+      border-bottom: 1px solid var(--line-soft);
     }
 
     tbody tr:hover {
@@ -109,29 +125,29 @@
     }
 
     .muted {
-      color: #9ecbff;
+      color: var(--muted);
     }
 
     .error-text {
-      color: #ff6b6b;
+      color: var(--danger);
     }
 
     .warn-text {
-      color: #ffd166;
+      color: var(--warn);
     }
 
     .up {
-      color: #ff6b6b;
+      color: var(--up);
       font-weight: 700;
     }
 
     .down {
-      color: #4cd97b;
+      color: var(--down);
       font-weight: 700;
     }
 
     .flat {
-      color: #d7e8ff;
+      color: var(--flat);
       font-weight: 700;
     }
 
@@ -179,7 +195,7 @@
             </thead>
             <tbody id="spotTimeTableBody">
               <tr>
-                <td colspan="6" class="muted" style="padding: 28px;">載入中...</td>
+                <td colspan="6" class="muted" style="padding:28px;">載入中...</td>
               </tr>
             </tbody>
           </table>
@@ -193,8 +209,8 @@
     const tbodyEl = document.getElementById("spotTimeTableBody");
 
     const REFRESH_SECONDS = 30;
-    let nextRefreshTimer = null;
-    let countdownTimer = null;
+    let refreshIntervalId = null;
+    let countdownIntervalId = null;
     let nextRefreshTime = null;
 
     function escapeHtml(value) {
@@ -204,19 +220,6 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
-    }
-
-    function getTrendClass(value) {
-      const text = String(value ?? "").trim();
-
-      const upKeywords = ["偏多", "轉強", "續強", "多方", "上攻", "走強", "強", "紅"];
-      const downKeywords = ["偏空", "轉弱", "續弱", "空方", "走弱", "下殺", "弱", "綠"];
-      const flatKeywords = ["中性", "震盪", "盤整", "持平", "--", "無"];
-
-      if (upKeywords.some(k => text.includes(k))) return "up";
-      if (downKeywords.some(k => text.includes(k))) return "down";
-      if (flatKeywords.some(k => text.includes(k))) return "flat";
-      return "";
     }
 
     function formatTime(date) {
@@ -231,7 +234,7 @@
     function showLoading() {
       tbodyEl.innerHTML = `
         <tr>
-          <td colspan="6" class="muted" style="padding: 28px;">載入中...</td>
+          <td colspan="6" class="muted" style="padding:28px;">載入中...</td>
         </tr>
       `;
     }
@@ -239,7 +242,7 @@
     function showError(message) {
       tbodyEl.innerHTML = `
         <tr>
-          <td colspan="6" class="error-text" style="padding: 28px;">${escapeHtml(message)}</td>
+          <td colspan="6" class="error-text" style="padding:28px;">${escapeHtml(message)}</td>
         </tr>
       `;
     }
@@ -247,7 +250,7 @@
     function showNoData() {
       tbodyEl.innerHTML = `
         <tr>
-          <td colspan="6" class="warn-text" style="padding: 28px;">沒有可顯示的資料</td>
+          <td colspan="6" class="warn-text" style="padding:28px;">沒有可顯示的資料</td>
         </tr>
       `;
     }
@@ -260,13 +263,26 @@
       return [];
     }
 
+    function getTrendClass(value) {
+      const text = String(value ?? "").trim();
+
+      const upKeywords = ["偏多", "轉強", "續強", "多方", "上攻", "走強", "強", "紅"];
+      const downKeywords = ["偏空", "轉弱", "續弱", "空方", "下殺", "走弱", "弱", "綠"];
+      const flatKeywords = ["中性", "震盪", "盤整", "持平", "--", "無"];
+
+      if (upKeywords.some(keyword => text.includes(keyword))) return "up";
+      if (downKeywords.some(keyword => text.includes(keyword))) return "down";
+      if (flatKeywords.some(keyword => text.includes(keyword))) return "flat";
+      return "";
+    }
+
     function renderTable(rows) {
       if (!Array.isArray(rows) || rows.length === 0) {
         showNoData();
         return;
       }
 
-      tbodyEl.innerHTML = rows.map(row => {
+      tbodyEl.innerHTML = rows.map((row) => {
         const time = escapeHtml(row.time ?? row.時間 ?? "--");
         const support = escapeHtml(row.support ?? row.支撐 ?? "--");
         const weight50 = escapeHtml(row.weight50 ?? row.權值50 ?? "--");
@@ -301,30 +317,28 @@
       return await response.json();
     }
 
-    function updateCountdownText(lastUpdateText, isError = false) {
+    function updateCountdown(lastUpdateText, isError = false) {
       if (!nextRefreshTime) {
         setStatus(`${lastUpdateText}　下次更新：--`, isError);
         return;
       }
 
       const diffMs = Math.max(0, nextRefreshTime - Date.now());
-      const secondsLeft = Math.ceil(diffMs / 1000);
-
-      setStatus(`${lastUpdateText}　下次更新：${secondsLeft}秒後`, isError);
+      const remainSeconds = Math.ceil(diffMs / 1000);
+      setStatus(`${lastUpdateText}　下次更新：${remainSeconds}秒後`, isError);
     }
 
     function startCountdown(lastUpdateText, isError = false) {
-      clearInterval(countdownTimer);
-      updateCountdownText(lastUpdateText, isError);
+      clearInterval(countdownIntervalId);
+      updateCountdown(lastUpdateText, isError);
 
-      countdownTimer = setInterval(() => {
-        updateCountdownText(lastUpdateText, isError);
+      countdownIntervalId = setInterval(() => {
+        updateCountdown(lastUpdateText, isError);
       }, 1000);
     }
 
     async function updateSpotStructureTable() {
-      const loadingText = "更新中...";
-      setStatus(`${loadingText}　下次更新：--`);
+      setStatus("更新中...　下次更新：--");
       showLoading();
 
       try {
@@ -350,10 +364,10 @@
     }
 
     function startAutoRefresh() {
-      clearInterval(nextRefreshTimer);
+      clearInterval(refreshIntervalId);
       updateSpotStructureTable();
 
-      nextRefreshTimer = setInterval(() => {
+      refreshIntervalId = setInterval(() => {
         updateSpotStructureTable();
       }, REFRESH_SECONDS * 1000);
     }
