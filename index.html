@@ -18,19 +18,23 @@
       --blue:#3aa0ff;
       --cyan:#21d4fd;
     }
-    *{box-sizing:border-box}
+
+    *{ box-sizing:border-box; }
+
     body{
       margin:0;
-      font-family: "Segoe UI","Microsoft JhengHei",Arial,sans-serif;
+      font-family:"Segoe UI","Microsoft JhengHei",Arial,sans-serif;
       background:#000;
       color:var(--text);
     }
+
     .wrap{
       width:100%;
       min-height:100vh;
       padding:8px;
       background:linear-gradient(180deg,#000 0%, #010714 100%);
     }
+
     .board{
       border:1px solid var(--line);
       border-radius:18px;
@@ -38,6 +42,7 @@
       background:var(--bg);
       box-shadow:0 0 0 1px rgba(58,160,255,.08) inset, 0 0 30px rgba(0,0,0,.35);
     }
+
     .topbar{
       display:flex;
       justify-content:space-between;
@@ -45,12 +50,14 @@
       gap:16px;
       margin-bottom:10px;
     }
+
     .title{
       color:var(--yellow);
       font-weight:900;
       font-size:18px;
       letter-spacing:1px;
     }
+
     .status-right{
       text-align:right;
       font-size:13px;
@@ -58,15 +65,22 @@
       color:#ff8f8f;
       white-space:nowrap;
     }
-    .status-right.ok{ color:#85ffb0; }
+
+    .status-right.ok{
+      color:#85ffb0;
+    }
+
     .dot{
       display:inline-block;
-      width:10px;height:10px;border-radius:50%;
+      width:10px;
+      height:10px;
+      border-radius:50%;
       background:var(--red);
       margin-right:8px;
       vertical-align:middle;
       box-shadow:0 0 10px rgba(255,77,87,.7);
     }
+
     .status-right.ok .dot{
       background:var(--green);
       box-shadow:0 0 10px rgba(34,197,94,.7);
@@ -74,19 +88,21 @@
 
     .grid-top{
       display:grid;
-      grid-template-columns: 1.25fr .95fr .95fr 1fr;
+      grid-template-columns:1.25fr .95fr .95fr 1fr;
       gap:10px;
       margin-bottom:10px;
     }
+
     .grid-mid{
       display:grid;
-      grid-template-columns: repeat(5,1fr);
+      grid-template-columns:repeat(5,1fr);
       gap:10px;
       margin-bottom:12px;
     }
+
     .grid-chart{
       display:grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns:1fr 1fr;
       gap:10px;
       margin-bottom:10px;
     }
@@ -100,12 +116,14 @@
       position:relative;
       overflow:hidden;
     }
+
     .card h3{
       margin:0 0 8px;
       font-size:13px;
       color:#d7e7ff;
       font-weight:700;
     }
+
     .card .label-yellow{
       display:inline-block;
       color:var(--yellow);
@@ -113,12 +131,14 @@
       font-weight:900;
       margin-bottom:10px;
     }
+
     .big{
       font-size:18px;
       font-weight:900;
       color:#fff;
       margin-bottom:6px;
     }
+
     .sub{
       font-size:13px;
       color:#bcd2f6;
@@ -131,12 +151,14 @@
       padding:12px 12px 18px;
       min-height:270px;
     }
+
     .chart-title{
       color:var(--yellow);
       font-weight:900;
       font-size:14px;
       margin-bottom:10px;
     }
+
     .chart-box{
       height:210px;
       border-radius:12px;
@@ -145,6 +167,7 @@
       padding:8px;
       position:relative;
     }
+
     canvas{
       width:100%;
       height:100%;
@@ -158,11 +181,13 @@
       overflow:hidden;
       margin-top:8px;
     }
+
     table{
       width:100%;
       border-collapse:collapse;
       table-layout:fixed;
     }
+
     thead th{
       background:#061a3a;
       color:var(--yellow);
@@ -170,6 +195,7 @@
       font-size:16px;
       border-bottom:1px solid rgba(17,56,110,.8);
     }
+
     tbody td{
       text-align:center;
       padding:16px 8px;
@@ -177,7 +203,10 @@
       color:#d9e8ff;
       font-size:15px;
     }
-    tbody tr:last-child td{ border-bottom:none; }
+
+    tbody tr:last-child td{
+      border-bottom:none;
+    }
 
     .error-row td{
       color:var(--red);
@@ -192,6 +221,7 @@
       font-size:12px;
       color:var(--muted);
     }
+
     .mini-note{
       margin-top:6px;
       font-size:12px;
@@ -199,15 +229,24 @@
       word-break:break-all;
     }
 
-    @media (max-width: 1200px){
+    @media (max-width:1200px){
       .grid-top{ grid-template-columns:1fr 1fr; }
-      .grid-mid{ grid-template-columns: repeat(2,1fr); }
+      .grid-mid{ grid-template-columns:repeat(2,1fr); }
       .grid-chart{ grid-template-columns:1fr; }
     }
-    @media (max-width: 768px){
-      .topbar{ flex-direction:column; align-items:flex-start; }
-      .grid-top, .grid-mid{ grid-template-columns:1fr; }
-      thead th, tbody td{ font-size:13px; padding:10px 6px; }
+
+    @media (max-width:768px){
+      .topbar{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+      .grid-top, .grid-mid{
+        grid-template-columns:1fr;
+      }
+      thead th, tbody td{
+        font-size:13px;
+        padding:10px 6px;
+      }
     }
   </style>
 </head>
@@ -228,16 +267,19 @@
         <div class="big" id="summaryMain">讀取中...</div>
         <div class="sub" id="summarySub">操作建議：讀取中...</div>
       </div>
+
       <div class="card">
         <h3>三核心判斷</h3>
         <div class="big" id="coreMain">讀取中...</div>
         <div class="sub" id="coreSub">權值 / 電子 / 金融</div>
       </div>
+
       <div class="card">
         <h3>最新支撐結構</h3>
         <div class="big" id="supportMain">--</div>
         <div class="sub" id="supportTime">時間：--</div>
       </div>
+
       <div class="card">
         <h3>資料來源 / 指數</h3>
         <div class="big" id="sourceMain">--</div>
@@ -272,11 +314,16 @@
     <div class="grid-chart">
       <div class="chart-card">
         <div class="chart-title">趨勢量能柱狀圖</div>
-        <div class="chart-box"><canvas id="powerChart"></canvas></div>
+        <div class="chart-box">
+          <canvas id="powerChart"></canvas>
+        </div>
       </div>
+
       <div class="chart-card">
         <div class="chart-title">電子 / 金融 分離柱狀圖</div>
-        <div class="chart-box"><canvas id="sectorChart"></canvas></div>
+        <div class="chart-box">
+          <canvas id="sectorChart"></canvas>
+        </div>
       </div>
     </div>
 
@@ -303,32 +350,11 @@
 </div>
 
 <script>
-/* =========================
-   你只要改這裡
-   ========================= */
 const CONFIG = {
   AUTO_REFRESH_MS: 28000,
-
-  // 先用 local-json 最穩定，確認畫面正常後，再切 api
-  DATA_MODE: "local-json", // "local-json" | "api" | "demo"
-
-  // local JSON 路徑：請確認真的有這個檔案
-  LOCAL_JSON_URLS: [
-     "./data/spot_structure_time.json",
-  "data/spot_structure_time.json"
-],
-
-  // 如果你未來有自己的 API，再放這裡
-  API_URLS: [
-    "./api/market",
-    "/api/market",
-    "http://127.0.0.1:3000/api/market"
-  ]
+  DATA_URL: "./data/spot_structure_time.json"
 };
 
-/* =========================
-   畫面元素
-   ========================= */
 const el = {
   statusBox: document.getElementById("statusBox"),
   statusText: document.getElementById("statusText"),
@@ -347,42 +373,13 @@ const el = {
   scoreElec: document.getElementById("scoreElec"),
   scoreFin: document.getElementById("scoreFin"),
   tableBody: document.getElementById("tableBody"),
+  powerChart: document.getElementById("powerChart"),
+  sectorChart: document.getElementById("sectorChart")
 };
-
-let powerChartCanvas = document.getElementById("powerChart");
-let sectorChartCanvas = document.getElementById("sectorChart");
 
 let historyRows = [];
 let refreshTimer = null;
 
-/* =========================
-   Demo 資料
-   ========================= */
-function getDemoData() {
-  const now = new Date();
-  const hh = String(now.getHours()).padStart(2, "0");
-  const mm = String(now.getMinutes()).padStart(2, "0");
-  const ss = String(now.getSeconds()).padStart(2, "0");
-
-  const rows = [
-    { time:`${hh}:${mm}:${ss}`, support:72, weight50:66, mid100:58, elec:64, fin:43 },
-    { time:`${hh}:${String((now.getMinutes()+1)%60).padStart(2,"0")}:${ss}`, support:75, weight50:69, mid100:60, elec:67, fin:45 },
-    { time:`${hh}:${String((now.getMinutes()+2)%60).padStart(2,"0")}:${ss}`, support:77, weight50:71, mid100:62, elec:68, fin:47 }
-  ];
-
-  return {
-    source: "demo",
-    index_name: "加權指數",
-    last_update: `${hh}:${mm}:${ss}`,
-    next_update_in_sec: Math.floor(CONFIG.AUTO_REFRESH_MS / 1000),
-    latest_support_structure: "短多支撐續強",
-    rows
-  };
-}
-
-/* =========================
-   工具
-   ========================= */
 function scoreClassText(v){
   if (v > 0) return `<span class="up">${v}</span>`;
   if (v < 0) return `<span class="down">${v}</span>`;
@@ -390,28 +387,28 @@ function scoreClassText(v){
 }
 
 function signalText(v){
-  if (v >= 70) return "強多";
-  if (v >= 55) return "偏多";
+  if (v >= 75) return "強多";
+  if (v >= 60) return "偏多";
   if (v >= 45) return "震盪";
   if (v >= 30) return "偏空";
   return "弱空";
 }
 
 function suggestText(avg){
-  if (avg >= 70) return "順勢偏多，可找拉回承接點";
-  if (avg >= 55) return "多方略優，避免過度追價";
-  if (avg >= 45) return "盤勢混沌，先觀察再出手";
-  if (avg >= 30) return "偏空看待，反彈偏保守";
-  return "空方主導，避免逆勢搶短";
+  if (avg >= 75) return "盤勢強，多方主導，可順勢操作";
+  if (avg >= 60) return "偏多看待，可找拉回承接";
+  if (avg >= 45) return "多空拉鋸，避免過度追價";
+  if (avg >= 30) return "偏空看待，反彈宜保守";
+  return "空方主導，避免逆勢進場";
 }
 
 function calcCore(row){
   const weight = Number(row.weight50 || 0);
   const elec = Number(row.elec || 0);
   const fin = Number(row.fin || 0);
-  const avg = (weight + elec + fin) / 3;
+  const avg = Math.round((weight + elec + fin) / 3);
   return {
-    avg: Math.round(avg),
+    avg,
     text: signalText(avg)
   };
 }
@@ -421,102 +418,78 @@ function setStatus(ok, text){
   el.statusText.textContent = text;
 }
 
-function safeRows(raw){
-  if (!raw) return [];
-  if (Array.isArray(raw.rows)) return raw.rows;
-  if (Array.isArray(raw.data)) return raw.data;
-  if (Array.isArray(raw.items)) return raw.items;
-  return [];
-}
-
 function normalizeData(raw){
-  const rows = safeRows(raw).map(item => ({
-    time: item.time ?? item.t ?? "--:--",
-    support: Number(item.support ?? item.support_score ?? item.s ?? 0),
-    weight50: Number(item.weight50 ?? item.weight ?? item.top50 ?? item.w ?? 0),
-    mid100: Number(item.mid100 ?? item.mid ?? item.m ?? 0),
-    elec: Number(item.elec ?? item.electronics ?? item.e ?? 0),
-    fin: Number(item.fin ?? item.finance ?? item.f ?? 0),
-  }));
+  let rows = [];
+
+  if (Array.isArray(raw)) {
+    rows = raw.map(item => ({
+      time: item.time ?? "--:--",
+      support: Number(item.support ?? 0),
+      weight50: Number(item.weight50 ?? 0),
+      mid100: Number(item.mid100 ?? 0),
+      elec: Number(item.elec ?? item.electronic ?? 0),
+      fin: Number(item.fin ?? item.finance ?? 0)
+    }));
+  } else if (raw && Array.isArray(raw.rows)) {
+    rows = raw.rows.map(item => ({
+      time: item.time ?? "--:--",
+      support: Number(item.support ?? 0),
+      weight50: Number(item.weight50 ?? 0),
+      mid100: Number(item.mid100 ?? 0),
+      elec: Number(item.elec ?? item.electronic ?? 0),
+      fin: Number(item.fin ?? item.finance ?? 0)
+    }));
+  }
 
   return {
-    source: raw.source ?? raw.provider ?? "unknown",
-    index_name: raw.index_name ?? raw.index ?? "加權指數",
-    last_update: raw.last_update ?? raw.update_time ?? "--:--:--",
-    next_update_in_sec: Number(raw.next_update_in_sec ?? Math.floor(CONFIG.AUTO_REFRESH_MS / 1000)),
-    latest_support_structure: raw.latest_support_structure ?? raw.support_structure ?? "--",
+    source: raw?.source ?? "local-json",
+    index_name: raw?.index_name ?? "加權指數",
+    last_update: raw?.last_update ?? new Date().toLocaleTimeString("zh-TW", { hour12:false }),
+    next_update_in_sec: raw?.next_update_in_sec ?? Math.floor(CONFIG.AUTO_REFRESH_MS / 1000),
+    latest_support_structure: raw?.latest_support_structure ?? "資料讀取成功",
     rows
   };
 }
 
-/* =========================
-   取資料：重點修正 404 問題
-   ========================= */
-async function fetchJsonWithDetail(url){
-  const res = await fetch(url, {
-    method: "GET",
-    cache: "no-store"
-  });
+async function fetchData(){
+  const response = await fetch(CONFIG.DATA_URL, { cache: "no-store" });
 
-  if (!res.ok) {
-    const err = new Error(`HTTP ${res.status}`);
-    err.status = res.status;
-    err.url = url;
+  if (!response.ok) {
+    const err = new Error(`HTTP ${response.status}`);
+    err.url = CONFIG.DATA_URL;
     throw err;
   }
 
-  const json = await res.json();
-  return { json, url };
+  const json = await response.json();
+  return {
+    data: normalizeData(json),
+    url: CONFIG.DATA_URL
+  };
 }
 
-async function tryManyUrls(urls){
-  let lastErr = null;
-  for (const url of urls){
-    try{
-      const result = await fetchJsonWithDetail(url);
-      return result;
-    }catch(err){
-      lastErr = err;
-    }
-  }
-  throw lastErr || new Error("全部 URL 嘗試失敗");
-}
-
-async function loadData(){
-  if (CONFIG.DATA_MODE === "demo"){
-    const demo = getDemoData();
-    return { data: normalizeData(demo), url: "demo://local" };
-  }
-
-  if (CONFIG.DATA_MODE === "local-json"){
-    const { json, url } = await tryManyUrls(CONFIG.LOCAL_JSON_URLS);
-    return { data: normalizeData(json), url };
-  }
-
-  if (CONFIG.DATA_MODE === "api"){
-    const { json, url } = await tryManyUrls(CONFIG.API_URLS);
-    return { data: normalizeData(json), url };
-  }
-
-  throw new Error("未知的 DATA_MODE");
-}
-
-/* =========================
-   渲染
-   ========================= */
 function renderCards(data){
-  const latest = data.rows[0] || { support:0, weight50:0, mid100:0, elec:0, fin:0, time:"--:--" };
-  const core = calcCore(latest);
-  const allAvg = Math.round((latest.support + latest.weight50 + latest.mid100 + latest.elec + latest.fin) / 5);
+  const latest = data.rows[data.rows.length - 1] || {
+    time: "--:--",
+    support: 0,
+    weight50: 0,
+    mid100: 0,
+    elec: 0,
+    fin: 0
+  };
 
-  el.summaryMain.textContent = signalText(allAvg);
-  el.summarySub.textContent = `操作建議：${suggestText(allAvg)}`;
+  const core = calcCore(latest);
+  const avg = Math.round(
+    (latest.support + latest.weight50 + latest.mid100 + latest.elec + latest.fin) / 5
+  );
+
+  el.summaryMain.textContent = signalText(avg);
+  el.summarySub.textContent = `操作建議：${suggestText(avg)}`;
 
   el.coreMain.textContent = core.text;
   el.coreSub.textContent = `權值 / 電子 / 金融：${core.avg} 分`;
 
-  el.supportMain.textContent = data.latest_support_structure || "--";
-  el.supportTime.textContent = `時間：${latest.time || "--:--"}`;
+  el.supportMain.textContent = data.latest_support_structure;
+  el.supportTime.textContent = `時間：${latest.time}`;
 
   el.sourceMain.textContent = `來源：${data.source}`;
   el.indexMain.textContent = `${data.index_name}｜更新 ${data.last_update}`;
@@ -529,7 +502,7 @@ function renderCards(data){
 }
 
 function renderTable(rows){
-  if (!rows.length){
+  if (!rows.length) {
     el.tableBody.innerHTML = `
       <tr class="error-row">
         <td colspan="6">沒有可顯示的資料</td>
@@ -550,16 +523,32 @@ function renderTable(rows){
   `).join("");
 }
 
-function clearCanvas(canvas){
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
 function setupCanvasHiDPI(canvas){
   const rect = canvas.getBoundingClientRect();
   const ratio = window.devicePixelRatio || 1;
   canvas.width = Math.max(300, Math.floor(rect.width * ratio));
   canvas.height = Math.max(180, Math.floor(rect.height * ratio));
+}
+
+function clearCanvas(canvas){
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function roundRect(ctx, x, y, w, h, r, fill, stroke){
+  if (w < 2 * r) r = w / 2;
+  if (h < 2 * r) r = h / 2;
+
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+
+  if (fill) ctx.fill();
+  if (stroke) ctx.stroke();
 }
 
 function drawAxes(ctx, w, h, left, top, right, bottom, yMax, yMin, yTitle, xLabels){
@@ -568,21 +557,18 @@ function drawAxes(ctx, w, h, left, top, right, bottom, yMax, yMin, yTitle, xLabe
   ctx.fillStyle = "#9cc0ef";
   ctx.lineWidth = 1;
 
-  // Y 軸
   ctx.beginPath();
   ctx.moveTo(left, top);
   ctx.lineTo(left, h - bottom);
   ctx.stroke();
 
-  // X 軸
   ctx.beginPath();
   ctx.moveTo(left, h - bottom);
   ctx.lineTo(w - right, h - bottom);
   ctx.stroke();
 
-  // Y 刻度
   const steps = 5;
-  for(let i=0;i<=steps;i++){
+  for (let i = 0; i <= steps; i++) {
     const y = top + ((h - top - bottom) / steps) * i;
     const value = Math.round(yMax - ((yMax - yMin) / steps) * i);
 
@@ -598,19 +584,18 @@ function drawAxes(ctx, w, h, left, top, right, bottom, yMax, yMin, yTitle, xLabe
     ctx.fillText(String(value), left - 8, y + 4);
   }
 
-  // X labels
   ctx.fillStyle = "#89a9d9";
   ctx.font = "12px Segoe UI, Microsoft JhengHei";
   ctx.textAlign = "center";
 
   const count = xLabels.length || 1;
-  const plotW = (w - left - right);
-  xLabels.forEach((lb, i)=>{
+  const plotW = w - left - right;
+
+  xLabels.forEach((lb, i) => {
     const x = left + plotW * ((i + 0.5) / count);
     ctx.fillText(lb, x, h - bottom + 18);
   });
 
-  // Y title
   ctx.save();
   ctx.translate(18, h / 2);
   ctx.rotate(-Math.PI / 2);
@@ -620,7 +605,6 @@ function drawAxes(ctx, w, h, left, top, right, bottom, yMax, yMin, yTitle, xLabe
   ctx.fillText(yTitle, 0, 0);
   ctx.restore();
 
-  // X title
   ctx.fillStyle = "#c7ddff";
   ctx.font = "13px Segoe UI, Microsoft JhengHei";
   ctx.textAlign = "center";
@@ -643,6 +627,7 @@ function drawBars(canvas, labels, values, options = {}){
 
   const maxVal = Math.max(...values, 100);
   const minVal = Math.min(0, ...values);
+
   drawAxes(ctx, w, h, left, top, right, bottom, maxVal, minVal, options.yTitle || "分數", labels);
 
   const plotW = w - left - right;
@@ -651,7 +636,7 @@ function drawBars(canvas, labels, values, options = {}){
   const groupW = plotW / count;
   const barW = Math.min(42 * (window.devicePixelRatio || 1), groupW * 0.55);
 
-  values.forEach((v, i)=>{
+  values.forEach((v, i) => {
     const x = left + groupW * i + (groupW - barW) / 2;
     const y0 = top + (maxVal / (maxVal - minVal)) * plotH;
     const yv = top + ((maxVal - v) / (maxVal - minVal)) * plotH;
@@ -665,12 +650,12 @@ function drawBars(canvas, labels, values, options = {}){
     ctx.fillStyle = "#e8f1ff";
     ctx.font = `${12 * (window.devicePixelRatio || 1)}px Segoe UI, Microsoft JhengHei`;
     ctx.textAlign = "center";
-    ctx.fillText(String(v), x + barW/2, barTop - 6);
+    ctx.fillText(String(v), x + barW / 2, barTop - 6);
     ctx.restore();
   });
 }
 
-function drawDualBars(canvas, labels, seriesA, seriesB, nameA="電子", nameB="金融"){
+function drawDualBars(canvas, labels, seriesA, seriesB, nameA = "電子", nameB = "金融"){
   setupCanvasHiDPI(canvas);
   const ctx = canvas.getContext("2d");
   clearCanvas(canvas);
@@ -685,6 +670,7 @@ function drawDualBars(canvas, labels, seriesA, seriesB, nameA="電子", nameB="�
   const allValues = [...seriesA, ...seriesB];
   const maxVal = Math.max(...allValues, 100);
   const minVal = Math.min(0, ...allValues);
+
   drawAxes(ctx, w, h, left, top, right, bottom, maxVal, minVal, "分數", labels);
 
   const plotW = w - left - right;
@@ -693,14 +679,14 @@ function drawDualBars(canvas, labels, seriesA, seriesB, nameA="電子", nameB="�
   const groupW = plotW / count;
   const barW = Math.min(18 * (window.devicePixelRatio || 1), groupW * 0.24);
 
-  labels.forEach((lb, i)=>{
+  labels.forEach((lb, i) => {
     const centerX = left + groupW * (i + 0.5);
 
     [
-      { v: seriesA[i], dx: -barW*0.7, color: "rgba(58,160,255,.95)" },
-      { v: seriesB[i], dx:  barW*0.7, color: "rgba(255,204,0,.95)" }
-    ].forEach(item=>{
-      const x = centerX + item.dx - barW/2;
+      { v: seriesA[i], dx: -barW * 0.7, color: "rgba(58,160,255,.95)" },
+      { v: seriesB[i], dx:  barW * 0.7, color: "rgba(255,204,0,.95)" }
+    ].forEach(item => {
+      const x = centerX + item.dx - barW / 2;
       const y0 = top + (maxVal / (maxVal - minVal)) * plotH;
       const yv = top + ((maxVal - item.v) / (maxVal - minVal)) * plotH;
       const barTop = Math.min(y0, yv);
@@ -713,12 +699,11 @@ function drawDualBars(canvas, labels, seriesA, seriesB, nameA="電子", nameB="�
       ctx.fillStyle = "#dcecff";
       ctx.font = `${11 * (window.devicePixelRatio || 1)}px Segoe UI, Microsoft JhengHei`;
       ctx.textAlign = "center";
-      ctx.fillText(String(item.v), x + barW/2, barTop - 6);
+      ctx.fillText(String(item.v), x + barW / 2, barTop - 6);
       ctx.restore();
     });
   });
 
-  // legend
   ctx.save();
   ctx.font = `${12 * (window.devicePixelRatio || 1)}px Segoe UI, Microsoft JhengHei`;
   ctx.textAlign = "left";
@@ -735,42 +720,33 @@ function drawDualBars(canvas, labels, seriesA, seriesB, nameA="電子", nameB="�
   ctx.restore();
 }
 
-function roundRect(ctx, x, y, w, h, r, fill, stroke){
-  if (w < 2 * r) r = w / 2;
-  if (h < 2 * r) r = h / 2;
-  ctx.beginPath();
-  ctx.moveTo(x+r, y);
-  ctx.arcTo(x+w, y,   x+w, y+h, r);
-  ctx.arcTo(x+w, y+h, x,   y+h, r);
-  ctx.arcTo(x,   y+h, x,   y,   r);
-  ctx.arcTo(x,   y,   x+w, y,   r);
-  ctx.closePath();
-  if (fill) ctx.fill();
-  if (stroke) ctx.stroke();
-}
-
 function renderCharts(rows){
-  const latestRows = rows.slice(0, 6).reverse();
+  if (!rows.length) {
+    setupCanvasHiDPI(el.powerChart);
+    setupCanvasHiDPI(el.sectorChart);
+    clearCanvas(el.powerChart);
+    clearCanvas(el.sectorChart);
+    return;
+  }
+
+  const latestRows = rows.slice(-6);
   const labels = latestRows.map(r => r.time);
   const supportValues = latestRows.map(r => r.support);
   const elecValues = latestRows.map(r => r.elec);
   const finValues = latestRows.map(r => r.fin);
 
-  drawBars(powerChartCanvas, labels, supportValues, { yTitle: "支撐分數" });
-  drawDualBars(sectorChartCanvas, labels, elecValues, finValues, "電子", "金融");
+  drawBars(el.powerChart, labels, supportValues, { yTitle: "支撐分數" });
+  drawDualBars(el.sectorChart, labels, elecValues, finValues, "電子", "金融");
 }
 
-/* =========================
-   失敗顯示
-   ========================= */
 function renderError(err){
   const msg = err?.message || "未知錯誤";
-  const url = err?.url || "未取得";
+  const url = err?.url || CONFIG.DATA_URL;
 
   el.summaryMain.textContent = "更新失敗";
-  el.summarySub.textContent = "操作建議：先修正資料路徑";
+  el.summarySub.textContent = "操作建議：請檢查 JSON 路徑或格式";
   el.coreMain.textContent = "讀取失敗";
-  el.coreSub.textContent = "請檢查 API / JSON 路徑";
+  el.coreSub.textContent = "請檢查 data/spot_structure_time.json";
   el.supportMain.textContent = "--";
   el.supportTime.textContent = "時間：--";
   el.sourceMain.textContent = "來源：失敗";
@@ -789,22 +765,19 @@ function renderError(err){
     </tr>
   `;
 
-  setupCanvasHiDPI(powerChartCanvas);
-  setupCanvasHiDPI(sectorChartCanvas);
-  clearCanvas(powerChartCanvas);
-  clearCanvas(sectorChartCanvas);
+  setupCanvasHiDPI(el.powerChart);
+  setupCanvasHiDPI(el.sectorChart);
+  clearCanvas(el.powerChart);
+  clearCanvas(el.sectorChart);
 }
 
-/* =========================
-   主流程
-   ========================= */
 async function refreshData(){
-  const start = new Date();
-  try{
+  try {
     setStatus(false, "更新中...");
-    const { data, url } = await loadData();
 
+    const { data, url } = await fetchData();
     historyRows = data.rows;
+
     renderCards(data);
     renderTable(data.rows);
     renderCharts(data.rows);
@@ -812,16 +785,12 @@ async function refreshData(){
     const sec = Math.floor(CONFIG.AUTO_REFRESH_MS / 1000);
     el.debugUrl.textContent = `成功 URL：${url}`;
     setStatus(true, `最後更新：${data.last_update}　下次更新：${sec}秒後`);
-  }catch(err){
-    console.error("refreshData failed:", err);
+  } catch (err) {
+    console.error(err);
     renderError(err);
 
     const sec = Math.floor(CONFIG.AUTO_REFRESH_MS / 1000);
     setStatus(false, `更新失敗：${err.message}　下次更新：${sec}秒後`);
-  }finally{
-    const end = new Date();
-    // 可留著 debug
-    // console.log("refresh cost ms =", end - start);
   }
 }
 
@@ -831,9 +800,7 @@ function startAutoRefresh(){
 }
 
 window.addEventListener("resize", () => {
-  if (historyRows.length){
-    renderCharts(historyRows);
-  }
+  renderCharts(historyRows);
 });
 
 (async function init(){
