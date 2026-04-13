@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>現貨結構時間表</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       background: #000;
@@ -13,62 +17,67 @@
     }
 
     .wrap {
-      width: 95%;
-      margin: 20px auto;
-      background: #05070d;
-      border: 1px solid #1f2430;
-      border-radius: 20px;
-      padding: 18px;
-      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
     }
 
-    .title-row {
+    .panel {
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(90, 120, 180, 0.35);
+      background:
+        linear-gradient(180deg, rgba(5, 15, 40, 0.96) 0%, rgba(1, 8, 24, 0.98) 100%);
+      box-shadow:
+        0 0 0 1px rgba(60, 90, 140, 0.18) inset,
+        0 12px 30px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+    }
+
+    .panel-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px;
-      gap: 12px;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px 8px 20px;
       flex-wrap: wrap;
     }
 
     .title {
-      font-size: 36px;
+      margin: 0;
+      font-size: 22px;
       font-weight: 800;
-      color: #ffb000;
+      color: #ffbf00;
       letter-spacing: 1px;
     }
 
-    .status-box {
+    .status {
       display: flex;
       align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 10px;
       font-size: 14px;
+      color: #d7e8ff;
+      white-space: nowrap;
     }
 
-    .status-dot {
+    .dot {
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: #00c853;
-      box-shadow: 0 0 10px #00c853;
-    }
-
-    .status-text {
-      color: #cfd8dc;
-    }
-
-    .error-text {
-      color: #ff6b6b;
-      font-weight: 700;
+      background: #ff5b5b;
+      box-shadow: 0 0 10px rgba(255, 91, 91, 0.8);
+      flex-shrink: 0;
     }
 
     .table-wrap {
-      max-height: 560px;
-      overflow-y: auto;
-      border: 1px solid #1f2430;
-      border-radius: 14px;
-      background: #080b12;
+      padding: 8px 16px 16px 16px;
+    }
+
+    .table-box {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(100, 140, 200, 0.22);
+      background: rgba(2, 10, 26, 0.92);
+      box-shadow: inset 0 0 0 1px rgba(40, 70, 120, 0.15);
     }
 
     table {
@@ -78,257 +87,278 @@
     }
 
     thead th {
-      position: sticky;
-      top: 0;
-      background: #0f1420;
-      color: #ffb000;
-      z-index: 2;
-      font-size: 20px;
+      background: linear-gradient(180deg, rgba(10, 24, 58, 0.95), rgba(8, 18, 42, 0.95));
+      color: #ffbf00;
+      font-size: 18px;
       font-weight: 800;
-      padding: 14px 8px;
-      border-bottom: 1px solid #202636;
+      padding: 14px 10px;
+      border-bottom: 1px solid rgba(120, 160, 220, 0.15);
+      text-align: center;
     }
 
     tbody td {
+      padding: 14px 10px;
       text-align: center;
-      padding: 12px 8px;
-      border-bottom: 1px solid #161c29;
-      font-size: 24px;
-      color: #ff69b4;
-      font-weight: 700;
+      color: #eaf4ff;
+      font-size: 16px;
+      border-bottom: 1px solid rgba(120, 160, 220, 0.08);
     }
 
     tbody tr:hover {
-      background: rgba(255,255,255,0.03);
+      background: rgba(30, 60, 110, 0.15);
     }
 
-    .time-col {
-      color: #e3f2fd;
+    .muted {
+      color: #9ecbff;
+    }
+
+    .error-text {
+      color: #ff6b6b;
+    }
+
+    .warn-text {
+      color: #ffd166;
+    }
+
+    .up {
+      color: #ff6b6b;
       font-weight: 700;
     }
 
-    .updating {
-      opacity: 0.65;
+    .down {
+      color: #4cd97b;
+      font-weight: 700;
+    }
+
+    .flat {
+      color: #d7e8ff;
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .title {
+        font-size: 20px;
+      }
+
+      thead th,
+      tbody td {
+        font-size: 14px;
+        padding: 12px 6px;
+      }
+
+      .status {
+        font-size: 12px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="title-row">
-      <div class="title">現貨結構時間表</div>
-      <div class="status-box">
-        <div class="status-dot" id="statusDot"></div>
-        <div class="status-text" id="lastUpdateText">最後更新：--</div>
-        <div class="status-text" id="nextUpdateText">下次更新：--</div>
-        <div class="error-text" id="errorText"></div>
-      </div>
-    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <h1 class="title">現貨結構時間表</h1>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>時間</th>
-            <th>支撐</th>
-            <th>權值50</th>
-            <th>中型100</th>
-            <th>電子</th>
-            <th>金融</th>
-          </tr>
-        </thead>
-        <tbody id="spotTableBody">
-          <tr>
-            <td colspan="6" style="padding: 30px; color: #9aa4b2;">載入中...</td>
-          </tr>
-        </tbody>
-      </table>
+        <div class="status">
+          <span class="dot"></span>
+          <span id="updateStatus">最後更新：--　下次更新：--</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-box">
+          <table>
+            <thead>
+              <tr>
+                <th>時間</th>
+                <th>支撐</th>
+                <th>權值50</th>
+                <th>中型100</th>
+                <th>電子</th>
+                <th>金融</th>
+              </tr>
+            </thead>
+            <tbody id="spotTimeTableBody">
+              <tr>
+                <td colspan="6" class="muted" style="padding: 28px;">載入中...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    /********************************************************
-     * 你要改的地方只有這個 API
-     * 請換成你自己的即時現貨 API
-     ********************************************************/
-    const SPOT_API_URL = "/api/spot-structure"; 
-    // 例如：
-    // const SPOT_API_URL = "http://127.0.0.1:3000/api/spot-structure";
+    const statusEl = document.getElementById("updateStatus");
+    const tbodyEl = document.getElementById("spotTimeTableBody");
 
-    /********************************************************
-     * 更新設定
-     ********************************************************/
-    const REFRESH_MS = 5000; // 每 5 秒更新一次
-    let pollingTimer = null;
+    const REFRESH_SECONDS = 30;
+    let nextRefreshTimer = null;
     let countdownTimer = null;
-    let isFetching = false;
-    let lastDataHash = "";
-    let nextUpdateAt = 0;
-    let abortController = null;
+    let nextRefreshTime = null;
 
-    const spotTableBody = document.getElementById("spotTableBody");
-    const lastUpdateText = document.getElementById("lastUpdateText");
-    const nextUpdateText = document.getElementById("nextUpdateText");
-    const errorText = document.getElementById("errorText");
-    const statusDot = document.getElementById("statusDot");
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getTrendClass(value) {
+      const text = String(value ?? "").trim();
+
+      const upKeywords = ["偏多", "轉強", "續強", "多方", "上攻", "走強", "強", "紅"];
+      const downKeywords = ["偏空", "轉弱", "續弱", "空方", "走弱", "下殺", "弱", "綠"];
+      const flatKeywords = ["中性", "震盪", "盤整", "持平", "--", "無"];
+
+      if (upKeywords.some(k => text.includes(k))) return "up";
+      if (downKeywords.some(k => text.includes(k))) return "down";
+      if (flatKeywords.some(k => text.includes(k))) return "flat";
+      return "";
+    }
 
     function formatTime(date) {
-      const d = new Date(date);
-      const hh = String(d.getHours()).padStart(2, "0");
-      const mm = String(d.getMinutes()).padStart(2, "0");
-      const ss = String(d.getSeconds()).padStart(2, "0");
-      return `${hh}:${mm}:${ss}`;
+      return date.toLocaleTimeString("zh-TW", { hour12: false });
     }
 
-    function setStatus(ok) {
-      statusDot.style.background = ok ? "#00c853" : "#ff5252";
-      statusDot.style.boxShadow = ok
-        ? "0 0 10px #00c853"
-        : "0 0 10px #ff5252";
+    function setStatus(message, isError = false) {
+      statusEl.textContent = message;
+      statusEl.style.color = isError ? "#ff6b6b" : "#d7e8ff";
     }
 
-    function updateCountdown() {
-      if (!nextUpdateAt) {
-        nextUpdateText.textContent = "下次更新：--";
-        return;
-      }
-      const diff = Math.max(0, nextUpdateAt - Date.now());
-      const sec = Math.ceil(diff / 1000);
-      nextUpdateText.textContent = `下次更新：${sec} 秒後`;
+    function showLoading() {
+      tbodyEl.innerHTML = `
+        <tr>
+          <td colspan="6" class="muted" style="padding: 28px;">載入中...</td>
+        </tr>
+      `;
     }
 
-    function safeNumber(value) {
-      if (value === null || value === undefined || value === "") return "--";
-      return value;
+    function showError(message) {
+      tbodyEl.innerHTML = `
+        <tr>
+          <td colspan="6" class="error-text" style="padding: 28px;">${escapeHtml(message)}</td>
+        </tr>
+      `;
+    }
+
+    function showNoData() {
+      tbodyEl.innerHTML = `
+        <tr>
+          <td colspan="6" class="warn-text" style="padding: 28px;">沒有可顯示的資料</td>
+        </tr>
+      `;
+    }
+
+    function normalizeRows(raw) {
+      if (Array.isArray(raw)) return raw;
+      if (Array.isArray(raw?.data)) return raw.data;
+      if (Array.isArray(raw?.rows)) return raw.rows;
+      if (Array.isArray(raw?.result)) return raw.result;
+      return [];
     }
 
     function renderTable(rows) {
       if (!Array.isArray(rows) || rows.length === 0) {
-        spotTableBody.innerHTML = `
-          <tr>
-            <td colspan="6" style="padding: 30px; color: #9aa4b2;">目前沒有資料</td>
-          </tr>
-        `;
+        showNoData();
         return;
       }
 
-      const html = rows.map(row => `
-        <tr>
-          <td class="time-col">${safeNumber(row.time)}</td>
-          <td>${safeNumber(row.support)}</td>
-          <td>${safeNumber(row.weight50)}</td>
-          <td>${safeNumber(row.mid100)}</td>
-          <td>${safeNumber(row.electronics)}</td>
-          <td>${safeNumber(row.finance)}</td>
-        </tr>
-      `).join("");
+      tbodyEl.innerHTML = rows.map(row => {
+        const time = escapeHtml(row.time ?? row.時間 ?? "--");
+        const support = escapeHtml(row.support ?? row.支撐 ?? "--");
+        const weight50 = escapeHtml(row.weight50 ?? row.權值50 ?? "--");
+        const mid100 = escapeHtml(row.mid100 ?? row.中型100 ?? "--");
+        const electronic = escapeHtml(row.electronic ?? row.電子 ?? "--");
+        const finance = escapeHtml(row.finance ?? row.金融 ?? "--");
 
-      spotTableBody.innerHTML = html;
+        return `
+          <tr>
+            <td>${time}</td>
+            <td class="${getTrendClass(support)}">${support}</td>
+            <td class="${getTrendClass(weight50)}">${weight50}</td>
+            <td class="${getTrendClass(mid100)}">${mid100}</td>
+            <td class="${getTrendClass(electronic)}">${electronic}</td>
+            <td class="${getTrendClass(finance)}">${finance}</td>
+          </tr>
+        `;
+      }).join("");
     }
 
     async function fetchSpotData() {
-      if (isFetching) return;
+      const url = `./data/spot_structure_time.json?t=${Date.now()}`;
+      const response = await fetch(url, {
+        method: "GET",
+        cache: "no-store"
+      });
 
-      isFetching = true;
-      errorText.textContent = "";
-      setStatus(true);
-      spotTableBody.classList.add("updating");
-
-      try {
-        if (abortController) {
-          abortController.abort();
-        }
-        abortController = new AbortController();
-
-        // 關鍵 1：加 timestamp，避免快取
-        const url = `${SPOT_API_URL}?t=${Date.now()}`;
-
-        const res = await fetch(url, {
-          method: "GET",
-          cache: "no-store", // 關鍵 2：不要用快取
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Pragma": "no-cache",
-            "Expires": "0"
-          },
-          signal: abortController.signal
-        });
-
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
-
-        const data = await res.json();
-
-        // 假設 API 回傳格式：
-        // { rows: [ {time, support, weight50, mid100, electronics, finance}, ... ] }
-
-        const rows = Array.isArray(data?.rows) ? data.rows : [];
-        const newHash = JSON.stringify(rows);
-
-        // 關鍵 3：即使內容沒變，也更新最後抓取時間
-        if (newHash !== lastDataHash) {
-          renderTable(rows);
-          lastDataHash = newHash;
-        }
-
-        lastUpdateText.textContent = `最後更新：${formatTime(Date.now())}`;
-        nextUpdateAt = Date.now() + REFRESH_MS;
-        updateCountdown();
-        setStatus(true);
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error("現貨更新失敗:", err);
-          errorText.textContent = `更新失敗：${err.message}`;
-          setStatus(false);
-        }
-      } finally {
-        isFetching = false;
-        spotTableBody.classList.remove("updating");
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
       }
+
+      return await response.json();
     }
 
-    function startPolling() {
-      stopPolling();
+    function updateCountdownText(lastUpdateText, isError = false) {
+      if (!nextRefreshTime) {
+        setStatus(`${lastUpdateText}　下次更新：--`, isError);
+        return;
+      }
 
-      // 先抓一次
-      fetchSpotData();
+      const diffMs = Math.max(0, nextRefreshTime - Date.now());
+      const secondsLeft = Math.ceil(diffMs / 1000);
 
-      // 關鍵 4：固定輪詢
-      pollingTimer = setInterval(() => {
-        fetchSpotData();
-      }, REFRESH_MS);
+      setStatus(`${lastUpdateText}　下次更新：${secondsLeft}秒後`, isError);
+    }
 
-      // 倒數顯示
+    function startCountdown(lastUpdateText, isError = false) {
+      clearInterval(countdownTimer);
+      updateCountdownText(lastUpdateText, isError);
+
       countdownTimer = setInterval(() => {
-        updateCountdown();
+        updateCountdownText(lastUpdateText, isError);
       }, 1000);
     }
 
-    function stopPolling() {
-      if (pollingTimer) {
-        clearInterval(pollingTimer);
-        pollingTimer = null;
-      }
-      if (countdownTimer) {
-        clearInterval(countdownTimer);
-        countdownTimer = null;
+    async function updateSpotStructureTable() {
+      const loadingText = "更新中...";
+      setStatus(`${loadingText}　下次更新：--`);
+      showLoading();
+
+      try {
+        const raw = await fetchSpotData();
+        const rows = normalizeRows(raw);
+        renderTable(rows);
+
+        const now = new Date();
+        const lastUpdateText = `最後更新：${formatTime(now)}　更新成功`;
+
+        nextRefreshTime = Date.now() + REFRESH_SECONDS * 1000;
+        startCountdown(lastUpdateText, false);
+      } catch (error) {
+        console.error("updateSpotStructureTable error:", error);
+
+        const now = new Date();
+        const lastUpdateText = `最後更新：${formatTime(now)}　更新失敗：${error.message}`;
+
+        showError(`資料讀取失敗：${error.message}`);
+        nextRefreshTime = Date.now() + REFRESH_SECONDS * 1000;
+        startCountdown(lastUpdateText, true);
       }
     }
 
-    // 切回頁面時強制更新一次
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) {
-        fetchSpotData();
-      }
-    });
+    function startAutoRefresh() {
+      clearInterval(nextRefreshTimer);
+      updateSpotStructureTable();
 
-    // 網路恢復時強制更新一次
-    window.addEventListener("online", () => {
-      fetchSpotData();
-    });
+      nextRefreshTimer = setInterval(() => {
+        updateSpotStructureTable();
+      }, REFRESH_SECONDS * 1000);
+    }
 
-    // 啟動
-    startPolling();
+    startAutoRefresh();
   </script>
 </body>
 </html>
