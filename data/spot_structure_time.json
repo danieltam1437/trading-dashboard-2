@@ -1,0 +1,42 @@
+[
+  {
+    "time": "09:00",
+    "support": "偏多",
+    "weight50": "轉強",
+    "mid100": "中性",
+    "electronic": "偏多",
+    "finance": "偏空"
+  },
+  {
+    "time": "09:05",
+    "support": "續強",
+    "weight50": "偏多",
+    "mid100": "轉強",
+    "electronic": "偏多",
+    "finance": "中性"
+  },
+  {
+    "time": "09:10",
+    "support": "中性",
+    "weight50": "中性",
+    "mid100": "偏多",
+    "electronic": "偏多",
+    "finance": "偏弱"
+  },
+  {
+    "time": "09:15",
+    "support": "偏空",
+    "weight50": "轉弱",
+    "mid100": "偏空",
+    "electronic": "中性",
+    "finance": "偏弱"
+  },
+  {
+    "time": "09:20",
+    "support": "震盪",
+    "weight50": "中性",
+    "mid100": "中性",
+    "electronic": "偏多",
+    "finance": "中性"
+  }
+]
