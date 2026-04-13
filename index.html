@@ -1,991 +1,334 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>[DT] Dr.Trader 2.0 - 三核心判斷版</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>現貨結構時間表</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: Arial, "Microsoft JhengHei", sans-serif;
+    }
 
-<style>
-:root{
-  --bg:#050505;
-  --card:#0f0f10;
-  --card2:#17171a;
-  --line:#2c2c30;
-  --text:#ffffff;
-  --muted:#b8b8c2;
-  --yellow:#ffd84d;
-  --orange:#ff8a00;
-  --pink:#ff4fa3;
-  --red:#ff3b30;
-  --green:#22c55e;
-  --gray:#94a3b8;
-  --shadow:0 12px 30px rgba(0,0,0,.42);
-}
+    .wrap {
+      width: 95%;
+      margin: 20px auto;
+      background: #05070d;
+      border: 1px solid #1f2430;
+      border-radius: 20px;
+      padding: 18px;
+      box-sizing: border-box;
+    }
 
-*{box-sizing:border-box}
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-body{
-  margin:0;
-  background:
-    radial-gradient(circle at top left, rgba(255,138,0,.10), transparent 32%),
-    radial-gradient(circle at top right, rgba(255,79,163,.10), transparent 28%),
-    var(--bg);
-  color:var(--text);
-  font-family:Arial,"Noto Sans TC",sans-serif;
-}
+    .title {
+      font-size: 36px;
+      font-weight: 800;
+      color: #ffb000;
+      letter-spacing: 1px;
+    }
 
-.wrap{
-  max-width:1360px;
-  margin:0 auto;
-  padding:22px;
-}
+    .status-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 14px;
+    }
 
-.hero{
-  display:grid;
-  grid-template-columns:1.15fr .85fr;
-  gap:18px;
-  margin-bottom:18px;
-}
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #00c853;
+      box-shadow: 0 0 10px #00c853;
+    }
 
-.card{
-  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-  border:1px solid var(--line);
-  border-radius:22px;
-  box-shadow:var(--shadow);
-  padding:20px;
-}
+    .status-text {
+      color: #cfd8dc;
+    }
 
-.hero-left{
-  background:linear-gradient(135deg, rgba(255,216,77,.08), rgba(255,79,163,.08));
-  min-height:220px;
-}
+    .error-text {
+      color: #ff6b6b;
+      font-weight: 700;
+    }
 
-.hero-right{
-  background:linear-gradient(135deg, rgba(255,138,0,.14), rgba(255,79,163,.12));
-}
+    .table-wrap {
+      max-height: 560px;
+      overflow-y: auto;
+      border: 1px solid #1f2430;
+      border-radius: 14px;
+      background: #080b12;
+    }
 
-.chip{
-  display:inline-block;
-  padding:8px 14px;
-  border-radius:999px;
-  border:1px solid rgba(255,216,77,.25);
-  color:var(--yellow);
-  background:rgba(255,216,77,.08);
-  font-weight:700;
-  font-size:14px;
-  margin-bottom:12px;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
 
-h1{
-  margin:0 0 10px;
-  font-size:44px;
-  line-height:1.06;
-  color:var(--yellow);
-  letter-spacing:.5px;
-}
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #0f1420;
+      color: #ffb000;
+      z-index: 2;
+      font-size: 20px;
+      font-weight: 800;
+      padding: 14px 8px;
+      border-bottom: 1px solid #202636;
+    }
 
-.sub{
-  color:#f5f5f5;
-  font-size:18px;
-  line-height:1.75;
-  max-width:900px;
-}
+    tbody td {
+      text-align: center;
+      padding: 12px 8px;
+      border-bottom: 1px solid #161c29;
+      font-size: 24px;
+      color: #ff69b4;
+      font-weight: 700;
+    }
 
-.score-label{
-  color:#ffe6f3;
-  font-size:14px;
-  margin-bottom:8px;
-}
+    tbody tr:hover {
+      background: rgba(255,255,255,0.03);
+    }
 
-.score{
-  font-size:78px;
-  line-height:1;
-  font-weight:800;
-  margin:6px 0 12px;
-}
+    .time-col {
+      color: #e3f2fd;
+      font-weight: 700;
+    }
 
-.signal{
-  font-size:22px;
-  font-weight:800;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.light{
-  font-size:34px;
-  margin:10px 0 8px;
-  line-height:1;
-}
-
-.summary{
-  font-size:19px;
-  line-height:1.75;
-  margin-top:10px;
-}
-
-.trade-plan{
-  margin-top:12px;
-  font-size:17px;
-  font-weight:700;
-  color:var(--yellow);
-  line-height:1.75;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:18px;
-}
-
-.grid-3{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  margin-bottom:18px;
-}
-
-.label{
-  color:var(--muted);
-  font-size:13px;
-  margin-bottom:10px;
-}
-
-.value{
-  font-size:21px;
-  font-weight:800;
-  color:#fff;
-}
-
-.value.big{
-  font-size:30px;
-}
-
-.panel{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px;
-  margin-bottom:18px;
-}
-
-.panel-wide{
-  display:grid;
-  grid-template-columns:1fr .95fr;
-  gap:18px;
-  margin-bottom:18px;
-}
-
-.section-title{
-  margin:0 0 14px;
-  font-size:24px;
-  color:var(--orange);
-  letter-spacing:.3px;
-}
-
-.metric-table{
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0 10px;
-}
-
-.metric-table td{
-  padding:12px 14px;
-  border:1px solid var(--line);
-  background:var(--card2);
-}
-
-.metric-table td:first-child{
-  border-radius:12px 0 0 12px;
-  color:var(--muted);
-  width:56%;
-}
-
-.metric-table td:last-child{
-  border-radius:0 12px 12px 0;
-  text-align:right;
-  font-weight:800;
-}
-
-.rows{
-  display:grid;
-  gap:10px;
-}
-
-.row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  padding:12px 14px;
-  background:var(--card2);
-  border:1px solid var(--line);
-  border-radius:14px;
-}
-
-.badge{
-  min-width:64px;
-  text-align:center;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:13px;
-  font-weight:700;
-  border:1px solid transparent;
-}
-
-.up{
-  background:rgba(255,79,163,.16);
-  color:#ff95c9;
-  border-color:rgba(255,79,163,.24);
-}
-
-.down{
-  background:rgba(34,197,94,.16);
-  color:#7ef0a6;
-  border-color:rgba(34,197,94,.24);
-}
-
-.neutral{
-  background:rgba(148,163,184,.14);
-  color:#d8dee8;
-  border-color:rgba(148,163,184,.2);
-}
-
-.warn{color:var(--yellow)}
-
-.charts{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px;
-  margin-bottom:18px;
-}
-
-.chart-wrap{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:22px;
-  box-shadow:var(--shadow);
-  padding:18px 18px 12px;
-}
-
-.chart-title{
-  margin:0 0 10px;
-  color:var(--orange);
-  font-size:22px;
-}
-
-.chart-sub{
-  color:var(--muted);
-  font-size:13px;
-  margin-bottom:10px;
-}
-
-canvas{
-  width:100%;
-  height:260px;
-  display:block;
-  background:#0b0b0d;
-  border:1px solid #1f1f24;
-  border-radius:14px;
-}
-
-.history-table{
-  width:100%;
-  border-collapse:collapse;
-  overflow:hidden;
-  border-radius:14px;
-  border:1px solid var(--line);
-}
-
-.history-table th,
-.history-table td{
-  padding:10px 10px;
-  text-align:right;
-  border-bottom:1px solid var(--line);
-  font-size:13px;
-}
-
-.history-table th{
-  background:#151519;
-  color:var(--yellow);
-  position:sticky;
-  top:0;
-}
-
-.history-table td:first-child,
-.history-table th:first-child{
-  text-align:center;
-}
-
-.history-wrap{
-  max-height:430px;
-  overflow:auto;
-  border-radius:14px;
-  background:#0b0b0d;
-  border:1px solid #1f1f24;
-}
-
-.pinkText{color:#ff95c9}
-.greenText{color:#7ef0a6}
-.grayText{color:#cfd6df}
-
-.core-box{
-  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
-}
-
-.core-title{
-  font-size:16px;
-  color:var(--yellow);
-  margin-bottom:8px;
-  font-weight:700;
-}
-
-.core-score{
-  font-size:34px;
-  font-weight:800;
-  margin-bottom:8px;
-}
-
-.core-status{
-  font-size:18px;
-  font-weight:700;
-}
-
-@media (max-width:1200px){
-  .hero,.panel,.grid,.charts,.panel-wide,.grid-3{grid-template-columns:1fr}
-  h1{font-size:36px}
-  .score{font-size:60px}
-}
-</style>
+    .updating {
+      opacity: 0.65;
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-
-  <div class="hero">
-    <div class="card hero-left">
-      <div class="chip">[DT] Dr.Trader 2.0</div>
-      <h1>三核心判斷版<br>專業儀表板</h1>
-      <div class="sub">
-        盤中趨勢判斷核心：權值核心、電子核心、金融核心，並整合 15分K方向、內外盤差、盤勢量能與現貨結構。
+  <div class="wrap">
+    <div class="title-row">
+      <div class="title">現貨結構時間表</div>
+      <div class="status-box">
+        <div class="status-dot" id="statusDot"></div>
+        <div class="status-text" id="lastUpdateText">最後更新：--</div>
+        <div class="status-text" id="nextUpdateText">下次更新：--</div>
+        <div class="error-text" id="errorText"></div>
       </div>
     </div>
 
-    <div class="card hero-right">
-      <div class="score-label">多空總分</div>
-      <div id="score" class="score">0</div>
-      <div id="signal" class="signal">⚪ 觀望</div>
-      <div id="light" class="light">⚪</div>
-      <div id="headlineSummary" class="summary">等待資料更新中。</div>
-      <div id="tradePlan" class="trade-plan">➡️ 建議：觀望，不進場</div>
-    </div>
-  </div>
-
-  <div class="grid">
-    <div class="card">
-      <div class="label">15分K方向</div>
-      <div id="k15View" class="value">—</div>
-    </div>
-    <div class="card">
-      <div class="label">內外盤差</div>
-      <div id="ioView" class="value">—</div>
-    </div>
-    <div class="card">
-      <div class="label">盤勢量能</div>
-      <div id="powerView" class="value">—</div>
-    </div>
-    <div class="card">
-      <div class="label">更新時間</div>
-      <div id="timeView" class="value">—</div>
-    </div>
-
-    <div class="card">
-      <div class="label">支撐</div>
-      <div id="supportView" class="value">—</div>
-    </div>
-    <div class="card">
-      <div class="label">權值50</div>
-      <div id="top50View" class="value">—</div>
-    </div>
-    <div class="card">
-      <div class="label">中型100</div>
-      <div id="mid100View" class="value">—</div>
-    </div>
-    <div class="card">
-      <div class="label">電子 / 金融</div>
-      <div id="sectorView" class="value">—</div>
-    </div>
-  </div>
-
-  <div class="grid-3">
-    <div class="card core-box">
-      <div class="core-title">權值核心</div>
-      <div id="coreWeightedScore" class="core-score">0</div>
-      <div id="coreWeightedStatus" class="core-status">中性</div>
-    </div>
-
-    <div class="card core-box">
-      <div class="core-title">電子核心</div>
-      <div id="coreElectronicsScore" class="core-score">0</div>
-      <div id="coreElectronicsStatus" class="core-status">中性</div>
-    </div>
-
-    <div class="card core-box">
-      <div class="core-title">金融核心</div>
-      <div id="coreFinanceScore" class="core-score">0</div>
-      <div id="coreFinanceStatus" class="core-status">中性</div>
-    </div>
-  </div>
-
-  <div class="charts">
-    <div class="chart-wrap">
-      <h2 class="chart-title">盤勢量能柱狀圖</h2>
-      <div class="chart-sub">紅色 = 多方推進，綠色 = 空方推進</div>
-      <canvas id="powerChart" width="600" height="260"></canvas>
-    </div>
-
-    <div class="chart-wrap">
-      <h2 class="chart-title">內外盤差柱狀圖</h2>
-      <div class="chart-sub">粉紅 = 偏多，綠色 = 偏空</div>
-      <canvas id="ioChart" width="600" height="260"></canvas>
-    </div>
-  </div>
-
-  <div class="panel-wide">
-    <div class="card">
-      <h2 class="section-title">核心數值</h2>
-      <table class="metric-table">
-        <tr><td>15分K方向分數</td><td id="k15ScoreCell">—</td></tr>
-        <tr><td>內外盤差分數</td><td id="ioScoreCell">—</td></tr>
-        <tr><td>盤勢量能分數</td><td id="powerScoreCell">—</td></tr>
-        <tr><td>支撐分數</td><td id="supportScoreCell">—</td></tr>
-        <tr><td>權值50分數</td><td id="top50ScoreCell">—</td></tr>
-        <tr><td>中型100分數</td><td id="mid100ScoreCell">—</td></tr>
-        <tr><td>電子分數</td><td id="electronicsScoreCell">—</td></tr>
-        <tr><td>金融分數</td><td id="financeScoreCell">—</td></tr>
-        <tr><td>三核心同步加權</td><td id="syncCoreScoreCell">—</td></tr>
-        <tr><td><span class="warn">總分</span></td><td id="totalScoreCell">—</td></tr>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>時間</th>
+            <th>支撐</th>
+            <th>權值50</th>
+            <th>中型100</th>
+            <th>電子</th>
+            <th>金融</th>
+          </tr>
+        </thead>
+        <tbody id="spotTableBody">
+          <tr>
+            <td colspan="6" style="padding: 30px; color: #9aa4b2;">載入中...</td>
+          </tr>
+        </tbody>
       </table>
     </div>
-
-    <div class="card">
-      <h2 class="section-title">現貨結構時間表</h2>
-      <div class="history-wrap">
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>時間</th>
-              <th>支撐</th>
-              <th>權值50</th>
-              <th>中型100</th>
-              <th>電子</th>
-              <th>金融</th>
-            </tr>
-          </thead>
-          <tbody id="historyBody"></tbody>
-        </table>
-      </div>
-    </div>
   </div>
 
-  <div class="panel">
-    <div class="card">
-      <h2 class="section-title">判斷拆解</h2>
-      <div id="reasonRows" class="rows"></div>
-    </div>
+  <script>
+    /********************************************************
+     * 你要改的地方只有這個 API
+     * 請換成你自己的即時現貨 API
+     ********************************************************/
+    const SPOT_API_URL = "/api/spot-structure"; 
+    // 例如：
+    // const SPOT_API_URL = "http://127.0.0.1:3000/api/spot-structure";
 
-    <div class="card">
-      <div class="label">一句話結論</div>
-      <div id="finalConclusion" class="value">等待計算。</div>
-    </div>
-  </div>
+    /********************************************************
+     * 更新設定
+     ********************************************************/
+    const REFRESH_MS = 5000; // 每 5 秒更新一次
+    let pollingTimer = null;
+    let countdownTimer = null;
+    let isFetching = false;
+    let lastDataHash = "";
+    let nextUpdateAt = 0;
+    let abortController = null;
 
-</div>
+    const spotTableBody = document.getElementById("spotTableBody");
+    const lastUpdateText = document.getElementById("lastUpdateText");
+    const nextUpdateText = document.getElementById("nextUpdateText");
+    const errorText = document.getElementById("errorText");
+    const statusDot = document.getElementById("statusDot");
 
-<script>
-let timer = null;
-let powerHistory = Array.from({length: 30}, (_, i) => {
-  const v = Math.sin(i / 4) * 3 + (Math.random() - 0.5) * 1.2;
-  return Number(v.toFixed(2));
-});
-let ioHistory = Array.from({length: 30}, (_, i) => {
-  const v = Math.cos(i / 5) * 120 + (Math.random() - 0.5) * 35;
-  return Math.round(v);
-});
-let spotHistory = [];
+    function formatTime(date) {
+      const d = new Date(date);
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      const ss = String(d.getSeconds()).padStart(2, "0");
+      return `${hh}:${mm}:${ss}`;
+    }
 
-function nowText(){
-  const d = new Date();
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  const ss = String(d.getSeconds()).padStart(2, "0");
-  return `${hh}:${mm}:${ss}`;
-}
+    function setStatus(ok) {
+      statusDot.style.background = ok ? "#00c853" : "#ff5252";
+      statusDot.style.boxShadow = ok
+        ? "0 0 10px #00c853"
+        : "0 0 10px #ff5252";
+    }
 
-function setCell(id, text){
-  document.getElementById(id).textContent = text;
-}
+    function updateCountdown() {
+      if (!nextUpdateAt) {
+        nextUpdateText.textContent = "下次更新：--";
+        return;
+      }
+      const diff = Math.max(0, nextUpdateAt - Date.now());
+      const sec = Math.ceil(diff / 1000);
+      nextUpdateText.textContent = `下次更新：${sec} 秒後`;
+    }
 
-function badgeClass(v){
-  if(v > 0) return "badge up";
-  if(v < 0) return "badge down";
-  return "badge neutral";
-}
+    function safeNumber(value) {
+      if (value === null || value === undefined || value === "") return "--";
+      return value;
+    }
 
-function buildReasonRow(name, value){
-  const row = document.createElement("div");
-  row.className = "row";
-  row.innerHTML = `<div>${name}</div><div class="${badgeClass(value)}">${value > 0 ? "+"+value : value}</div>`;
-  return row;
-}
+    function renderTable(rows) {
+      if (!Array.isArray(rows) || rows.length === 0) {
+        spotTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" style="padding: 30px; color: #9aa4b2;">目前沒有資料</td>
+          </tr>
+        `;
+        return;
+      }
 
-function directionText(v){
-  if(v > 0) return "偏強";
-  if(v < 0) return "偏弱";
-  return "中性";
-}
+      const html = rows.map(row => `
+        <tr>
+          <td class="time-col">${safeNumber(row.time)}</td>
+          <td>${safeNumber(row.support)}</td>
+          <td>${safeNumber(row.weight50)}</td>
+          <td>${safeNumber(row.mid100)}</td>
+          <td>${safeNumber(row.electronics)}</td>
+          <td>${safeNumber(row.finance)}</td>
+        </tr>
+      `).join("");
 
-function scoreBand(v){
-  if(v >= 80) return 2;
-  if(v >= 60) return 1;
-  if(v >= 40) return 0;
-  if(v >= 20) return -1;
-  return -2;
-}
+      spotTableBody.innerHTML = html;
+    }
 
-function coreStatus(score){
-  if(score >= 4) return "偏強";
-  if(score >= 1) return "轉強";
-  if(score <= -4) return "偏弱";
-  if(score <= -1) return "轉弱";
-  return "中性";
-}
+    async function fetchSpotData() {
+      if (isFetching) return;
 
-function generateSignal(score){
-  if(score >= 10) return { text:"🔴 做多", light:"🔴" };
-  if(score >= 4) return { text:"🟠 偏多", light:"🟠" };
-  if(score > -3) return { text:"⚪ 觀望", light:"🟡" };
-  if(score > -10) return { text:"🟢 偏空", light:"🟢" };
-  return { text:"🟢 放空", light:"🟢" };
-}
+      isFetching = true;
+      errorText.textContent = "";
+      setStatus(true);
+      spotTableBody.classList.add("updating");
 
-function clamp(value, min, max){
-  return Math.max(min, Math.min(max, value));
-}
-
-async function fetchSpotData(){
-  const out = {
-    support: 55,
-    top50: 58,
-    mid100: 52,
-    electronics: 60,
-    finance: 48,
-    k15Direction: 0,
-    ioDiff: 0,
-    trendPower: 0
-  };
-
-  try{
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth()+1).padStart(2,"0");
-    const dd = String(d.getDate()).padStart(2,"0");
-    const dateText = `${yyyy}${mm}${dd}`;
-
-    const taiexUrl = `https://www.twse.com.tw/rwd/zh/TAIEX/MI_5MINS_HIST?date=${dateText}&response=json`;
-    const r1 = await fetch(taiexUrl, { cache:"no-store" });
-    const j1 = await r1.json();
-
-    const taiexDayUrl = `https://www.twse.com.tw/rwd/zh/TAIEX/MI_INDEX?date=${dateText}&type=ALLBUT0999&response=json`;
-    const r2 = await fetch(taiexDayUrl, { cache:"no-store" });
-    const j2 = await r2.json();
-
-    const rows5m = Array.isArray(j1?.data) ? j1.data : [];
-    if(rows5m.length >= 4){
-      const last4 = rows5m.slice(-4).map(row => {
-        const raw = row[1] ?? row[0];
-        return Number(String(raw).replace(/,/g,""));
-      });
-
-      if(last4.every(v => !Number.isNaN(v))){
-        const first = last4[0];
-        const last = last4[last4.length - 1];
-        const drift = last - first;
-
-        out.k15Direction = drift;
-        out.support = drift > 0 ? 72 : drift < 0 ? 28 : 50;
-
-        let power = Number((drift / 10).toFixed(2));
-        if(Math.abs(power) < 0.35){
-          power = drift >= 0 ? 0.45 : -0.45;
+      try {
+        if (abortController) {
+          abortController.abort();
         }
-        out.trendPower = power;
+        abortController = new AbortController();
 
-        let io = Math.round(drift * 8);
-        if(Math.abs(io) < 20){
-          io = drift >= 0 ? 28 : -28;
+        // 關鍵 1：加 timestamp，避免快取
+        const url = `${SPOT_API_URL}?t=${Date.now()}`;
+
+        const res = await fetch(url, {
+          method: "GET",
+          cache: "no-store", // 關鍵 2：不要用快取
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+          },
+          signal: abortController.signal
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
         }
-        out.ioDiff = io;
+
+        const data = await res.json();
+
+        // 假設 API 回傳格式：
+        // { rows: [ {time, support, weight50, mid100, electronics, finance}, ... ] }
+
+        const rows = Array.isArray(data?.rows) ? data.rows : [];
+        const newHash = JSON.stringify(rows);
+
+        // 關鍵 3：即使內容沒變，也更新最後抓取時間
+        if (newHash !== lastDataHash) {
+          renderTable(rows);
+          lastDataHash = newHash;
+        }
+
+        lastUpdateText.textContent = `最後更新：${formatTime(Date.now())}`;
+        nextUpdateAt = Date.now() + REFRESH_MS;
+        updateCountdown();
+        setStatus(true);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("現貨更新失敗:", err);
+          errorText.textContent = `更新失敗：${err.message}`;
+          setStatus(false);
+        }
+      } finally {
+        isFetching = false;
+        spotTableBody.classList.remove("updating");
       }
     }
 
-    const rowsDay = Array.isArray(j2?.tables?.[0]?.data) ? j2.tables[0].data : [];
-    if(rowsDay.length > 0){
-      if(out.k15Direction > 0){
-        out.top50 = 78;
-        out.mid100 = 67;
-        out.electronics = 82;
-        out.finance = 58;
-      }else if(out.k15Direction < 0){
-        out.top50 = 32;
-        out.mid100 = 41;
-        out.electronics = 28;
-        out.finance = 44;
-      }else{
-        out.top50 = 52;
-        out.mid100 = 50;
-        out.electronics = 54;
-        out.finance = 49;
+    function startPolling() {
+      stopPolling();
+
+      // 先抓一次
+      fetchSpotData();
+
+      // 關鍵 4：固定輪詢
+      pollingTimer = setInterval(() => {
+        fetchSpotData();
+      }, REFRESH_MS);
+
+      // 倒數顯示
+      countdownTimer = setInterval(() => {
+        updateCountdown();
+      }, 1000);
+    }
+
+    function stopPolling() {
+      if (pollingTimer) {
+        clearInterval(pollingTimer);
+        pollingTimer = null;
+      }
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
       }
     }
 
-  }catch(e){
-    const lastP = powerHistory[powerHistory.length - 1] || 0.5;
-    const lastI = ioHistory[ioHistory.length - 1] || 35;
+    // 切回頁面時強制更新一次
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        fetchSpotData();
+      }
+    });
 
-    out.k15Direction = lastP >= 0 ? 5 : -5;
-    out.trendPower = Number((lastP + (Math.random() - 0.5) * 0.8).toFixed(2));
-    out.ioDiff = Math.round(lastI + (Math.random() - 0.5) * 30);
+    // 網路恢復時強制更新一次
+    window.addEventListener("online", () => {
+      fetchSpotData();
+    });
 
-    const mood = out.trendPower >= 0 ? 1 : -1;
-    out.support = mood > 0 ? 70 : 30;
-    out.top50 = mood > 0 ? 76 : 34;
-    out.mid100 = mood > 0 ? 64 : 42;
-    out.electronics = mood > 0 ? 81 : 29;
-    out.finance = mood > 0 ? 56 : 46;
-  }
-
-  out.trendPower = Number((out.trendPower * 0.7 + (powerHistory[powerHistory.length - 1] || 0) * 0.3).toFixed(2));
-  if(Math.abs(out.trendPower) < 0.35){
-    out.trendPower = out.trendPower >= 0 ? 0.45 : -0.45;
-  }
-
-  out.ioDiff = Math.round(out.ioDiff * 0.7 + (ioHistory[ioHistory.length - 1] || 0) * 0.3);
-  if(Math.abs(out.ioDiff) < 20){
-    out.ioDiff = out.ioDiff >= 0 ? 28 : -28;
-  }
-
-  out.support = clamp(Math.round(out.support), 0, 100);
-  out.top50 = clamp(Math.round(out.top50), 0, 100);
-  out.mid100 = clamp(Math.round(out.mid100), 0, 100);
-  out.electronics = clamp(Math.round(out.electronics), 0, 100);
-  out.finance = clamp(Math.round(out.finance), 0, 100);
-
-  return out;
-}
-
-function calcDecision(spot){
-  const reasons = [];
-  let total = 0;
-
-  let k15Score = 0;
-  if(spot.k15Direction > 8) k15Score = 2;
-  else if(spot.k15Direction > 0) k15Score = 1;
-  else if(spot.k15Direction < -8) k15Score = -2;
-  else if(spot.k15Direction < 0) k15Score = -1;
-  reasons.push(["15分K方向", k15Score]);
-  total += k15Score;
-
-  let ioScore = 0;
-  if(spot.ioDiff >= 120) ioScore = 2;
-  else if(spot.ioDiff >= 30) ioScore = 1;
-  else if(spot.ioDiff <= -120) ioScore = -2;
-  else if(spot.ioDiff <= -30) ioScore = -1;
-  reasons.push(["內外盤差", ioScore]);
-  total += ioScore;
-
-  let powerScore = 0;
-  if(spot.trendPower >= 6) powerScore = 2;
-  else if(spot.trendPower >= 2) powerScore = 1;
-  else if(spot.trendPower <= -6) powerScore = -2;
-  else if(spot.trendPower <= -2) powerScore = -1;
-  reasons.push(["盤勢量能", powerScore]);
-  total += powerScore;
-
-  const supportScore = scoreBand(spot.support) * 2;
-  const top50Score = scoreBand(spot.top50) * 2;
-  const mid100Score = scoreBand(spot.mid100) * 1;
-  const electronicsScore = scoreBand(spot.electronics) * 2;
-  const financeScore = scoreBand(spot.finance) * 1;
-
-  reasons.push(["支撐", supportScore]);
-  reasons.push(["權值50", top50Score]);
-  reasons.push(["中型100", mid100Score]);
-  reasons.push(["電子", electronicsScore]);
-  reasons.push(["金融", financeScore]);
-
-  total += supportScore + top50Score + mid100Score + electronicsScore + financeScore;
-
-  // 三核心
-  const coreWeighted = top50Score + mid100Score;
-  const coreElectronics = electronicsScore;
-  const coreFinance = financeScore;
-
-  let syncCoreScore = 0;
-  const positiveCores = [coreWeighted, coreElectronics, coreFinance].filter(v => v > 0).length;
-  const negativeCores = [coreWeighted, coreElectronics, coreFinance].filter(v => v < 0).length;
-
-  if(positiveCores === 3) syncCoreScore = 2;
-  else if(positiveCores === 2) syncCoreScore = 1;
-  else if(negativeCores === 3) syncCoreScore = -2;
-  else if(negativeCores === 2) syncCoreScore = -1;
-  reasons.push(["三核心同步", syncCoreScore]);
-  total += syncCoreScore;
-
-  const signal = generateSignal(total);
-
-  let summary = "三核心未一致，先觀望。";
-  let tradePlan = "➡️ 建議：觀望，不進場";
-
-  if(total >= 10){
-    summary = "三核心同步偏強，現貨與量能共振。";
-    tradePlan = "➡️ 建議：順勢做多（紅燈），拉回找進場。";
-  }else if(total >= 4){
-    summary = "偏多結構成立，但需防回檔。";
-    tradePlan = "➡️ 建議：偏多操作，小倉位試單。";
-  }else if(total > -3){
-    summary = "三核心分歧，盤勢尚未完全一致。";
-    tradePlan = "➡️ 建議：觀望，不追單。";
-  }else if(total > -10){
-    summary = "偏空結構成立，但需防反彈。";
-    tradePlan = "➡️ 建議：偏空操作，反彈找空點。";
-  }else{
-    summary = "三核心同步偏弱，空方結構完整。";
-    tradePlan = "➡️ 建議：強空（綠燈），優先順勢放空。";
-  }
-
-  return {
-    total,
-    signal,
-    summary,
-    tradePlan,
-    reasons,
-    k15Score,
-    ioScore,
-    powerScore,
-    supportScore,
-    top50Score,
-    mid100Score,
-    electronicsScore,
-    financeScore,
-    syncCoreScore,
-    coreWeighted,
-    coreElectronics,
-    coreFinance
-  };
-}
-
-function drawBarChart(canvasId, values, positiveColor, negativeColor, yTitle, xTitle){
-  const canvas = document.getElementById(canvasId);
-  const ctx = canvas.getContext("2d");
-  const w = canvas.width;
-  const h = canvas.height;
-
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#0b0b0d";
-  ctx.fillRect(0, 0, w, h);
-
-  const paddingLeft = 44;
-  const paddingRight = 12;
-  const paddingTop = 18;
-  const paddingBottom = 28;
-
-  const chartX = paddingLeft;
-  const chartY = paddingTop;
-  const chartW = w - paddingLeft - paddingRight;
-  const chartH = h - paddingTop - paddingBottom;
-  const midY = chartY + chartH / 2;
-
-  const maxAbs = Math.max(1, ...values.map(v => Math.abs(v)));
-
-  ctx.strokeStyle = "#202028";
-  ctx.lineWidth = 1;
-  ctx.strokeRect(chartX, chartY, chartW, chartH);
-
-  ctx.strokeStyle = "#1b1b20";
-  ctx.lineWidth = 1;
-  for(let i = 0; i <= 4; i++){
-    const y = chartY + (chartH / 4) * i;
-    ctx.beginPath();
-    ctx.moveTo(chartX, y);
-    ctx.lineTo(chartX + chartW, y);
-    ctx.stroke();
-  }
-
-  ctx.strokeStyle = "#3a3a44";
-  ctx.beginPath();
-  ctx.moveTo(chartX, chartY);
-  ctx.lineTo(chartX, chartY + chartH);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(chartX, midY);
-  ctx.lineTo(chartX + chartW, midY);
-  ctx.stroke();
-
-  ctx.fillStyle = "#9ca3af";
-  ctx.font = "11px Arial";
-  ctx.textAlign = "right";
-  ctx.textBaseline = "middle";
-  ctx.fillText(String(maxAbs), chartX - 6, chartY);
-  ctx.fillText(String(Math.round(maxAbs / 2)), chartX - 6, chartY + chartH * 0.25);
-  ctx.fillText("0", chartX - 6, midY);
-  ctx.fillText(String(-Math.round(maxAbs / 2)), chartX - 6, chartY + chartH * 0.75);
-  ctx.fillText(String(-maxAbs), chartX - 6, chartY + chartH);
-
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  ctx.fillStyle = "#9ca3af";
-  ctx.fillText("較早", chartX + 20, chartY + chartH + 6);
-  ctx.fillText(xTitle || "時間", chartX + chartW / 2, chartY + chartH + 6);
-  ctx.fillText("最新", chartX + chartW - 20, chartY + chartH + 6);
-
-  ctx.save();
-  ctx.translate(14, chartY + chartH / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = "#9ca3af";
-  ctx.font = "12px Arial";
-  ctx.fillText(yTitle || "數值", 0, 0);
-  ctx.restore();
-
-  const n = values.length;
-  const gap = 4;
-  const barWidth = Math.max(4, (chartW - (n + 1) * gap) / n);
-
-  values.forEach((v, i) => {
-    const x = chartX + gap + i * (barWidth + gap);
-    const height = Math.max(2, Math.abs(v) / maxAbs * (chartH * 0.46));
-    const y = v >= 0 ? midY - height : midY;
-    ctx.fillStyle = v >= 0 ? positiveColor : negativeColor;
-    ctx.fillRect(x, y, barWidth, height);
-  });
-}
-
-function updateCharts(spot){
-  powerHistory.push(spot.trendPower);
-  ioHistory.push(spot.ioDiff);
-
-  if(powerHistory.length > 30) powerHistory.shift();
-  if(ioHistory.length > 30) ioHistory.shift();
-
-  drawBarChart("powerChart", powerHistory, "#ff3b30", "#22c55e", "量能值", "時間");
-  drawBarChart("ioChart", ioHistory, "#ff4fa3", "#22c55e", "差值", "時間");
-}
-
-function updateHistoryTable(spot){
-  const row = {
-    time: nowText(),
-    support: spot.support,
-    top50: spot.top50,
-    mid100: spot.mid100,
-    electronics: spot.electronics,
-    finance: spot.finance
-  };
-
-  spotHistory.unshift(row);
-  if(spotHistory.length > 18) spotHistory.pop();
-
-  const tbody = document.getElementById("historyBody");
-  tbody.innerHTML = "";
-
-  spotHistory.forEach(item => {
-    const tr = document.createElement("tr");
-
-    function td(text, cls=""){
-      const cell = document.createElement("td");
-      cell.textContent = text;
-      if(cls) cell.className = cls;
-      return cell;
-    }
-
-    tr.appendChild(td(item.time, "grayText"));
-    tr.appendChild(td(item.support, item.support >= 60 ? "pinkText" : item.support < 40 ? "greenText" : "grayText"));
-    tr.appendChild(td(item.top50, item.top50 >= 60 ? "pinkText" : item.top50 < 40 ? "greenText" : "grayText"));
-    tr.appendChild(td(item.mid100, item.mid100 >= 60 ? "pinkText" : item.mid100 < 40 ? "greenText" : "grayText"));
-    tr.appendChild(td(item.electronics, item.electronics >= 60 ? "pinkText" : item.electronics < 40 ? "greenText" : "grayText"));
-    tr.appendChild(td(item.finance, item.finance >= 60 ? "pinkText" : item.finance < 40 ? "greenText" : "grayText"));
-
-    tbody.appendChild(tr);
-  });
-}
-
-function updateUI(spot, result){
-  setCell("score", result.total > 0 ? `+${result.total}` : `${result.total}`);
-  setCell("signal", result.signal.text);
-  setCell("light", result.signal.light);
-  setCell("headlineSummary", result.summary);
-  setCell("tradePlan", result.tradePlan);
-  setCell("finalConclusion", result.summary);
-
-  setCell("k15View", directionText(spot.k15Direction));
-  setCell("ioView", spot.ioDiff > 0 ? `+${Math.round(spot.ioDiff)}` : `${Math.round(spot.ioDiff)}`);
-  setCell("powerView", spot.trendPower > 0 ? `+${spot.trendPower.toFixed(2)}` : `${spot.trendPower.toFixed(2)}`);
-  setCell("timeView", nowText());
-
-  setCell("supportView", String(spot.support));
-  setCell("top50View", String(spot.top50));
-  setCell("mid100View", String(spot.mid100));
-  setCell("sectorView", `${spot.electronics} / ${spot.finance}`);
-
-  setCell("k15ScoreCell", result.k15Score > 0 ? `+${result.k15Score}` : `${result.k15Score}`);
-  setCell("ioScoreCell", result.ioScore > 0 ? `+${result.ioScore}` : `${result.ioScore}`);
-  setCell("powerScoreCell", result.powerScore > 0 ? `+${result.powerScore}` : `${result.powerScore}`);
-  setCell("supportScoreCell", result.supportScore > 0 ? `+${result.supportScore}` : `${result.supportScore}`);
-  setCell("top50ScoreCell", result.top50Score > 0 ? `+${result.top50Score}` : `${result.top50Score}`);
-  setCell("mid100ScoreCell", result.mid100Score > 0 ? `+${result.mid100Score}` : `${result.mid100Score}`);
-  setCell("electronicsScoreCell", result.electronicsScore > 0 ? `+${result.electronicsScore}` : `${result.electronicsScore}`);
-  setCell("financeScoreCell", result.financeScore > 0 ? `+${result.financeScore}` : `${result.financeScore}`);
-  setCell("syncCoreScoreCell", result.syncCoreScore > 0 ? `+${result.syncCoreScore}` : `${result.syncCoreScore}`);
-  setCell("totalScoreCell", result.total > 0 ? `+${result.total}` : `${result.total}`);
-
-  setCell("coreWeightedScore", result.coreWeighted > 0 ? `+${result.coreWeighted}` : `${result.coreWeighted}`);
-  setCell("coreWeightedStatus", coreStatus(result.coreWeighted));
-
-  setCell("coreElectronicsScore", result.coreElectronics > 0 ? `+${result.coreElectronics}` : `${result.coreElectronics}`);
-  setCell("coreElectronicsStatus", coreStatus(result.coreElectronics));
-
-  setCell("coreFinanceScore", result.coreFinance > 0 ? `+${result.coreFinance}` : `${result.coreFinance}`);
-  setCell("coreFinanceStatus", coreStatus(result.coreFinance));
-
-  const reasonRows = document.getElementById("reasonRows");
-  reasonRows.innerHTML = "";
-  result.reasons.forEach(([name, value]) => {
-    reasonRows.appendChild(buildReasonRow(name, value));
-  });
-
-  updateCharts(spot);
-  updateHistoryTable(spot);
-}
-
-async function runNow(){
-  try{
-    const spot = await fetchSpotData();
-    const result = calcDecision(spot);
-    updateUI(spot, result);
-  }catch(e){
-    document.getElementById("headlineSummary").textContent = "資料抓取失敗，請稍後重新整理。";
-    document.getElementById("tradePlan").textContent = "➡️ 建議：暫時觀望。";
-  }
-}
-
-function startAuto(){
-  if(timer) clearInterval(timer);
-  timer = setInterval(runNow, 15000);
-}
-
-startAuto();
-runNow();
-</script>
+    // 啟動
+    startPolling();
+  </script>
 </body>
 </html>
