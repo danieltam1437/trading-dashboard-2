@@ -28,28 +28,42 @@ export default async function handler(req, res) {
 
     const result = await response.json();
 
-    if (!result.data || !Array.isArray(result.data) || result.data.length === 0) {
+    if (!result || !Array.isArray(result.data) || result.data.length === 0) {
       throw new Error("TradingView returned empty data");
     }
 
     const taiex = result.data[0];
     const stocks = result.data.slice(1);
 
-    const indexPrice = Number(taiex?.d?.[0] ?? 0);
-    const indexChangePct = Number(taiex?.d?.[1] ?? 0);
-    const indexChangeAbs = Number(taiex?.d?.[2] ?? 0);
+    if (!taiex || !Array.isArray(taiex.d)) {
+      throw new Error("TAIEX data format invalid");
+    }
 
-    const validStocks = stocks.filter(s => Array.isArray(s.d) && typeof s.d[1] === "number");
-    const upCount = validStocks.filter(s => s.d[1] > 0).length;
+    let indexPrice = Number(taiex.d[0] ?? 0);
+    let indexChangePct = Number(taiex.d[1] ?? 0);
+    let indexChangeAbs = Number(taiex.d[2] ?? 0);
 
+    // 若抓到縮放後的值，例如 2055，自動修正為 20550
+    if (indexPrice > 0 && indexPrice < 10000) {
+      indexPrice = indexPrice * 10;
+      indexChangeAbs = indexChangeAbs * 10;
+    }
+
+    const validStocks = stocks.filter(item => {
+      return item && Array.isArray(item.d) && typeof item.d[1] === "number";
+    });
+
+    const upCount = validStocks.filter(item => item.d[1] > 0).length;
     const support = validStocks.length
       ? Math.round((upCount / validStocks.length) * 100)
       : 0;
 
-    const weight50 = Math.max(0, Math.min(100, Math.round(50 + indexChangePct * 8)));
-    const mid100 = Math.max(0, Math.min(100, Math.round(50 + indexChangePct * 6)));
-    const electronics = Math.max(0, Math.min(100, Math.round(55 + indexChangePct * 9)));
-    const finance = Math.max(0, Math.min(100, Math.round(45 + indexChangePct * 5)));
+    const clamp = (v, min = 0, max = 100) => Math.max(min, Math.min(max, v));
+
+    const weight50 = clamp(Math.round(50 + indexChangePct * 8));
+    const mid100 = clamp(Math.round(50 + indexChangePct * 6));
+    const electronics = clamp(Math.round(55 + indexChangePct * 9));
+    const finance = clamp(Math.round(45 + indexChangePct * 5));
 
     const avgScore = Math.round(
       (support + weight50 + mid100 + electronics + finance) / 5
@@ -70,15 +84,22 @@ export default async function handler(req, res) {
     }
 
     const now = new Date();
-    const timeText = now.toLocaleTimeString("zh-TW", { hour12: false });
+    const timeText = now.toLocaleTimeString("zh-TW", {
+      hour12: false,
+      timeZone: "Asia/Taipei"
+    });
+
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
 
     return res.status(200).json({
       ok: true,
       updatedAt: Date.now(),
       taiex: {
-        current: indexPrice,
-        pct: indexChangePct,
-        changeAbs: indexChangeAbs
+        current: Number(indexPrice.toFixed(2)),
+        pct: Number(indexChangePct.toFixed(2)),
+        changeAbs: Number(indexChangeAbs.toFixed(2))
       },
       dashboard: {
         marketStatus,
