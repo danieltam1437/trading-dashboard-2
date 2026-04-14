@@ -46,39 +46,33 @@ export default async function handler(req, res) {
       return Number.isFinite(n) ? n : 0;
     }
 
-    let taiexCurrent = toNum(taiexRaw.d[0]);
+    // 原始資料
+    let taiexCurrentRaw = toNum(taiexRaw.d[0]);
     let taiexPct = toNum(taiexRaw.d[1]);
-    let taiexChangeAbs = toNum(taiexRaw.d[2]);
+    let taiexChangeAbsRaw = toNum(taiexRaw.d[2]);
 
-    let txfCurrent = toNum(txfRaw.d[0]);
+    let txfCurrentRaw = toNum(txfRaw.d[0]);
     let txfPct = toNum(txfRaw.d[1]);
-    let txfChangeAbs = toNum(txfRaw.d[2]);
+    let txfChangeAbsRaw = toNum(txfRaw.d[2]);
 
-    // 先修正加權指數縮放
+    // 加權指數：2055 -> 20550
+    let taiexCurrent = taiexCurrentRaw;
+    let taiexChangeAbs = taiexChangeAbsRaw;
     if (taiexCurrent > 0 && taiexCurrent < 10000) {
-      taiexCurrent *= 10;
-      taiexChangeAbs *= 10;
+      taiexCurrent = taiexCurrent * 10;
+      taiexChangeAbs = taiexChangeAbs * 10;
     }
 
-    // 再修正台指期縮放
-    // 規則 1：若台指期本身小於 10000，先乘 10
+    // 台指期：2075 -> 20750
+    // 這裡直接強制用同樣規則修正，不再做其他條件判斷
+    let txfCurrent = txfCurrentRaw;
+    let txfChangeAbs = txfChangeAbsRaw;
     if (txfCurrent > 0 && txfCurrent < 10000) {
-      txfCurrent *= 10;
-      txfChangeAbs *= 10;
+      txfCurrent = txfCurrent * 10;
+      txfChangeAbs = txfChangeAbs * 10;
     }
 
-    // 規則 2：若修正後仍遠小於加權（例如只有一半以下），再補乘 10
-    if (taiexCurrent > 10000 && txfCurrent > 0 && txfCurrent < taiexCurrent * 0.5) {
-      txfCurrent *= 10;
-      txfChangeAbs *= 10;
-    }
-
-    // 規則 3：若台指期遠大於加權很多倍，避免過度放大，縮回來
-    if (taiexCurrent > 10000 && txfCurrent > taiexCurrent * 5) {
-      txfCurrent /= 10;
-      txfChangeAbs /= 10;
-    }
-
+    // 四捨五入
     taiexCurrent = Number(taiexCurrent.toFixed(2));
     taiexPct = Number(taiexPct.toFixed(2));
     taiexChangeAbs = Number(taiexChangeAbs.toFixed(2));
