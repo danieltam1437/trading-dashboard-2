@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>台指期同步版 3.0</title>
+  <title>台指期同步版 3.1</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -17,15 +17,18 @@
       font-family: Arial, "Microsoft JhengHei", sans-serif;
       overflow: hidden;
     }
+
     body {
       background: radial-gradient(circle at top, rgba(90,0,0,0.18), transparent 28%), #000;
     }
+
     .app {
       width: 100vw;
       height: 100vh;
       display: flex;
       flex-direction: column;
     }
+
     .topbar {
       height: 84px;
       background: linear-gradient(to bottom, #4a0000, #170000);
@@ -36,6 +39,7 @@
       padding: 3px;
       flex-shrink: 0;
     }
+
     .topbox {
       background: linear-gradient(to bottom, #171717, #050505);
       border: 1px solid #3d1717;
@@ -45,6 +49,7 @@
       flex-direction: column;
       justify-content: center;
     }
+
     .topbox-title {
       font-size: 10px;
       color: #d2d2d2;
@@ -52,46 +57,54 @@
       white-space: nowrap;
       opacity: 0.95;
     }
+
     .topbox-value {
       font-size: 15px;
       font-weight: 700;
       line-height: 1.15;
       white-space: nowrap;
     }
+
     .status-box {
       background: linear-gradient(to bottom, #d50000, #7a0000);
       border: 1px solid #ff6666;
       text-align: center;
       align-items: center;
     }
+
     .status-box .topbox-title {
       color: #fff;
       font-size: 11px;
       font-weight: 700;
     }
+
     .status-box .topbox-value {
       color: #fff;
       font-size: 25px;
       font-weight: 900;
       letter-spacing: 1px;
     }
+
     .main-index {
       color: #ff4d4d;
       font-size: 29px;
       font-weight: 900;
       letter-spacing: 0.3px;
     }
+
     .futures-index {
       color: #37d7ff;
       font-size: 27px;
       font-weight: 900;
       letter-spacing: 0.3px;
     }
+
     .subline {
       color: #ffd54f;
       font-size: 11px;
       margin-top: 4px;
     }
+
     .structure-values {
       display: flex;
       gap: 12px;
@@ -100,20 +113,24 @@
       font-weight: 900;
       color: #ff3b3b;
     }
+
     .structure-values span {
       min-width: 28px;
       text-align: center;
       display: inline-block;
     }
+
     .top-right {
       align-items: flex-end;
       text-align: right;
     }
+
     .signal-line {
       font-size: 12px;
       font-weight: 800;
       margin-top: 3px;
     }
+
     .signal-bull { color: #00ff66; }
     .signal-bear { color: #ff5a5a; }
     .signal-neutral { color: #ffd54f; }
@@ -129,11 +146,13 @@
       flex-shrink: 0;
       gap: 8px;
     }
+
     .control-left, .control-right {
       display: flex;
       align-items: center;
       gap: 8px;
     }
+
     .badge {
       border: 1px solid #404040;
       background: #090909;
@@ -143,9 +162,11 @@
       font-size: 11px;
       white-space: nowrap;
     }
+
     .badge.red { color: #ff5b5b; border-color: #632020; }
     .badge.green { color: #38ff77; border-color: #205b34; }
     .badge.yellow { color: #ffd54f; border-color: #5d4a17; }
+
     button.ctrl-btn {
       background: linear-gradient(to bottom, #181818, #090909);
       border: 1px solid #444;
@@ -155,6 +176,7 @@
       font-size: 12px;
       cursor: pointer;
     }
+
     button.ctrl-btn:hover { border-color: #7a7a7a; }
 
     .main {
@@ -165,12 +187,14 @@
       padding: 6px;
       min-height: 0;
     }
+
     .left-panel {
       display: grid;
-      grid-template-rows: 1fr 250px 200px;
+      grid-template-rows: 1fr repeat(5, 110px);
       gap: 6px;
       min-height: 0;
     }
+
     .chart-card {
       position: relative;
       background: linear-gradient(to bottom, #040404, #010101);
@@ -178,12 +202,13 @@
       overflow: hidden;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
     }
+
     .chart-header {
       position: absolute;
       left: 0;
       right: 0;
       top: 0;
-      height: 30px;
+      height: 28px;
       padding: 0 8px;
       display: flex;
       align-items: center;
@@ -194,6 +219,7 @@
       font-size: 11px;
       color: #ddd;
     }
+
     .mini-tag {
       padding: 2px 7px;
       border: 1px solid #484848;
@@ -202,6 +228,7 @@
       color: #eee;
       font-size: 10px;
     }
+
     .legend-line {
       display: inline-flex;
       align-items: center;
@@ -211,12 +238,14 @@
       font-size: 10px;
       white-space: nowrap;
     }
+
     .dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       display: inline-block;
     }
+
     .dot-red { background: #ff2e2e; }
     .dot-green { background: #00ff66; }
     .dot-yellow { background: #ffd400; }
@@ -225,8 +254,8 @@
 
     .chart-inner {
       position: absolute;
-      inset: 30px 0 0 0;
-      padding: 6px 8px 8px 8px;
+      inset: 28px 0 0 0;
+      padding: 4px 8px 8px 8px;
     }
 
     canvas {
@@ -241,11 +270,13 @@
       gap: 6px;
       min-height: 0;
     }
+
     .summary-card, .table-card {
       background: linear-gradient(to bottom, #050505, #010101);
       border: 1px solid #353535;
       overflow: hidden;
     }
+
     .summary-head, .table-head {
       height: 30px;
       display: flex;
@@ -257,27 +288,32 @@
       color: #ddd;
       font-weight: 700;
     }
+
     .summary-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 6px;
       padding: 8px;
     }
+
     .mini-box {
       border: 1px solid #262626;
       background: #090909;
       padding: 8px;
       min-height: 54px;
     }
+
     .mini-box-title {
       font-size: 10px;
       color: #aaa;
       margin-bottom: 4px;
     }
+
     .mini-box-value {
       font-size: 18px;
       font-weight: 900;
     }
+
     .table-header-row {
       height: 30px;
       display: grid;
@@ -291,12 +327,14 @@
       color: #ddd;
       font-weight: 700;
     }
+
     .time-table {
       height: calc(100% - 30px);
       overflow-y: auto;
       padding: 2px 6px 6px;
       font-size: 12px;
     }
+
     .row {
       display: grid;
       grid-template-columns: 70px repeat(5, 1fr);
@@ -306,15 +344,18 @@
       border-bottom: 1px solid rgba(255,255,255,0.04);
       padding: 2px 0;
     }
+
     .cell {
       text-align: right;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
+
     .time {
       text-align: left;
       color: #cfcfcf;
     }
+
     .red-text { color: #ff4747; font-weight: 800; }
     .green-text { color: #45da68; font-weight: 800; }
     .yellow-text { color: #ffd54f; font-weight: 800; }
@@ -410,27 +451,51 @@
 
         <div class="chart-card">
           <div class="chart-header">
-            <span class="mini-tag">五結構同步監控</span>
+            <span class="mini-tag">支撐</span>
             <span class="legend-line"><span class="dot dot-red"></span>支撐</span>
-            <span class="legend-line"><span class="dot dot-yellow"></span>權值50</span>
-            <span class="legend-line"><span class="dot dot-cyan"></span>中型100</span>
-            <span class="legend-line"><span class="dot dot-green"></span>電子</span>
-            <span class="legend-line"><span class="dot dot-pink"></span>金融</span>
           </div>
           <div class="chart-inner">
-            <canvas id="structureChart"></canvas>
+            <canvas id="supportChart"></canvas>
           </div>
         </div>
 
         <div class="chart-card">
           <div class="chart-header">
-            <span class="mini-tag">期現/類股分流監控</span>
-            <span class="legend-line"><span class="dot dot-red"></span>整體量能</span>
+            <span class="mini-tag">電子</span>
             <span class="legend-line"><span class="dot dot-green"></span>電子</span>
+          </div>
+          <div class="chart-inner">
+            <canvas id="electronicsChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="mini-tag">權50</span>
+            <span class="legend-line"><span class="dot dot-yellow"></span>權50</span>
+          </div>
+          <div class="chart-inner">
+            <canvas id="weight50Chart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="mini-tag">中100</span>
+            <span class="legend-line"><span class="dot dot-cyan"></span>中100</span>
+          </div>
+          <div class="chart-inner">
+            <canvas id="mid100Chart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="mini-tag">金融</span>
             <span class="legend-line"><span class="dot dot-pink"></span>金融</span>
           </div>
           <div class="chart-inner">
-            <canvas id="sectorChart"></canvas>
+            <canvas id="financeChart"></canvas>
           </div>
         </div>
       </div>
@@ -481,7 +546,7 @@
       </div>
     </div>
 
-    <div class="footer-strip">台指期同步版 3.0｜真實資料 + 每分鐘更新 + 流暢補點</div>
+    <div class="footer-strip">台指期同步版 3.1｜真實資料 + 每分鐘更新 + 流暢補點</div>
   </div>
 
   <script>
@@ -499,12 +564,13 @@
     const taiexData = [];
     const futuresData = [];
     const maData = [];
+
     const supportData = [];
+    const electronicsData = [];
     const weight50Data = [];
     const mid100Data = [];
-    const electronicsData = [];
     const financeData = [];
-    const sectorPowerData = [];
+
     const rows = [];
 
     let latestSnapshot = null;
@@ -512,9 +578,9 @@
       taiex: null,
       futures: null,
       support: null,
+      electronics: null,
       weight50: null,
       mid100: null,
-      electronics: null,
       finance: null
     };
 
@@ -561,6 +627,45 @@
       return n;
     }
 
+    function createSmallChart(canvasId, label, color, dataArr, min = 0, max = 100) {
+      return new Chart(document.getElementById(canvasId), {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label,
+              data: dataArr,
+              borderColor: color,
+              borderWidth: 1.8,
+              pointRadius: 0,
+              tension: 0.15
+            }
+          ]
+        },
+        options: {
+          animation: false,
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              ticks: { color: "#999", maxTicksLimit: 12, autoSkip: true },
+              grid: { color: "rgba(255,255,255,0.08)" }
+            },
+            y: {
+              min,
+              max,
+              ticks: { color: "#ff5a5a" },
+              grid: { color: "rgba(255,255,255,0.08)" }
+            }
+          }
+        }
+      });
+    }
+
     const priceChart = new Chart(document.getElementById("priceChart"), {
       type: "line",
       data: {
@@ -583,7 +688,7 @@
             tension: 0.15
           },
           {
-            label: "短均線",
+            label: "加權短均線",
             data: maData,
             borderColor: "#ffd400",
             borderWidth: 1.4,
@@ -613,93 +718,11 @@
       }
     });
 
-    const structureChart = new Chart(document.getElementById("structureChart"), {
-      type: "line",
-      data: {
-        labels,
-        datasets: [
-          { label: "支撐", data: supportData, borderColor: "#ff3b3b", borderWidth: 1.5, pointRadius: 0, tension: 0.15 },
-          { label: "權值50", data: weight50Data, borderColor: "#ffd400", borderWidth: 1.5, pointRadius: 0, tension: 0.15 },
-          { label: "中型100", data: mid100Data, borderColor: "#37d7ff", borderWidth: 1.5, pointRadius: 0, tension: 0.15 },
-          { label: "電子", data: electronicsData, borderColor: "#00ff66", borderWidth: 1.5, pointRadius: 0, tension: 0.15 },
-          { label: "金融", data: financeData, borderColor: "#ff76ff", borderWidth: 1.5, pointRadius: 0, tension: 0.15 }
-        ]
-      },
-      options: {
-        animation: false,
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: "#ccc" } } },
-        scales: {
-          x: {
-            ticks: { color: "#999", maxTicksLimit: 10 },
-            grid: { color: "rgba(255,255,255,0.08)" }
-          },
-          y: {
-            min: 0,
-            max: 100,
-            ticks: { color: "#ff5a5a" },
-            grid: { color: "rgba(255,255,255,0.08)" }
-          }
-        }
-      }
-    });
-
-    const sectorChart = new Chart(document.getElementById("sectorChart"), {
-      data: {
-        labels,
-        datasets: [
-          {
-            type: "bar",
-            label: "整體量能",
-            data: sectorPowerData,
-            backgroundColor: "#ff1d1d",
-            borderWidth: 0,
-            barPercentage: 1.0,
-            categoryPercentage: 1.0,
-            yAxisID: "y"
-          },
-          {
-            type: "line",
-            label: "電子",
-            data: electronicsData,
-            borderColor: "#00ff66",
-            borderWidth: 1.5,
-            pointRadius: 0,
-            tension: 0.15,
-            yAxisID: "y"
-          },
-          {
-            type: "line",
-            label: "金融",
-            data: financeData,
-            borderColor: "#ff76ff",
-            borderWidth: 1.3,
-            pointRadius: 0,
-            tension: 0.15,
-            yAxisID: "y"
-          }
-        ]
-      },
-      options: {
-        animation: false,
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: "#ccc" } } },
-        scales: {
-          x: {
-            ticks: { color: "#999", maxTicksLimit: 10 },
-            grid: { color: "rgba(255,255,255,0.08)" }
-          },
-          y: {
-            min: 0,
-            max: 100,
-            ticks: { color: "#ff5a5a" },
-            grid: { color: "rgba(255,255,255,0.08)" }
-          }
-        }
-      }
-    });
+    const supportChart = createSmallChart("supportChart", "支撐", "#ff2e2e", supportData, 0, 100);
+    const electronicsChart = createSmallChart("electronicsChart", "電子", "#00ff66", electronicsData, 0, 100);
+    const weight50Chart = createSmallChart("weight50Chart", "權50", "#ffd400", weight50Data, 0, 100);
+    const mid100Chart = createSmallChart("mid100Chart", "中100", "#37d7ff", mid100Data, 0, 100);
+    const financeChart = createSmallChart("financeChart", "金融", "#ff76ff", financeData, 0, 100);
 
     function renderTable() {
       document.getElementById("timeTable").innerHTML = rows.map(r => `
@@ -802,11 +825,11 @@
 
       displayState.taiex = smoothStep(displayState.taiex, taiexTarget, 0.22) + tinyNoise(2.2);
       displayState.futures = smoothStep(displayState.futures, futuresTarget, 0.22) + tinyNoise(2.4);
-      displayState.support = smoothStep(displayState.support, row.support, 0.30) + tinyNoise(0.20);
+      displayState.support = smoothStep(displayState.support, row.support, 0.30) + tinyNoise(0.18);
+      displayState.electronics = smoothStep(displayState.electronics, row.electronics, 0.30) + tinyNoise(0.20);
       displayState.weight50 = smoothStep(displayState.weight50, row.weight50, 0.30) + tinyNoise(0.18);
       displayState.mid100 = smoothStep(displayState.mid100, row.mid100, 0.30) + tinyNoise(0.18);
-      displayState.electronics = smoothStep(displayState.electronics, row.electronics, 0.30) + tinyNoise(0.25);
-      displayState.finance = smoothStep(displayState.finance, row.finance, 0.30) + tinyNoise(0.22);
+      displayState.finance = smoothStep(displayState.finance, row.finance, 0.30) + tinyNoise(0.18);
 
       pushLimit(labels, formatNowTime());
       pushLimit(taiexData, Number(displayState.taiex.toFixed(2)));
@@ -814,23 +837,17 @@
       pushLimit(maData, Number(calcMA(taiexData, 10).toFixed(2)));
 
       pushLimit(supportData, Number(displayState.support.toFixed(2)));
+      pushLimit(electronicsData, Number(displayState.electronics.toFixed(2)));
       pushLimit(weight50Data, Number(displayState.weight50.toFixed(2)));
       pushLimit(mid100Data, Number(displayState.mid100.toFixed(2)));
-      pushLimit(electronicsData, Number(displayState.electronics.toFixed(2)));
       pushLimit(financeData, Number(displayState.finance.toFixed(2)));
 
-      const sectorPower = Math.max(
-        0,
-        Math.min(
-          100,
-          row.electronics * 0.55 + row.finance * 0.25 + row.support * 0.20 + tinyNoise(0.8)
-        )
-      );
-      pushLimit(sectorPowerData, Number(sectorPower.toFixed(2)));
-
       priceChart.update();
-      structureChart.update();
-      sectorChart.update();
+      supportChart.update();
+      electronicsChart.update();
+      weight50Chart.update();
+      mid100Chart.update();
+      financeChart.update();
     }
 
     async function fetchSnapshot() {
@@ -853,9 +870,9 @@
           displayState.taiex = taiexTarget;
           displayState.futures = futuresTarget;
           displayState.support = d.row.support;
+          displayState.electronics = d.row.electronics;
           displayState.weight50 = d.row.weight50;
           displayState.mid100 = d.row.mid100;
-          displayState.electronics = d.row.electronics;
           displayState.finance = d.row.finance;
         }
 
@@ -906,37 +923,39 @@
       futuresData.length = 0;
       maData.length = 0;
       supportData.length = 0;
+      electronicsData.length = 0;
       weight50Data.length = 0;
       mid100Data.length = 0;
-      electronicsData.length = 0;
       financeData.length = 0;
-      sectorPowerData.length = 0;
       rows.length = 0;
 
       if (latestSnapshot) {
         displayState.taiex = normalizeMajorValue(latestSnapshot.taiex.current);
         displayState.futures = normalizeMajorValue(latestSnapshot.futures.current);
         displayState.support = latestSnapshot.row.support;
+        displayState.electronics = latestSnapshot.row.electronics;
         displayState.weight50 = latestSnapshot.row.weight50;
         displayState.mid100 = latestSnapshot.row.mid100;
-        displayState.electronics = latestSnapshot.row.electronics;
         displayState.finance = latestSnapshot.row.finance;
       } else {
         displayState = {
           taiex: null,
           futures: null,
           support: null,
+          electronics: null,
           weight50: null,
           mid100: null,
-          electronics: null,
           finance: null
         };
       }
 
       renderTable();
       priceChart.update();
-      structureChart.update();
-      sectorChart.update();
+      supportChart.update();
+      electronicsChart.update();
+      weight50Chart.update();
+      mid100Chart.update();
+      financeChart.update();
     });
 
     startTimers();
