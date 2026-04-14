@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>台指期同步版 3.4｜固定早盤時間軸</title>
+  <title>台指期同步版 3.5｜左二右三</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -190,8 +190,29 @@
 
     .left-panel {
       display: grid;
-      grid-template-rows: 1fr repeat(5, 110px);
-      gap: 6px;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .left-two-right-three {
+      display: grid;
+      grid-template-columns: 1fr 0.9fr;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .left-column {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .right-column {
+      display: grid;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 10px;
       min-height: 0;
     }
 
@@ -201,6 +222,7 @@
       border: 1px solid #353535;
       overflow: hidden;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+      min-height: 0;
     }
 
     .chart-header {
@@ -449,53 +471,59 @@
           </div>
         </div>
 
-        <div class="chart-card">
-          <div class="chart-header">
-            <span class="mini-tag">支撐</span>
-            <span class="legend-line"><span class="dot dot-red"></span>支撐</span>
-          </div>
-          <div class="chart-inner">
-            <canvas id="supportChart"></canvas>
-          </div>
-        </div>
+        <div class="left-two-right-three">
+          <div class="left-column">
+            <div class="chart-card">
+              <div class="chart-header">
+                <span class="mini-tag">支撐</span>
+                <span class="legend-line"><span class="dot dot-red"></span>支撐</span>
+              </div>
+              <div class="chart-inner">
+                <canvas id="supportChart"></canvas>
+              </div>
+            </div>
 
-        <div class="chart-card">
-          <div class="chart-header">
-            <span class="mini-tag">電子</span>
-            <span class="legend-line"><span class="dot dot-green"></span>電子</span>
+            <div class="chart-card">
+              <div class="chart-header">
+                <span class="mini-tag">電子</span>
+                <span class="legend-line"><span class="dot dot-green"></span>電子</span>
+              </div>
+              <div class="chart-inner">
+                <canvas id="electronicsChart"></canvas>
+              </div>
+            </div>
           </div>
-          <div class="chart-inner">
-            <canvas id="electronicsChart"></canvas>
-          </div>
-        </div>
 
-        <div class="chart-card">
-          <div class="chart-header">
-            <span class="mini-tag">權50</span>
-            <span class="legend-line"><span class="dot dot-yellow"></span>權50</span>
-          </div>
-          <div class="chart-inner">
-            <canvas id="weight50Chart"></canvas>
-          </div>
-        </div>
+          <div class="right-column">
+            <div class="chart-card">
+              <div class="chart-header">
+                <span class="mini-tag">權50</span>
+                <span class="legend-line"><span class="dot dot-yellow"></span>權50</span>
+              </div>
+              <div class="chart-inner">
+                <canvas id="weight50Chart"></canvas>
+              </div>
+            </div>
 
-        <div class="chart-card">
-          <div class="chart-header">
-            <span class="mini-tag">中100</span>
-            <span class="legend-line"><span class="dot dot-cyan"></span>中100</span>
-          </div>
-          <div class="chart-inner">
-            <canvas id="mid100Chart"></canvas>
-          </div>
-        </div>
+            <div class="chart-card">
+              <div class="chart-header">
+                <span class="mini-tag">中100</span>
+                <span class="legend-line"><span class="dot dot-cyan"></span>中100</span>
+              </div>
+              <div class="chart-inner">
+                <canvas id="mid100Chart"></canvas>
+              </div>
+            </div>
 
-        <div class="chart-card">
-          <div class="chart-header">
-            <span class="mini-tag">金融</span>
-            <span class="legend-line"><span class="dot dot-pink"></span>金融</span>
-          </div>
-          <div class="chart-inner">
-            <canvas id="financeChart"></canvas>
+            <div class="chart-card">
+              <div class="chart-header">
+                <span class="mini-tag">金融</span>
+                <span class="legend-line"><span class="dot dot-pink"></span>金融</span>
+              </div>
+              <div class="chart-inner">
+                <canvas id="financeChart"></canvas>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -546,14 +574,14 @@
       </div>
     </div>
 
-    <div class="footer-strip">台指期同步版 3.4｜只看早盤固定時間軸</div>
+    <div class="footer-strip">台指期同步版 3.5｜左二右三 + 早盤固定時間軸</div>
   </div>
 
   <script>
     const API_POLL_MS = 60000;
     const INTERPOLATE_MS = 1000;
 
-    // 固定早盤時間軸：08:45 ~ 13:45，每 15 分鐘一格
+    // 固定早盤時間軸
     const FIXED_SESSION_LABELS = [
       "08:45","09:00","09:15","09:30","09:45",
       "10:00","10:15","10:30","10:45",
@@ -569,7 +597,6 @@
     let nextUpdateAt = 0;
 
     const labels = [...FIXED_SESSION_LABELS];
-
     const taiexData = new Array(labels.length).fill(null);
     const futuresData = new Array(labels.length).fill(null);
     const maData = new Array(labels.length).fill(null);
@@ -847,8 +874,7 @@
       weight50Data[currentSlot] = Number(displayState.weight50.toFixed(2));
       mid100Data[currentSlot] = Number(displayState.mid100.toFixed(2));
       financeData[currentSlot] = Number(displayState.finance.toFixed(2));
-
-      maData[currentSlot] = Number((avgValid(taiexData.slice(0, currentSlot + 1), 3) || displayState.taiex).toFixed(2));
+      maData[currentSlot] = Number((avgValid(taiexData, 3) || displayState.taiex).toFixed(2));
 
       currentSlot++;
       updateAllCharts();
