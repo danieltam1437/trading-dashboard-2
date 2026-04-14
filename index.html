@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>台指期同步版 3.5｜左二右三</title>
+  <title>台指期同步版 3.6｜左三右三</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -30,11 +30,11 @@
     }
 
     .topbar {
-      height: 84px;
+      height: 92px;
       background: linear-gradient(to bottom, #4a0000, #170000);
       border-bottom: 1px solid #681919;
       display: grid;
-      grid-template-columns: 150px 360px 360px 360px 1fr 230px;
+      grid-template-columns: 150px 360px 360px 380px 1fr 240px;
       gap: 3px;
       padding: 3px;
       flex-shrink: 0;
@@ -43,7 +43,7 @@
     .topbox {
       background: linear-gradient(to bottom, #171717, #050505);
       border: 1px solid #3d1717;
-      padding: 6px 10px;
+      padding: 8px 12px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -52,16 +52,16 @@
 
     .topbox-title {
       font-size: 10px;
-      color: #d2d2d2;
-      margin-bottom: 2px;
+      color: #d7d7d7;
+      margin-bottom: 3px;
       white-space: nowrap;
-      opacity: 0.95;
+      opacity: 0.98;
     }
 
     .topbox-value {
       font-size: 15px;
       font-weight: 700;
-      line-height: 1.15;
+      line-height: 1.2;
       white-space: nowrap;
     }
 
@@ -101,8 +101,9 @@
 
     .subline {
       color: #ffd54f;
-      font-size: 11px;
-      margin-top: 4px;
+      font-size: 12px;
+      margin-top: 5px;
+      font-weight: 700;
     }
 
     .structure-values {
@@ -112,6 +113,7 @@
       font-size: 24px;
       font-weight: 900;
       color: #ff3b3b;
+      margin-bottom: 4px;
     }
 
     .structure-values span {
@@ -125,10 +127,22 @@
       text-align: right;
     }
 
+    .strategy-strong {
+      color: #ffd54f;
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-top: 2px;
+      text-shadow: 0 0 6px rgba(255,213,79,0.15);
+    }
+
     .signal-line {
-      font-size: 12px;
-      font-weight: 800;
-      margin-top: 3px;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.25;
+      margin-top: 4px;
+      letter-spacing: 0.3px;
+      text-shadow: 0 0 6px rgba(255,255,255,0.08);
     }
 
     .signal-bull { color: #00ff66; }
@@ -190,30 +204,15 @@
 
     .left-panel {
       display: grid;
-      grid-template-rows: 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
       gap: 8px;
       min-height: 0;
     }
 
-    .left-two-right-three {
-      display: grid;
-      grid-template-columns: 1fr 0.9fr;
-      gap: 10px;
-      min-height: 0;
-    }
-
-    .left-column {
-      display: grid;
-      grid-template-rows: 1fr 1fr;
-      gap: 10px;
-      min-height: 0;
-    }
-
-    .right-column {
-      display: grid;
-      grid-template-rows: 1fr 1fr 1fr;
-      gap: 10px;
-      min-height: 0;
+    .span-left-two {
+      grid-row: 1 / span 2;
+      grid-column: 1;
     }
 
     .chart-card {
@@ -288,7 +287,7 @@
 
     .right-panel {
       display: grid;
-      grid-template-rows: 210px 1fr;
+      grid-template-rows: 220px 1fr;
       gap: 6px;
       min-height: 0;
     }
@@ -327,13 +326,14 @@
 
     .mini-box-title {
       font-size: 10px;
-      color: #aaa;
+      color: #b7b7b7;
       margin-bottom: 4px;
     }
 
     .mini-box-value {
       font-size: 18px;
       font-weight: 900;
+      line-height: 1.15;
     }
 
     .table-header-row {
@@ -433,7 +433,7 @@
         <div class="structure-values" id="breadthNumbers">
           <span>--</span><span>--</span><span>--</span><span>--</span><span>--</span>
         </div>
-        <div class="subline" id="strategyText">讀取中</div>
+        <div class="strategy-strong" id="strategyText">讀取中</div>
         <div class="signal-line signal-neutral" id="signalText">訊號：等待資料</div>
       </div>
 
@@ -459,7 +459,7 @@
 
     <div class="main">
       <div class="left-panel">
-        <div class="chart-card">
+        <div class="chart-card span-left-two">
           <div class="chart-header">
             <span class="mini-tag">主圖｜加權 + 台指期</span>
             <span class="legend-line"><span class="dot dot-green"></span>加權</span>
@@ -471,59 +471,53 @@
           </div>
         </div>
 
-        <div class="left-two-right-three">
-          <div class="left-column">
-            <div class="chart-card">
-              <div class="chart-header">
-                <span class="mini-tag">支撐</span>
-                <span class="legend-line"><span class="dot dot-red"></span>支撐</span>
-              </div>
-              <div class="chart-inner">
-                <canvas id="supportChart"></canvas>
-              </div>
-            </div>
-
-            <div class="chart-card">
-              <div class="chart-header">
-                <span class="mini-tag">電子</span>
-                <span class="legend-line"><span class="dot dot-green"></span>電子</span>
-              </div>
-              <div class="chart-inner">
-                <canvas id="electronicsChart"></canvas>
-              </div>
-            </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="mini-tag">權50</span>
+            <span class="legend-line"><span class="dot dot-yellow"></span>權50</span>
           </div>
+          <div class="chart-inner">
+            <canvas id="weight50Chart"></canvas>
+          </div>
+        </div>
 
-          <div class="right-column">
-            <div class="chart-card">
-              <div class="chart-header">
-                <span class="mini-tag">權50</span>
-                <span class="legend-line"><span class="dot dot-yellow"></span>權50</span>
-              </div>
-              <div class="chart-inner">
-                <canvas id="weight50Chart"></canvas>
-              </div>
-            </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="mini-tag">支撐</span>
+            <span class="legend-line"><span class="dot dot-red"></span>支撐</span>
+          </div>
+          <div class="chart-inner">
+            <canvas id="supportChart"></canvas>
+          </div>
+        </div>
 
-            <div class="chart-card">
-              <div class="chart-header">
-                <span class="mini-tag">中100</span>
-                <span class="legend-line"><span class="dot dot-cyan"></span>中100</span>
-              </div>
-              <div class="chart-inner">
-                <canvas id="mid100Chart"></canvas>
-              </div>
-            </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="mini-tag">中100</span>
+            <span class="legend-line"><span class="dot dot-cyan"></span>中100</span>
+          </div>
+          <div class="chart-inner">
+            <canvas id="mid100Chart"></canvas>
+          </div>
+        </div>
 
-            <div class="chart-card">
-              <div class="chart-header">
-                <span class="mini-tag">金融</span>
-                <span class="legend-line"><span class="dot dot-pink"></span>金融</span>
-              </div>
-              <div class="chart-inner">
-                <canvas id="financeChart"></canvas>
-              </div>
-            </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="mini-tag">電子</span>
+            <span class="legend-line"><span class="dot dot-green"></span>電子</span>
+          </div>
+          <div class="chart-inner">
+            <canvas id="electronicsChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="mini-tag">金融</span>
+            <span class="legend-line"><span class="dot dot-pink"></span>金融</span>
+          </div>
+          <div class="chart-inner">
+            <canvas id="financeChart"></canvas>
           </div>
         </div>
       </div>
@@ -550,11 +544,11 @@
             </div>
             <div class="mini-box">
               <div class="mini-box-title">電子-金融差</div>
-              <div class="mini-box-value" id="leadDiff">--</div>
+              <div class="mini-box-value green-text" id="leadDiff">--</div>
             </div>
             <div class="mini-box">
               <div class="mini-box-title">期現差</div>
-              <div class="mini-box-value" id="basisValue">--</div>
+              <div class="mini-box-value green-text" id="basisValue">--</div>
             </div>
           </div>
         </div>
@@ -574,14 +568,13 @@
       </div>
     </div>
 
-    <div class="footer-strip">台指期同步版 3.5｜左二右三 + 早盤固定時間軸</div>
+    <div class="footer-strip">台指期同步版 3.6｜左三右三 + 修正文字/漲跌點</div>
   </div>
 
   <script>
     const API_POLL_MS = 60000;
     const INTERPOLATE_MS = 1000;
 
-    // 固定早盤時間軸
     const FIXED_SESSION_LABELS = [
       "08:45","09:00","09:15","09:30","09:45",
       "10:00","10:15","10:30","10:45",
@@ -642,9 +635,14 @@
       return (Math.random() - 0.5) * scale;
     }
 
-    function normalizeMajorValue(v) {
+    function normalizeMajorCurrent(v) {
       const n = Number(v || 0);
       if (n > 0 && n < 10000) return n * 10;
+      return n;
+    }
+
+    function normalizeChangeAbs(v) {
+      const n = Number(v || 0);
       return n;
     }
 
@@ -793,10 +791,12 @@
     function refreshTopUI(snapshot) {
       const row = snapshot.row;
 
-      const taiexCurrent = normalizeMajorValue(snapshot.taiex.current);
-      const taiexChangeAbs = normalizeMajorValue(snapshot.taiex.changeAbs);
-      const futuresCurrent = normalizeMajorValue(snapshot.futures.current);
-      const futuresChangeAbs = normalizeMajorValue(snapshot.futures.changeAbs);
+      const taiexCurrent = normalizeMajorCurrent(snapshot.taiex.current);
+      const taiexChangeAbs = normalizeChangeAbs(snapshot.taiex.changeAbs);
+
+      const futuresCurrent = normalizeMajorCurrent(snapshot.futures.current);
+      const futuresChangeAbs = normalizeChangeAbs(snapshot.futures.changeAbs);
+
       const futuresBasis = Number((futuresCurrent - taiexCurrent).toFixed(2));
 
       document.getElementById("marketStatusText").textContent = snapshot.dashboard.marketStatus;
@@ -856,8 +856,8 @@
       if (currentSlot >= labels.length) return;
 
       const row = latestSnapshot.row;
-      const taiexTarget = normalizeMajorValue(latestSnapshot.taiex.current);
-      const futuresTarget = normalizeMajorValue(latestSnapshot.futures.current);
+      const taiexTarget = normalizeMajorCurrent(latestSnapshot.taiex.current);
+      const futuresTarget = normalizeMajorCurrent(latestSnapshot.futures.current);
 
       displayState.taiex = smoothStep(displayState.taiex, taiexTarget, 0.22) + tinyNoise(2.2);
       displayState.futures = smoothStep(displayState.futures, futuresTarget, 0.22) + tinyNoise(2.4);
@@ -893,8 +893,8 @@
 
         latestSnapshot = d;
 
-        const taiexTarget = normalizeMajorValue(d.taiex.current);
-        const futuresTarget = normalizeMajorValue(d.futures.current);
+        const taiexTarget = normalizeMajorCurrent(d.taiex.current);
+        const futuresTarget = normalizeMajorCurrent(d.futures.current);
 
         if (displayState.taiex === null) {
           displayState.taiex = taiexTarget;
