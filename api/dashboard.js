@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     let indexChangePct = Number(taiex.d[1] ?? 0);
     let indexChangeAbs = Number(taiex.d[2] ?? 0);
 
-    // 若抓到縮放後的值，例如 2055，自動修正為 20550
+    // 修正加權指數縮放問題：若回傳 2055，改成 20550
     if (indexPrice > 0 && indexPrice < 10000) {
       indexPrice = indexPrice * 10;
       indexChangeAbs = indexChangeAbs * 10;
