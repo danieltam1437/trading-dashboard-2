@@ -3,138 +3,197 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>大盤多空結構儀表板</title>
+  <title>大盤多空結構儀表板｜實戰版</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
     html, body {
       margin: 0;
       padding: 0;
+      width: 100%;
+      height: 100%;
       background: #000;
       color: #fff;
       font-family: Arial, "Microsoft JhengHei", sans-serif;
+      overflow: hidden;
     }
 
     body {
-      overflow: hidden;
+      background:
+        radial-gradient(circle at top, rgba(80,0,0,0.22), transparent 28%),
+        #000;
     }
 
     .app {
       width: 100vw;
       height: 100vh;
-      background: #000;
       display: flex;
       flex-direction: column;
+      background: #000;
     }
 
     /* ===== TOP BAR ===== */
     .topbar {
-      height: 58px;
-      background: linear-gradient(to bottom, #430000, #180000);
-      border-bottom: 1px solid #5f1a1a;
+      height: 64px;
+      background: linear-gradient(to bottom, #420000, #150000);
+      border-bottom: 1px solid #5a1a1a;
       display: grid;
-      grid-template-columns: 110px 280px 210px 1fr 170px;
-      align-items: stretch;
-      gap: 2px;
-      padding: 2px;
+      grid-template-columns: 120px 330px 250px 1fr 210px;
+      gap: 3px;
+      padding: 3px;
+      flex-shrink: 0;
     }
 
     .topbox {
-      background: linear-gradient(to bottom, #1b1b1b, #080808);
-      border: 1px solid #3a1a1a;
+      background: linear-gradient(to bottom, #191919, #070707);
+      border: 1px solid #341616;
+      padding: 5px 9px;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 4px 8px;
-      overflow: hidden;
     }
 
     .topbox-title {
       font-size: 10px;
-      color: #ddd;
-      opacity: 0.9;
+      color: #c9c9c9;
       line-height: 1.1;
       margin-bottom: 2px;
       white-space: nowrap;
+      opacity: 0.95;
     }
 
     .topbox-value {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
-      line-height: 1.2;
+      line-height: 1.15;
       white-space: nowrap;
     }
 
-    .top-main-index {
-      color: #ff4a4a;
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-    }
-
-    .top-sub {
-      color: #ffcf57;
-      font-size: 11px;
-    }
-
-    .strong-support {
-      background: linear-gradient(to bottom, #e10000, #7d0000);
-      border: 1px solid #ff5a5a;
-      justify-content: center;
+    .status-box {
+      background: linear-gradient(to bottom, #d00000, #750000);
+      border: 1px solid #ff6161;
       align-items: center;
       text-align: center;
     }
 
-    .strong-support .topbox-title {
+    .status-box .topbox-title {
       color: #fff;
-      margin: 0;
-      font-size: 12px;
-      font-weight: 800;
+      font-size: 11px;
+      margin-bottom: 1px;
+      font-weight: 700;
     }
 
-    .strong-support .topbox-value {
+    .status-box .topbox-value {
       color: #fff;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .main-index {
+      color: #ff4a4a;
       font-size: 26px;
       font-weight: 900;
+      letter-spacing: 0.4px;
     }
 
-    .market-breadth {
+    .subline {
+      color: #ffd95a;
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .structure-values {
       display: flex;
-      align-items: center;
       gap: 10px;
+      align-items: center;
+      flex-wrap: nowrap;
       font-size: 24px;
-      font-weight: 800;
+      font-weight: 900;
       color: #ff2d2d;
-      justify-content: flex-start;
     }
 
-    .market-breadth span {
+    .structure-values span {
+      min-width: 28px;
       display: inline-block;
-      min-width: 26px;
       text-align: center;
     }
 
     .top-right {
-      justify-content: center;
       align-items: flex-end;
       text-align: right;
-      padding-right: 12px;
-    }
-
-    .top-right .topbox-title {
-      font-size: 11px;
     }
 
     .top-right .topbox-value {
-      font-size: 16px;
+      font-size: 14px;
       color: #fff;
+    }
+
+    .signal-line {
+      font-size: 12px;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .signal-bull { color: #00ff66; }
+    .signal-bear { color: #ff5252; }
+    .signal-neutral { color: #ffd54f; }
+
+    /* ===== CONTROL BAR ===== */
+    .controlbar {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      background: linear-gradient(to bottom, #121212, #060606);
+      border-bottom: 1px solid #212121;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+
+    .control-left,
+    .control-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .badge {
+      border: 1px solid #414141;
+      background: #0a0a0a;
+      color: #ddd;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .badge.red { color: #ff5959; border-color: #5b2323; }
+    .badge.green { color: #3cff75; border-color: #1f5a34; }
+    .badge.yellow { color: #ffd54f; border-color: #665319; }
+
+    button.ctrl-btn {
+      background: linear-gradient(to bottom, #181818, #0a0a0a);
+      border: 1px solid #404040;
+      color: #eaeaea;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    button.ctrl-btn:hover {
+      border-color: #6e6e6e;
     }
 
     /* ===== MAIN ===== */
     .main {
       flex: 1;
       display: grid;
-      grid-template-columns: 1fr 250px;
+      grid-template-columns: 1fr 270px;
       gap: 6px;
       padding: 6px;
       min-height: 0;
@@ -142,122 +201,53 @@
 
     .left-panel {
       display: grid;
-      grid-template-rows: 1fr 145px 145px;
+      grid-template-rows: 1fr 185px 165px;
       gap: 6px;
       min-height: 0;
     }
 
     .chart-card {
       position: relative;
-      background: #020202;
-      border: 1px solid #393939;
+      background: linear-gradient(to bottom, #040404, #010101);
+      border: 1px solid #353535;
       overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
     }
 
     .chart-header {
       position: absolute;
-      top: 0;
       left: 0;
       right: 0;
-      height: 24px;
-      background: linear-gradient(to bottom, #101010, #060606);
-      border-bottom: 1px solid #292929;
+      top: 0;
+      height: 26px;
+      padding: 0 8px;
       display: flex;
       align-items: center;
-      padding: 0 8px;
+      gap: 8px;
       z-index: 5;
+      background: linear-gradient(to bottom, #111, #060606);
+      border-bottom: 1px solid #262626;
       font-size: 11px;
       color: #d9d9d9;
-      gap: 8px;
     }
 
     .mini-tag {
-      padding: 2px 6px;
-      border: 1px solid #444;
+      padding: 2px 7px;
+      border: 1px solid #464646;
       background: #111;
-      border-radius: 3px;
-      color: #ddd;
+      border-radius: 4px;
+      color: #eee;
       font-size: 10px;
     }
-
-    .chart-inner {
-      position: absolute;
-      inset: 24px 0 0 0;
-      padding: 0;
-    }
-
-    /* 已保留容器，但不顯示文字 */
-    .overlay-slogan {
-      display: none;
-    }
-
-    canvas {
-      width: 100% !important;
-      height: 100% !important;
-      display: block;
-    }
-
-    /* ===== RIGHT TABLE ===== */
-    .right-panel {
-      background: #040404;
-      border: 1px solid #393939;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    .right-header {
-      height: 28px;
-      background: linear-gradient(to bottom, #171717, #080808);
-      border-bottom: 1px solid #2e2e2e;
-      display: grid;
-      grid-template-columns: 58px repeat(5, 1fr);
-      align-items: center;
-      font-size: 11px;
-      color: #ddd;
-      font-weight: 700;
-      padding: 0 6px;
-      gap: 4px;
-    }
-
-    .time-table {
-      flex: 1;
-      overflow-y: auto;
-      font-size: 12px;
-      padding: 2px 6px 6px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 58px repeat(5, 1fr);
-      gap: 4px;
-      padding: 2px 0;
-      align-items: center;
-      min-height: 22px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-    }
-
-    .cell {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
-
-    .time {
-      color: #cfcfcf;
-      text-align: left;
-    }
-
-    .red { color: #ff4040; font-weight: 700; }
-    .green { color: #46d946; font-weight: 700; }
-    .yellow { color: #ffd54f; font-weight: 700; }
-    .white { color: #fff; }
 
     .legend-line {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      margin-right: 8px;
+      margin-right: 6px;
+      color: #ddd;
+      font-size: 10px;
+      white-space: nowrap;
     }
 
     .dot {
@@ -267,19 +257,133 @@
       display: inline-block;
     }
 
-    .dot-red { background: #ff1e1e; }
-    .dot-green { background: #00ff4c; }
+    .dot-red { background: #ff2e2e; }
+    .dot-green { background: #00ff66; }
     .dot-yellow { background: #ffd400; }
+    .dot-cyan { background: #37d7ff; }
+    .dot-pink { background: #ff76ff; }
+
+    .chart-inner {
+      position: absolute;
+      inset: 26px 0 0 0;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    /* ===== RIGHT PANEL ===== */
+    .right-panel {
+      display: grid;
+      grid-template-rows: 132px 1fr;
+      gap: 6px;
+      min-height: 0;
+    }
+
+    .summary-card,
+    .table-card {
+      background: linear-gradient(to bottom, #050505, #010101);
+      border: 1px solid #353535;
+      overflow: hidden;
+    }
+
+    .summary-head,
+    .table-head {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      background: linear-gradient(to bottom, #151515, #070707);
+      border-bottom: 1px solid #252525;
+      font-size: 11px;
+      color: #ddd;
+      font-weight: 700;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 8px;
+    }
+
+    .mini-box {
+      border: 1px solid #262626;
+      background: #090909;
+      padding: 6px;
+      min-height: 42px;
+    }
+
+    .mini-box-title {
+      font-size: 10px;
+      color: #aaa;
+      margin-bottom: 2px;
+    }
+
+    .mini-box-value {
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .table-header-row {
+      height: 28px;
+      display: grid;
+      grid-template-columns: 62px repeat(5, 1fr);
+      align-items: center;
+      gap: 4px;
+      padding: 0 6px;
+      border-bottom: 1px solid #242424;
+      background: linear-gradient(to bottom, #111, #050505);
+      font-size: 11px;
+      color: #ddd;
+      font-weight: 700;
+    }
+
+    .time-table {
+      height: calc(100% - 28px);
+      overflow-y: auto;
+      padding: 2px 6px 6px;
+      font-size: 12px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 62px repeat(5, 1fr);
+      gap: 4px;
+      min-height: 22px;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 2px 0;
+    }
+
+    .cell {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .time {
+      text-align: left;
+      color: #cfcfcf;
+    }
+
+    .red-text { color: #ff4747; font-weight: 800; }
+    .green-text { color: #45da68; font-weight: 800; }
+    .yellow-text { color: #ffd54f; font-weight: 800; }
+    .white-text { color: #fff; }
 
     .footer-strip {
-      height: 20px;
-      background: linear-gradient(to bottom, #111, #050505);
+      height: 22px;
+      flex-shrink: 0;
+      background: linear-gradient(to bottom, #121212, #050505);
       border-top: 1px solid #232323;
-      color: #bfbfbf;
-      font-size: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 10px;
+      color: #bdbdbd;
       letter-spacing: 0.5px;
     }
 
@@ -307,9 +411,12 @@
       background: #555;
     }
 
-    @media (max-width: 1200px) {
+    @media (max-width: 1300px) {
+      .topbar {
+        grid-template-columns: 110px 300px 230px 1fr 190px;
+      }
       .main {
-        grid-template-columns: 1fr 220px;
+        grid-template-columns: 1fr 245px;
       }
     }
   </style>
@@ -317,105 +424,178 @@
 <body>
   <div class="app">
     <div class="topbar">
-      <div class="topbox strong-support">
-        <div class="topbox-title">大盤</div>
-        <div class="topbox-value blink">強烈支撐</div>
+      <div class="topbox status-box">
+        <div class="topbox-title">大盤狀態</div>
+        <div class="topbox-value blink" id="marketStatusText">強勢偏多</div>
       </div>
 
       <div class="topbox">
-        <div class="topbox-title">指數 / 漲跌 / 漲跌幅 / 昨收</div>
-        <div class="top-main-index" id="mainIndexText">17364 (192) 17341.25 (203.83)</div>
+        <div class="topbox-title">加權指數 / 漲跌 / 漲跌幅 / 昨收</div>
+        <div class="main-index" id="mainIndexText">17364.20 +92.35 (+0.54%)</div>
+        <div class="subline" id="mainSubText">昨收 17271.85 ｜ 波動正常</div>
       </div>
 
       <div class="topbox">
-        <div class="topbox-title">多空結構數值</div>
-        <div class="market-breadth" id="breadthNumbers">
-          <span>91</span><span>94</span><span>87</span><span>97</span><span>64</span>
+        <div class="topbox-title">五大結構數值</div>
+        <div class="structure-values" id="breadthNumbers">
+          <span>78</span><span>82</span><span>75</span><span>84</span><span>61</span>
         </div>
+        <div class="subline">支撐 / 權值50 / 中型100 / 電子 / 金融</div>
       </div>
 
       <div class="topbox">
-        <div class="topbox-title">結構說明</div>
-        <div class="topbox-value" style="color:#ffdd57;">權值 / 中型 / 電子 / 金融 / 支撐</div>
-        <div class="top-sub">現貨結構與大盤方向同步判斷</div>
+        <div class="topbox-title">實戰判斷</div>
+        <div class="topbox-value" id="strategyText" style="color:#ffd54f;">主攻順勢，拉回找多</div>
+        <div class="signal-line signal-bull" id="signalText">訊號：結構偏多，電子領漲，金融中性</div>
       </div>
 
       <div class="topbox top-right">
         <div class="topbox-title">資料狀態</div>
         <div class="topbox-value" id="updateTime">模擬更新中 09:00:00</div>
+        <div class="subline" id="nextRefreshText">下一次更新：2 秒內</div>
+      </div>
+    </div>
+
+    <div class="controlbar">
+      <div class="control-left">
+        <div class="badge red" id="trendBadge">趨勢：偏多</div>
+        <div class="badge yellow" id="structureBadge">結構：同步偏強</div>
+        <div class="badge green" id="entryBadge">進場：等拉回不追高</div>
+      </div>
+      <div class="control-right">
+        <button class="ctrl-btn" id="pauseBtn">暫停</button>
+        <button class="ctrl-btn" id="resumeBtn">繼續</button>
+        <button class="ctrl-btn" id="resetBtn">重置</button>
       </div>
     </div>
 
     <div class="main">
       <div class="left-panel">
-        <!-- 主圖 -->
         <div class="chart-card">
           <div class="chart-header">
-            <span class="mini-tag">加權指數</span>
-            <span class="legend-line"><span class="dot dot-red"></span>紅K</span>
-            <span class="legend-line"><span class="dot dot-green"></span>綠K</span>
-            <span class="legend-line"><span class="dot dot-yellow"></span>結構線</span>
+            <span class="mini-tag">主圖｜加權指數</span>
+            <span class="legend-line"><span class="dot dot-green"></span>指數線</span>
+            <span class="legend-line"><span class="dot dot-yellow"></span>短均線</span>
+            <span class="legend-line"><span class="dot dot-cyan"></span>結構均值</span>
           </div>
-          <div class="overlay-slogan" id="mainSlogan"></div>
           <div class="chart-inner">
             <canvas id="priceChart"></canvas>
           </div>
         </div>
 
-        <!-- 盤勢量能 -->
         <div class="chart-card">
           <div class="chart-header">
-            <span class="mini-tag">盤勢量能</span>
-            <span class="legend-line"><span class="dot dot-red"></span>多方結構值</span>
+            <span class="mini-tag">五結構同步監控</span>
+            <span class="legend-line"><span class="dot dot-red"></span>支撐</span>
+            <span class="legend-line"><span class="dot dot-yellow"></span>權值50</span>
+            <span class="legend-line"><span class="dot dot-cyan"></span>中型100</span>
+            <span class="legend-line"><span class="dot dot-green"></span>電子</span>
+            <span class="legend-line"><span class="dot dot-pink"></span>金融</span>
           </div>
           <div class="chart-inner">
-            <canvas id="powerChart"></canvas>
+            <canvas id="structureChart"></canvas>
           </div>
         </div>
 
-        <!-- 現貨結構 -->
         <div class="chart-card">
           <div class="chart-header">
-            <span class="mini-tag">現貨結構</span>
-            <span class="legend-line"><span class="dot dot-red"></span>整體現貨動能</span>
+            <span class="mini-tag">類股分流監控</span>
+            <span class="legend-line"><span class="dot dot-green"></span>電子</span>
+            <span class="legend-line"><span class="dot dot-pink"></span>金融</span>
+            <span class="legend-line"><span class="dot dot-red"></span>整體量能</span>
           </div>
           <div class="chart-inner">
-            <canvas id="spotChart"></canvas>
+            <canvas id="sectorChart"></canvas>
           </div>
         </div>
       </div>
 
       <div class="right-panel">
-        <div class="right-header">
-          <div>時間</div>
-          <div style="text-align:right;">支撐</div>
-          <div style="text-align:right;">權值50</div>
-          <div style="text-align:right;">中型100</div>
-          <div style="text-align:right;">電子</div>
-          <div style="text-align:right;">金融</div>
+        <div class="summary-card">
+          <div class="summary-head">即時摘要</div>
+          <div class="summary-grid">
+            <div class="mini-box">
+              <div class="mini-box-title">平均結構</div>
+              <div class="mini-box-value yellow-text" id="avgStructure">76</div>
+            </div>
+            <div class="mini-box">
+              <div class="mini-box-title">電子領先差</div>
+              <div class="mini-box-value green-text" id="leadDiff">+8</div>
+            </div>
+            <div class="mini-box">
+              <div class="mini-box-title">支撐強度</div>
+              <div class="mini-box-value red-text" id="supportPower">強</div>
+            </div>
+            <div class="mini-box">
+              <div class="mini-box-title">短線節奏</div>
+              <div class="mini-box-value white-text" id="paceText">順勢偏多</div>
+            </div>
+          </div>
         </div>
-        <div class="time-table" id="timeTable"></div>
+
+        <div class="table-card">
+          <div class="table-head">現貨結構時間表</div>
+          <div class="table-header-row">
+            <div>時間</div>
+            <div style="text-align:right;">支撐</div>
+            <div style="text-align:right;">權值50</div>
+            <div style="text-align:right;">中型100</div>
+            <div style="text-align:right;">電子</div>
+            <div style="text-align:right;">金融</div>
+          </div>
+          <div class="time-table" id="timeTable"></div>
+        </div>
       </div>
     </div>
 
     <div class="footer-strip">
-      現貨結構監測儀表板｜黑底交易介面風格版
+      大盤多空結構儀表板｜實戰版｜已預留真實 API 串接位置
     </div>
   </div>
 
   <script>
+    /* =========================
+       全域資料
+    ========================= */
+    const MAX_POINTS = 100;
+    const UPDATE_MS = 2000;
+
     const labels = [];
     const priceData = [];
-    const powerData = [];
-    const spotData = [];
+    const priceMAData = [];
+    const structureAvgData = [];
+
+    const supportData = [];
+    const weight50Data = [];
+    const mid100Data = [];
+    const electronicsData = [];
+    const financeData = [];
+    const sectorPowerData = [];
+
     const tableRows = [];
+
+    let isPaused = false;
+    let timer = null;
+    let countdownTimer = null;
+    let nextUpdateAt = Date.now() + UPDATE_MS;
+
+    let currentPrice = 17320;
+    let yesterdayClose = 17271.85;
+
+    let state = {
+      support: 68,
+      weight50: 73,
+      mid100: 67,
+      electronics: 76,
+      finance: 58
+    };
 
     function pad(n) {
       return String(n).padStart(2, "0");
     }
 
-    function formatClock(d) {
-      return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    function formatClock(date) {
+      return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
     }
 
     function rand(min, max) {
@@ -426,60 +606,126 @@
       return Math.max(min, Math.min(max, v));
     }
 
-    let basePrice = 17320;
-    let lastPower = 72;
-    let lastSpot = 70;
+    function avg(arr) {
+      if (!arr.length) return 0;
+      return arr.reduce((a, b) => a + b, 0) / arr.length;
+    }
 
-    function generateInitialData() {
-      const now = new Date();
-      now.setHours(9, 0, 0, 0);
+    function last(arr, fallback = 0) {
+      return arr.length ? arr[arr.length - 1] : fallback;
+    }
 
-      for (let i = 0; i < 70; i++) {
-        const t = new Date(now.getTime() + i * 15000);
-        labels.push(formatClock(t));
+    function calcMA(source, len) {
+      if (!source.length) return 0;
+      const slice = source.slice(Math.max(0, source.length - len));
+      return avg(slice);
+    }
 
-        basePrice += rand(-9, 11);
-        if (i > 12 && i < 25) basePrice += rand(4, 10);
-        if (i > 40 && i < 50) basePrice += rand(-8, 3);
+    function valueClass(val) {
+      if (val >= 70) return "red-text";
+      if (val <= 45) return "green-text";
+      return "yellow-text";
+    }
 
-        lastPower = clamp(lastPower + rand(-1.5, 2.2), 40, 98);
-        lastSpot = clamp(lastSpot + rand(-1.2, 1.8), 38, 96);
+    function pushWithLimit(arr, value, limit = MAX_POINTS) {
+      arr.push(value);
+      if (arr.length > limit) arr.shift();
+    }
 
-        priceData.push(Number(basePrice.toFixed(2)));
-        powerData.push(Number(lastPower.toFixed(2)));
-        spotData.push(Number(lastSpot.toFixed(2)));
+    function pseudoMarketMove() {
+      const momentum = (
+        state.weight50 * 0.20 +
+        state.mid100 * 0.18 +
+        state.electronics * 0.30 +
+        state.finance * 0.12 +
+        state.support * 0.20
+      ) / 100;
 
-        addTableRow(labels[labels.length - 1], false);
+      let drift = 0;
+      if (momentum >= 0.72) drift = rand(1.5, 6.5);
+      else if (momentum <= 0.45) drift = rand(-6.5, -1.5);
+      else drift = rand(-3.5, 3.5);
+
+      if (state.electronics - state.finance > 12) {
+        drift += rand(0.8, 2.2);
+      }
+
+      currentPrice = Number((currentPrice + drift).toFixed(2));
+    }
+
+    function updateStructureState() {
+      const regimeBias = rand(-1.3, 1.8);
+
+      state.support = clamp(state.support + rand(-3, 3) + regimeBias * 0.8, 20, 98);
+      state.weight50 = clamp(state.weight50 + rand(-3, 3) + regimeBias * 0.9, 20, 99);
+      state.mid100 = clamp(state.mid100 + rand(-3.2, 3.2) + regimeBias * 0.7, 18, 99);
+      state.electronics = clamp(state.electronics + rand(-4, 4) + regimeBias * 1.05, 18, 99);
+      state.finance = clamp(state.finance + rand(-3, 3) + regimeBias * 0.45, 18, 99);
+
+      /* 模擬盤勢節奏切換 */
+      const totalAvg = (state.support + state.weight50 + state.mid100 + state.electronics + state.finance) / 5;
+
+      if (totalAvg > 78) {
+        state.electronics = clamp(state.electronics + rand(0, 1.5), 18, 99);
+        state.support = clamp(state.support + rand(0, 1.2), 18, 99);
+      }
+      if (totalAvg < 42) {
+        state.finance = clamp(state.finance - rand(0, 1.2), 18, 99);
+        state.support = clamp(state.support - rand(0, 1.5), 18, 99);
       }
     }
 
-    function addTableRow(timeStr, prepend = true) {
-      const support = Math.round(clamp(lastSpot + rand(-8, 8), 28, 99));
-      const weight50 = Math.round(clamp(lastSpot + rand(-5, 10), 30, 99));
-      const mid100 = Math.round(clamp(lastSpot + rand(-7, 7), 25, 99));
-      const electronics = Math.round(clamp(lastSpot + rand(-4, 13), 20, 99));
-      const finance = Math.round(clamp(lastSpot + rand(-15, 6), 18, 99));
+    function createTimeLabel(index) {
+      const base = new Date();
+      base.setHours(9, 0, 0, 0);
+      base.setSeconds(base.getSeconds() + index * 15);
+      return formatClock(base);
+    }
 
-      const row = {
-        time: timeStr,
+    function addSnapshot(timeText) {
+      const support = Math.round(state.support);
+      const weight50 = Math.round(state.weight50);
+      const mid100 = Math.round(state.mid100);
+      const electronics = Math.round(state.electronics);
+      const finance = Math.round(state.finance);
+      const totalAvg = Math.round((support + weight50 + mid100 + electronics + finance) / 5);
+
+      pushWithLimit(supportData, support);
+      pushWithLimit(weight50Data, weight50);
+      pushWithLimit(mid100Data, mid100);
+      pushWithLimit(electronicsData, electronics);
+      pushWithLimit(financeData, finance);
+      pushWithLimit(structureAvgData, totalAvg);
+
+      const sectorPower = Math.round((electronics * 0.55 + finance * 0.25 + support * 0.20));
+      pushWithLimit(sectorPowerData, sectorPower);
+
+      pushWithLimit(priceData, currentPrice);
+      pushWithLimit(priceMAData, Number(calcMA(priceData, 12).toFixed(2)));
+      pushWithLimit(labels, timeText);
+
+      tableRows.unshift({
+        time: timeText,
         support,
         weight50,
         mid100,
         electronics,
         finance
-      };
+      });
+      if (tableRows.length > 160) tableRows.pop();
+    }
 
-      if (prepend) {
-        tableRows.unshift(row);
-        if (tableRows.length > 100) tableRows.pop();
-      } else {
-        tableRows.push(row);
-        if (tableRows.length > 100) tableRows.shift();
+    function seedData() {
+      for (let i = 0; i < 80; i++) {
+        updateStructureState();
+        pseudoMarketMove();
+        addSnapshot(createTimeLabel(i));
       }
     }
 
-    generateInitialData();
-
+    /* =========================
+       Chart.js 插件
+    ========================= */
     const guideLinePlugin = {
       id: "guideLinePlugin",
       afterDraw(chart) {
@@ -507,8 +753,12 @@
 
     Chart.register(guideLinePlugin);
 
-    const priceCtx = document.getElementById("priceChart").getContext("2d");
-    const priceChart = new Chart(priceCtx, {
+    seedData();
+
+    /* =========================
+       主圖
+    ========================= */
+    const priceChart = new Chart(document.getElementById("priceChart").getContext("2d"), {
       type: "line",
       data: {
         labels,
@@ -516,10 +766,27 @@
           {
             label: "加權指數",
             data: priceData,
-            borderColor: "#00ff5a",
-            borderWidth: 1.5,
+            borderColor: "#00ff66",
+            borderWidth: 1.6,
             pointRadius: 0,
-            tension: 0.15
+            tension: 0.18
+          },
+          {
+            label: "短均線",
+            data: priceMAData,
+            borderColor: "#ffd400",
+            borderWidth: 1.2,
+            pointRadius: 0,
+            tension: 0.16
+          },
+          {
+            label: "結構均值",
+            data: structureAvgData.map(v => yesterdayClose + (v - 50) * 1.8),
+            borderColor: "#37d7ff",
+            borderWidth: 1,
+            pointRadius: 0,
+            tension: 0.14,
+            borderDash: [4, 3]
           }
         ]
       },
@@ -527,7 +794,7 @@
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
-        layout: { padding: { top: 6, bottom: 8, left: 8, right: 8 } },
+        layout: { padding: { top: 6, bottom: 8, left: 8, right: 10 } },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -535,8 +802,7 @@
             borderColor: "#666",
             borderWidth: 1,
             titleColor: "#fff",
-            bodyColor: "#fff",
-            displayColors: false
+            bodyColor: "#fff"
           }
         },
         scales: {
@@ -552,7 +818,7 @@
             position: "left",
             grid: { color: "rgba(255,255,255,0.08)" },
             ticks: {
-              color: "#ff3b3b",
+              color: "#ff4a4a",
               callback: v => Number(v).toFixed(0)
             }
           }
@@ -560,19 +826,53 @@
       }
     });
 
-    const powerCtx = document.getElementById("powerChart").getContext("2d");
-    const powerChart = new Chart(powerCtx, {
-      type: "bar",
+    /* =========================
+       五結構同步監控
+    ========================= */
+    const structureChart = new Chart(document.getElementById("structureChart").getContext("2d"), {
+      type: "line",
       data: {
         labels,
         datasets: [
           {
-            label: "盤勢量能",
-            data: powerData,
-            backgroundColor: "#ff1010",
-            borderWidth: 0,
-            barPercentage: 1.0,
-            categoryPercentage: 1.0
+            label: "支撐",
+            data: supportData,
+            borderColor: "#ff2e2e",
+            borderWidth: 1.4,
+            pointRadius: 0,
+            tension: 0.15
+          },
+          {
+            label: "權值50",
+            data: weight50Data,
+            borderColor: "#ffd400",
+            borderWidth: 1.3,
+            pointRadius: 0,
+            tension: 0.15
+          },
+          {
+            label: "中型100",
+            data: mid100Data,
+            borderColor: "#37d7ff",
+            borderWidth: 1.2,
+            pointRadius: 0,
+            tension: 0.15
+          },
+          {
+            label: "電子",
+            data: electronicsData,
+            borderColor: "#00ff66",
+            borderWidth: 1.4,
+            pointRadius: 0,
+            tension: 0.15
+          },
+          {
+            label: "金融",
+            data: financeData,
+            borderColor: "#ff76ff",
+            borderWidth: 1.2,
+            pointRadius: 0,
+            tension: 0.15
           }
         ]
       },
@@ -580,50 +880,67 @@
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
-        layout: { padding: { top: 8, bottom: 6, left: 8, right: 8 } },
+        layout: { padding: { top: 6, bottom: 6, left: 8, right: 8 } },
         plugins: {
           legend: { display: false },
           guideLinePlugin: {
             lines: [
-              { value: 85, color: "#ffe100", width: 1 },
-              { value: 50, color: "#00ff4c", width: 1 }
+              { value: 80, color: "#ffd400", width: 1 },
+              { value: 50, color: "#00ff66", width: 1, dash: [3, 3] }
             ]
           }
         },
         scales: {
           x: {
             grid: { display: false },
-            ticks: {
-              color: "#999",
-              maxTicksLimit: 8
-            }
+            ticks: { color: "#999", maxTicksLimit: 8 }
           },
           y: {
             min: 0,
             max: 100,
             grid: { color: "rgba(255,255,255,0.08)" },
-            ticks: {
-              color: "#ff3b3b",
-              stepSize: 25
-            }
+            ticks: { color: "#ff4a4a", stepSize: 20 }
           }
         }
       }
     });
 
-    const spotCtx = document.getElementById("spotChart").getContext("2d");
-    const spotChart = new Chart(spotCtx, {
-      type: "bar",
+    /* =========================
+       類股分流監控
+    ========================= */
+    const sectorChart = new Chart(document.getElementById("sectorChart").getContext("2d"), {
       data: {
         labels,
         datasets: [
           {
-            label: "現貨結構",
-            data: spotData,
-            backgroundColor: "#ff1010",
+            type: "bar",
+            label: "整體量能",
+            data: sectorPowerData,
+            backgroundColor: "#ff1d1d",
             borderWidth: 0,
             barPercentage: 1.0,
-            categoryPercentage: 1.0
+            categoryPercentage: 1.0,
+            yAxisID: "y"
+          },
+          {
+            type: "line",
+            label: "電子",
+            data: electronicsData,
+            borderColor: "#00ff66",
+            borderWidth: 1.5,
+            pointRadius: 0,
+            tension: 0.15,
+            yAxisID: "y"
+          },
+          {
+            type: "line",
+            label: "金融",
+            data: financeData,
+            borderColor: "#ff76ff",
+            borderWidth: 1.3,
+            pointRadius: 0,
+            tension: 0.15,
+            yAxisID: "y"
           }
         ]
       },
@@ -631,125 +948,331 @@
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
-        layout: { padding: { top: 8, bottom: 6, left: 8, right: 8 } },
+        layout: { padding: { top: 6, bottom: 6, left: 8, right: 8 } },
         plugins: {
           legend: { display: false },
           guideLinePlugin: {
             lines: [
-              { value: 85, color: "#ffe100", width: 1 },
-              { value: 50, color: "#00ff4c", width: 1 }
+              { value: 80, color: "#ffd400", width: 1 },
+              { value: 50, color: "#00ff66", width: 1, dash: [3, 3] }
             ]
           }
         },
         scales: {
           x: {
             grid: { display: false },
-            ticks: {
-              color: "#999",
-              maxTicksLimit: 8
-            }
+            ticks: { color: "#999", maxTicksLimit: 8 }
           },
           y: {
             min: 0,
             max: 100,
             grid: { color: "rgba(255,255,255,0.08)" },
-            ticks: {
-              color: "#ff3b3b",
-              stepSize: 25
-            }
+            ticks: { color: "#ff4a4a", stepSize: 20 }
           }
         }
       }
     });
 
-    const timeTableEl = document.getElementById("timeTable");
-
-    function colorClass(val) {
-      if (val >= 70) return "red";
-      if (val <= 45) return "green";
-      return "yellow";
-    }
-
+    /* =========================
+       畫面更新
+    ========================= */
     function renderTable() {
+      const timeTableEl = document.getElementById("timeTable");
       timeTableEl.innerHTML = tableRows.map(r => `
         <div class="row">
           <div class="cell time">${r.time}</div>
-          <div class="cell ${colorClass(r.support)}">${r.support}</div>
-          <div class="cell ${colorClass(r.weight50)}">${r.weight50}</div>
-          <div class="cell ${colorClass(r.mid100)}">${r.mid100}</div>
-          <div class="cell ${colorClass(r.electronics)}">${r.electronics}</div>
-          <div class="cell ${colorClass(r.finance)}">${r.finance}</div>
+          <div class="cell ${valueClass(r.support)}">${r.support}</div>
+          <div class="cell ${valueClass(r.weight50)}">${r.weight50}</div>
+          <div class="cell ${valueClass(r.mid100)}">${r.mid100}</div>
+          <div class="cell ${valueClass(r.electronics)}">${r.electronics}</div>
+          <div class="cell ${valueClass(r.finance)}">${r.finance}</div>
         </div>
       `).join("");
     }
 
-    function updateTopInfo() {
-      const latestPrice = priceData[priceData.length - 1];
-      const prevPrice = priceData[priceData.length - 2] ?? latestPrice;
-      const diff = latestPrice - prevPrice;
-      const diffAbs = Math.abs(diff).toFixed(2);
-      const pct = prevPrice ? ((diff / prevPrice) * 100).toFixed(2) : "0.00";
+    function judgeMarket(avgVal, electronicLead, financeVal, priceDiff) {
+      if (avgVal >= 75 && electronicLead >= 4 && priceDiff >= 0) {
+        return {
+          status: "強勢偏多",
+          strategy: "主攻順勢，拉回找多",
+          signal: "訊號：結構偏多，電子領漲，金融不拖累",
+          signalClass: "signal-bull",
+          trendBadge: "趨勢：偏多",
+          structureBadge: "結構：同步偏強",
+          entryBadge: "進場：等拉回不追高"
+        };
+      }
 
-      document.getElementById("mainIndexText").textContent =
-        `${latestPrice.toFixed(2)} (${diff >= 0 ? "+" : "-"}${diffAbs})  昨收比 ${pct}%`;
+      if (avgVal <= 42 && priceDiff <= 0) {
+        return {
+          status: "弱勢偏空",
+          strategy: "反彈偏空，不搶短多",
+          signal: "訊號：支撐不足，結構轉弱，先保守",
+          signalClass: "signal-bear",
+          trendBadge: "趨勢：偏空",
+          structureBadge: "結構：同步偏弱",
+          entryBadge: "進場：反彈再看空"
+        };
+      }
 
-      const latestRow = tableRows[0];
-      document.getElementById("breadthNumbers").innerHTML = `
-        <span>${latestRow.support}</span>
-        <span>${latestRow.weight50}</span>
-        <span>${latestRow.mid100}</span>
-        <span>${latestRow.electronics}</span>
-        <span>${latestRow.finance}</span>
-      `;
-
-      document.getElementById("updateTime").textContent =
-        `模擬更新中 ${labels[labels.length - 1]}`;
-
-      const sloganEl = document.getElementById("mainSlogan");
-      sloganEl.textContent = "";
+      return {
+        status: "震盪整理",
+        strategy: "先等確認，再做方向",
+        signal: "訊號：結構分歧，避免追單",
+        signalClass: "signal-neutral",
+        trendBadge: "趨勢：盤整",
+        structureBadge: "結構：分歧中",
+        entryBadge: "進場：等突破確認"
+      };
     }
 
-    renderTable();
-    updateTopInfo();
+    function updateSummaryAndTop() {
+      const latestPrice = last(priceData, currentPrice);
+      const diff = latestPrice - yesterdayClose;
+      const pct = yesterdayClose ? (diff / yesterdayClose) * 100 : 0;
 
-    function tickUpdate() {
-      const lastLabel = labels[labels.length - 1];
+      const latestSupport = last(supportData);
+      const latestW50 = last(weight50Data);
+      const latestMid = last(mid100Data);
+      const latestEle = last(electronicsData);
+      const latestFin = last(financeData);
+      const avgStructure = Math.round((latestSupport + latestW50 + latestMid + latestEle + latestFin) / 5);
+      const eleLead = Math.round(latestEle - latestFin);
+
+      document.getElementById("mainIndexText").textContent =
+        `${latestPrice.toFixed(2)} ${diff >= 0 ? "+" : ""}${diff.toFixed(2)} (${pct >= 0 ? "+" : ""}${pct.toFixed(2)}%)`;
+
+      document.getElementById("mainSubText").textContent =
+        `昨收 ${yesterdayClose.toFixed(2)} ｜ 波動 ${Math.abs(diff).toFixed(2)} 點`;
+
+      document.getElementById("breadthNumbers").innerHTML = `
+        <span>${latestSupport}</span>
+        <span>${latestW50}</span>
+        <span>${latestMid}</span>
+        <span>${latestEle}</span>
+        <span>${latestFin}</span>
+      `;
+
+      const judge = judgeMarket(avgStructure, eleLead, latestFin, diff);
+
+      document.getElementById("marketStatusText").textContent = judge.status;
+      document.getElementById("strategyText").textContent = judge.strategy;
+
+      const signalEl = document.getElementById("signalText");
+      signalEl.textContent = judge.signal;
+      signalEl.className = `signal-line ${judge.signalClass}`;
+
+      document.getElementById("trendBadge").textContent = judge.trendBadge;
+      document.getElementById("structureBadge").textContent = judge.structureBadge;
+      document.getElementById("entryBadge").textContent = judge.entryBadge;
+
+      document.getElementById("avgStructure").textContent = String(avgStructure);
+      document.getElementById("avgStructure").className = `mini-box-value ${valueClass(avgStructure)}`;
+
+      const leadDiffEl = document.getElementById("leadDiff");
+      leadDiffEl.textContent = `${eleLead >= 0 ? "+" : ""}${eleLead}`;
+      leadDiffEl.className = `mini-box-value ${eleLead >= 0 ? "green-text" : "red-text"}`;
+
+      const supportPowerEl = document.getElementById("supportPower");
+      if (latestSupport >= 75) {
+        supportPowerEl.textContent = "強";
+        supportPowerEl.className = "mini-box-value red-text";
+      } else if (latestSupport <= 45) {
+        supportPowerEl.textContent = "弱";
+        supportPowerEl.className = "mini-box-value green-text";
+      } else {
+        supportPowerEl.textContent = "中";
+        supportPowerEl.className = "mini-box-value yellow-text";
+      }
+
+      const paceTextEl = document.getElementById("paceText");
+      paceTextEl.textContent = judge.trendBadge.replace("趨勢：", "");
+    }
+
+    function updateTimersText() {
+      const remain = Math.max(0, Math.ceil((nextUpdateAt - Date.now()) / 1000));
+      document.getElementById("nextRefreshText").textContent = `下一次更新：${remain} 秒內`;
+    }
+
+    function redrawCharts() {
+      priceChart.data.labels = labels;
+      priceChart.data.datasets[0].data = priceData;
+      priceChart.data.datasets[1].data = priceMAData;
+      priceChart.data.datasets[2].data = structureAvgData.map(v => yesterdayClose + (v - 50) * 1.8);
+      priceChart.update();
+
+      structureChart.data.labels = labels;
+      structureChart.data.datasets[0].data = supportData;
+      structureChart.data.datasets[1].data = weight50Data;
+      structureChart.data.datasets[2].data = mid100Data;
+      structureChart.data.datasets[3].data = electronicsData;
+      structureChart.data.datasets[4].data = financeData;
+      structureChart.update();
+
+      sectorChart.data.labels = labels;
+      sectorChart.data.datasets[0].data = sectorPowerData;
+      sectorChart.data.datasets[1].data = electronicsData;
+      sectorChart.data.datasets[2].data = financeData;
+      sectorChart.update();
+    }
+
+    function getNextTimeText() {
+      const lastLabel = last(labels, "09:00:00");
       const [h, m, s] = lastLabel.split(":").map(Number);
       const dt = new Date();
       dt.setHours(h, m, s, 0);
       dt.setSeconds(dt.getSeconds() + 15);
-
-      const newLabel = formatClock(dt);
-
-      let newPrice = priceData[priceData.length - 1] + rand(-8, 10);
-      let newPower = clamp(powerData[powerData.length - 1] + rand(-2.5, 2.8), 20, 98);
-      let newSpot = clamp(spotData[spotData.length - 1] + rand(-2.2, 2.4), 18, 98);
-
-      labels.push(newLabel);
-      priceData.push(Number(newPrice.toFixed(2)));
-      powerData.push(Number(newPower.toFixed(2)));
-      spotData.push(Number(newSpot.toFixed(2)));
-
-      if (labels.length > 80) {
-        labels.shift();
-        priceData.shift();
-        powerData.shift();
-        spotData.shift();
-      }
-
-      lastPower = newPower;
-      lastSpot = newSpot;
-      addTableRow(newLabel, true);
-
-      priceChart.update();
-      powerChart.update();
-      spotChart.update();
-
-      renderTable();
-      updateTopInfo();
+      return formatClock(dt);
     }
 
-    setInterval(tickUpdate, 2000);
+    function tickUpdate() {
+      if (isPaused) return;
+
+      updateStructureState();
+      pseudoMarketMove();
+      addSnapshot(getNextTimeText());
+
+      redrawCharts();
+      renderTable();
+      updateSummaryAndTop();
+
+      document.getElementById("updateTime").textContent = `模擬更新中 ${last(labels, "--:--:--")}`;
+      nextUpdateAt = Date.now() + UPDATE_MS;
+      updateTimersText();
+    }
+
+    function startTimers() {
+      stopTimers();
+      timer = setInterval(tickUpdate, UPDATE_MS);
+      countdownTimer = setInterval(updateTimersText, 300);
+    }
+
+    function stopTimers() {
+      if (timer) clearInterval(timer);
+      if (countdownTimer) clearInterval(countdownTimer);
+    }
+
+    function resetDashboard() {
+      labels.length = 0;
+      priceData.length = 0;
+      priceMAData.length = 0;
+      structureAvgData.length = 0;
+      supportData.length = 0;
+      weight50Data.length = 0;
+      mid100Data.length = 0;
+      electronicsData.length = 0;
+      financeData.length = 0;
+      sectorPowerData.length = 0;
+      tableRows.length = 0;
+
+      currentPrice = 17320;
+      state = {
+        support: 68,
+        weight50: 73,
+        mid100: 67,
+        electronics: 76,
+        finance: 58
+      };
+
+      seedData();
+      redrawCharts();
+      renderTable();
+      updateSummaryAndTop();
+      document.getElementById("updateTime").textContent = `模擬更新中 ${last(labels, "--:--:--")}`;
+      nextUpdateAt = Date.now() + UPDATE_MS;
+      updateTimersText();
+    }
+
+    document.getElementById("pauseBtn").addEventListener("click", () => {
+      isPaused = true;
+      document.getElementById("updateTime").textContent = `已暫停 ${last(labels, "--:--:--")}`;
+    });
+
+    document.getElementById("resumeBtn").addEventListener("click", () => {
+      isPaused = false;
+      nextUpdateAt = Date.now() + UPDATE_MS;
+      document.getElementById("updateTime").textContent = `模擬更新中 ${last(labels, "--:--:--")}`;
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      resetDashboard();
+    });
+
+    renderTable();
+    updateSummaryAndTop();
+    document.getElementById("updateTime").textContent = `模擬更新中 ${last(labels, "--:--:--")}`;
+    updateTimersText();
+    startTimers();
+
+    /* =========================
+       真實 API 串接範例
+       之後你可把 tickUpdate 改成 fetchRealtimeData
+    ========================= */
+    /*
+    async function fetchRealtimeData() {
+      if (isPaused) return;
+
+      try {
+        const res = await fetch('/api/dashboard?t=' + Date.now(), {
+          method: 'GET',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
+
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        labels.length = 0;
+        priceData.length = 0;
+        priceMAData.length = 0;
+        structureAvgData.length = 0;
+        supportData.length = 0;
+        weight50Data.length = 0;
+        mid100Data.length = 0;
+        electronicsData.length = 0;
+        financeData.length = 0;
+        sectorPowerData.length = 0;
+        tableRows.length = 0;
+
+        labels.push(...data.labels);
+        priceData.push(...data.priceData);
+        priceMAData.push(...data.priceMAData);
+        structureAvgData.push(...data.structureAvgData);
+        supportData.push(...data.supportData);
+        weight50Data.push(...data.weight50Data);
+        mid100Data.push(...data.mid100Data);
+        electronicsData.push(...data.electronicsData);
+        financeData.push(...data.financeData);
+        sectorPowerData.push(...data.sectorPowerData);
+        tableRows.push(...data.tableRows);
+
+        currentPrice = data.currentPrice ?? currentPrice;
+        yesterdayClose = data.yesterdayClose ?? yesterdayClose;
+
+        redrawCharts();
+        renderTable();
+        updateSummaryAndTop();
+
+        document.getElementById('updateTime').textContent =
+          `即時更新 ${labels[labels.length - 1] || '--:--:--'}`;
+
+        nextUpdateAt = Date.now() + UPDATE_MS;
+        updateTimersText();
+
+      } catch (err) {
+        console.error('更新失敗:', err);
+        document.getElementById('updateTime').textContent = '更新失敗';
+      }
+    }
+
+    // 改用真實API時：
+    // stopTimers();
+    // timer = setInterval(fetchRealtimeData, UPDATE_MS);
+    */
   </script>
 </body>
 </html>
