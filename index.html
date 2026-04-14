@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>台指期同步版 3.2</title>
+  <title>台指期同步版 3.3｜固定分鐘時間軸</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -546,14 +546,13 @@
       </div>
     </div>
 
-    <div class="footer-strip">台指期同步版 3.2｜固定時間軸版</div>
+    <div class="footer-strip">台指期同步版 3.3｜真正固定分鐘時間軸</div>
   </div>
 
   <script>
-    const MAX_POINTS = 240;
     const API_POLL_MS = 60000;
     const INTERPOLATE_MS = 1000;
-    const FIXED_TICK_COUNT = 10; // 固定顯示 10 個時間刻度
+    const SLOT_COUNT = 60; // 一分鐘固定 60 格
 
     let isPaused = false;
     let apiTimer = null;
@@ -561,15 +560,19 @@
     let countdownTimer = null;
     let nextUpdateAt = 0;
 
-    const labels = [];
-    const taiexData = [];
-    const futuresData = [];
-    const maData = [];
-    const supportData = [];
-    const electronicsData = [];
-    const weight50Data = [];
-    const mid100Data = [];
-    const financeData = [];
+    // 固定 60 格時間軸
+    let labels = new Array(SLOT_COUNT).fill("");
+    let taiexData = new Array(SLOT_COUNT).fill(null);
+    let futuresData = new Array(SLOT_COUNT).fill(null);
+    let maData = new Array(SLOT_COUNT).fill(null);
+    let supportData = new Array(SLOT_COUNT).fill(null);
+    let electronicsData = new Array(SLOT_COUNT).fill(null);
+    let weight50Data = new Array(SLOT_COUNT).fill(null);
+    let mid100Data = new Array(SLOT_COUNT).fill(null);
+    let financeData = new Array(SLOT_COUNT).fill(null);
+
+    let currentSecondSlot = 0;
+    let currentMinuteKey = null;
     const rows = [];
 
     let latestSnapshot = null;
@@ -583,19 +586,10 @@
       finance: null
     };
 
-    function avg(arr) {
-      if (!arr.length) return 0;
-      return arr.reduce((a, b) => a + b, 0) / arr.length;
-    }
-
-    function calcMA(arr, len) {
-      const slice = arr.slice(Math.max(0, arr.length - len));
-      return slice.length ? avg(slice) : 0;
-    }
-
-    function pushLimit(arr, value, limit = MAX_POINTS) {
-      arr.push(value);
-      if (arr.length > limit) arr.shift();
+    function avgValid(arr, len) {
+      const slice = arr.slice(Math.max(0, arr.length - len)).filter(v => v !== null);
+      if (!slice.length) return null;
+      return slice.reduce((a, b) => a + b, 0) / slice.length;
     }
 
     function valueClass(v) {
@@ -613,22 +607,54 @@
       return (Math.random() - 0.5) * scale;
     }
 
-    function formatNowTime() {
-      return new Date().toLocaleTimeString("zh-TW", {
-        hour12: false,
-        timeZone: "Asia/Taipei"
-      });
-    }
-
     function normalizeMajorValue(v) {
       const n = Number(v || 0);
       if (n > 0 && n < 10000) return n * 10;
       return n;
     }
 
-    function pushTimeLabel() {
-      labels.push(formatNowTime());
-      if (labels.length > MAX_POINTS) labels.shift();
+    function getMinuteBase(dateObj) {
+      const h = String(dateObj.getHours()).padStart(2, "0");
+      const m = String(dateObj.getMinutes()).padStart(2, "0");
+      return `${h}:${m}`;
+    }
+
+    function rebuildFixedMinuteAxis(baseMinute) {
+      labels = Array.from({ length: SLOT_COUNT }, (_, i) => `${baseMinute}:${String(i).padStart(2, "0")}`);
+      taiexData = new Array(SLOT_COUNT).fill(null);
+      futuresData = new Array(SLOT_COUNT).fill(null);
+      maData = new Array(SLOT_COUNT).fill(null);
+      supportData = new Array(SLOT_COUNT).fill(null);
+      electronicsData = new Array(SLOT_COUNT).fill(null);
+      weight50Data = new Array(SLOT_COUNT).fill(null);
+      mid100Data = new Array(SLOT_COUNT).fill(null);
+      financeData = new Array(SLOT_COUNT).fill(null);
+      currentSecondSlot = 0;
+
+      bindAllDatasets();
+      updateAllCharts();
+    }
+
+    function bindAllDatasets() {
+      priceChart.data.labels = labels;
+      priceChart.data.datasets[0].data = taiexData;
+      priceChart.data.datasets[1].data = futuresData;
+      priceChart.data.datasets[2].data = maData;
+
+      supportChart.data.labels = labels;
+      supportChart.data.datasets[0].data = supportData;
+
+      electronicsChart.data.labels = labels;
+      electronicsChart.data.datasets[0].data = electronicsData;
+
+      weight50Chart.data.labels = labels;
+      weight50Chart.data.datasets[0].data = weight50Data;
+
+      mid100Chart.data.labels = labels;
+      mid100Chart.data.datasets[0].data = mid100Data;
+
+      financeChart.data.labels = labels;
+      financeChart.data.datasets[0].data = financeData;
     }
 
     function commonXAxis() {
@@ -639,12 +665,8 @@
           maxRotation: 0,
           minRotation: 0,
           callback: function(value, index) {
-            const total = this.getLabels().length;
-            if (total <= 1) return this.getLabelForValue(value);
-
-            const step = Math.max(1, Math.floor(total / FIXED_TICK_COUNT));
-            const isLast = index === total - 1;
-            if (index % step === 0 || isLast) {
+            // 每 5 秒顯示一個固定時間標籤
+            if (index % 5 === 0 || index === SLOT_COUNT - 1) {
               return this.getLabelForValue(value);
             }
             return "";
@@ -848,6 +870,18 @@
     function pushInterpolatedPoint() {
       if (!latestSnapshot || isPaused) return;
 
+      const now = new Date();
+      const baseMinute = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      const second = now.getSeconds();
+
+      // 只在進入新分鐘時，重建一次固定時間軸
+      if (currentMinuteKey !== baseMinute) {
+        currentMinuteKey = baseMinute;
+        rebuildFixedMinuteAxis(baseMinute);
+      }
+
+      currentSecondSlot = second;
+
       const row = latestSnapshot.row;
       const taiexTarget = normalizeMajorValue(latestSnapshot.taiex.current);
       const futuresTarget = normalizeMajorValue(latestSnapshot.futures.current);
@@ -860,17 +894,15 @@
       displayState.mid100 = smoothStep(displayState.mid100, row.mid100, 0.30) + tinyNoise(0.18);
       displayState.finance = smoothStep(displayState.finance, row.finance, 0.30) + tinyNoise(0.18);
 
-      pushTimeLabel();
+      taiexData[currentSecondSlot] = Number(displayState.taiex.toFixed(2));
+      futuresData[currentSecondSlot] = Number(displayState.futures.toFixed(2));
+      supportData[currentSecondSlot] = Number(displayState.support.toFixed(2));
+      electronicsData[currentSecondSlot] = Number(displayState.electronics.toFixed(2));
+      weight50Data[currentSecondSlot] = Number(displayState.weight50.toFixed(2));
+      mid100Data[currentSecondSlot] = Number(displayState.mid100.toFixed(2));
+      financeData[currentSecondSlot] = Number(displayState.finance.toFixed(2));
 
-      pushLimit(taiexData, Number(displayState.taiex.toFixed(2)));
-      pushLimit(futuresData, Number(displayState.futures.toFixed(2)));
-      pushLimit(maData, Number(calcMA(taiexData, 10).toFixed(2)));
-
-      pushLimit(supportData, Number(displayState.support.toFixed(2)));
-      pushLimit(electronicsData, Number(displayState.electronics.toFixed(2)));
-      pushLimit(weight50Data, Number(displayState.weight50.toFixed(2)));
-      pushLimit(mid100Data, Number(displayState.mid100.toFixed(2)));
-      pushLimit(financeData, Number(displayState.finance.toFixed(2)));
+      maData[currentSecondSlot] = Number((avgValid(taiexData.slice(0, currentSecondSlot + 1), 10) || displayState.taiex).toFixed(2));
 
       updateAllCharts();
     }
@@ -919,7 +951,6 @@
       stopTimers();
       fetchSnapshot();
       pushInterpolatedPoint();
-
       apiTimer = setInterval(fetchSnapshot, API_POLL_MS);
       interpTimer = setInterval(pushInterpolatedPoint, INTERPOLATE_MS);
       countdownTimer = setInterval(updateCountdownText, 300);
@@ -943,41 +974,23 @@
     });
 
     document.getElementById("resetBtn").addEventListener("click", () => {
-      labels.length = 0;
-      taiexData.length = 0;
-      futuresData.length = 0;
-      maData.length = 0;
-      supportData.length = 0;
-      electronicsData.length = 0;
-      weight50Data.length = 0;
-      mid100Data.length = 0;
-      financeData.length = 0;
+      currentMinuteKey = null;
+      labels = new Array(SLOT_COUNT).fill("");
+      taiexData = new Array(SLOT_COUNT).fill(null);
+      futuresData = new Array(SLOT_COUNT).fill(null);
+      maData = new Array(SLOT_COUNT).fill(null);
+      supportData = new Array(SLOT_COUNT).fill(null);
+      electronicsData = new Array(SLOT_COUNT).fill(null);
+      weight50Data = new Array(SLOT_COUNT).fill(null);
+      mid100Data = new Array(SLOT_COUNT).fill(null);
+      financeData = new Array(SLOT_COUNT).fill(null);
       rows.length = 0;
-
-      if (latestSnapshot) {
-        displayState.taiex = normalizeMajorValue(latestSnapshot.taiex.current);
-        displayState.futures = normalizeMajorValue(latestSnapshot.futures.current);
-        displayState.support = latestSnapshot.row.support;
-        displayState.electronics = latestSnapshot.row.electronics;
-        displayState.weight50 = latestSnapshot.row.weight50;
-        displayState.mid100 = latestSnapshot.row.mid100;
-        displayState.finance = latestSnapshot.row.finance;
-      } else {
-        displayState = {
-          taiex: null,
-          futures: null,
-          support: null,
-          electronics: null,
-          weight50: null,
-          mid100: null,
-          finance: null
-        };
-      }
-
+      bindAllDatasets();
       renderTable();
       updateAllCharts();
     });
 
+    bindAllDatasets();
     startTimers();
   </script>
 </body>
