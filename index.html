@@ -486,8 +486,8 @@
 
   <script>
     const MAX_POINTS = 240;
-    const API_POLL_MS = 60000;   // 每分鐘抓一次真實資料
-    const INTERPOLATE_MS = 1000; // 每秒補一個流暢點
+    const API_POLL_MS = 60000;
+    const INTERPOLATE_MS = 1000;
 
     let isPaused = false;
     let apiTimer = null;
@@ -539,7 +539,7 @@
       return "yellow-text";
     }
 
-    function smoothStep(current, target, factor = 0.28) {
+    function smoothStep(current, target, factor = 0.22) {
       if (current === null || current === undefined) return target;
       return current + (target - current) * factor;
     }
@@ -553,6 +553,12 @@
         hour12: false,
         timeZone: "Asia/Taipei"
       });
+    }
+
+    function normalizeMajorValue(v) {
+      const n = Number(v || 0);
+      if (n > 0 && n < 10000) return n * 10;
+      return n;
     }
 
     const priceChart = new Chart(document.getElementById("priceChart"), {
@@ -727,8 +733,13 @@
 
     function refreshTopUI(snapshot) {
       const row = snapshot.row;
-      const t = snapshot.taiex;
-      const f = snapshot.futures;
+
+      const taiexCurrent = normalizeMajorValue(snapshot.taiex.current);
+      const taiexChangeAbs = normalizeMajorValue(snapshot.taiex.changeAbs);
+
+      const futuresCurrent = normalizeMajorValue(snapshot.futures.current);
+      const futuresChangeAbs = normalizeMajorValue(snapshot.futures.changeAbs);
+      const futuresBasis = Number((futuresCurrent - taiexCurrent).toFixed(2));
 
       document.getElementById("marketStatusText").textContent = snapshot.dashboard.marketStatus;
       document.getElementById("strategyText").textContent = snapshot.dashboard.strategyText;
@@ -736,16 +747,16 @@
       updateSignalClass(snapshot.dashboard.marketStatus);
 
       document.getElementById("mainIndexText").textContent =
-        `${Number(t.current).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${Number(t.pct).toFixed(2)}%)`;
+        `${taiexCurrent.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${Number(snapshot.taiex.pct).toFixed(2)}%)`;
 
       document.getElementById("mainSubText").textContent =
-        `時間 ${row.time} ｜ 漲跌點 ${Number(t.changeAbs).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        `時間 ${row.time} ｜ 漲跌點 ${taiexChangeAbs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
       document.getElementById("futuresIndexText").textContent =
-        `${Number(f.current).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${Number(f.pct).toFixed(2)}%)`;
+        `${futuresCurrent.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${Number(snapshot.futures.pct).toFixed(2)}%)`;
 
       document.getElementById("futuresSubText").textContent =
-        `台指期 ${f.symbol} ｜ 漲跌點 ${Number(f.changeAbs).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        `台指期 ${snapshot.futures.symbol} ｜ 漲跌點 ${futuresChangeAbs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
       document.getElementById("breadthNumbers").innerHTML = `
         <span>${row.support}</span>
@@ -772,9 +783,9 @@
       document.getElementById("leadDiff").className = `mini-box-value ${diff >= 0 ? "green-text" : "red-text"}`;
 
       document.getElementById("basisValue").textContent =
-        `${Number(f.basis) >= 0 ? "+" : ""}${Number(f.basis).toFixed(2)}`;
+        `${futuresBasis >= 0 ? "+" : ""}${futuresBasis.toFixed(2)}`;
       document.getElementById("basisValue").className =
-        `mini-box-value ${Number(f.basis) >= 0 ? "green-text" : "red-text"}`;
+        `mini-box-value ${futuresBasis >= 0 ? "green-text" : "red-text"}`;
 
       document.getElementById("trendBadge").textContent = `趨勢：${snapshot.dashboard.marketStatus}`;
       document.getElementById("structureBadge").textContent = `結構：平均 ${snapshot.dashboard.avgScore}`;
@@ -785,14 +796,12 @@
     function pushInterpolatedPoint() {
       if (!latestSnapshot || isPaused) return;
 
-      const target = latestSnapshot;
-      const row = target.row;
-      const t = target.taiex;
-      const f = target.futures;
+      const row = latestSnapshot.row;
+      const taiexTarget = normalizeMajorValue(latestSnapshot.taiex.current);
+      const futuresTarget = normalizeMajorValue(latestSnapshot.futures.current);
 
-      displayState.taiex = smoothStep(displayState.taiex, Number(t.current), 0.22) + tinyNoise(2.2);
-      displayState.futures = smoothStep(displayState.futures, Number(f.current), 0.22) + tinyNoise(2.4);
-
+      displayState.taiex = smoothStep(displayState.taiex, taiexTarget, 0.22) + tinyNoise(2.2);
+      displayState.futures = smoothStep(displayState.futures, futuresTarget, 0.22) + tinyNoise(2.4);
       displayState.support = smoothStep(displayState.support, row.support, 0.30) + tinyNoise(0.20);
       displayState.weight50 = smoothStep(displayState.weight50, row.weight50, 0.30) + tinyNoise(0.18);
       displayState.mid100 = smoothStep(displayState.mid100, row.mid100, 0.30) + tinyNoise(0.18);
@@ -837,9 +846,12 @@
 
         latestSnapshot = d;
 
+        const taiexTarget = normalizeMajorValue(d.taiex.current);
+        const futuresTarget = normalizeMajorValue(d.futures.current);
+
         if (displayState.taiex === null) {
-          displayState.taiex = Number(d.taiex.current);
-          displayState.futures = Number(d.futures.current);
+          displayState.taiex = taiexTarget;
+          displayState.futures = futuresTarget;
           displayState.support = d.row.support;
           displayState.weight50 = d.row.weight50;
           displayState.mid100 = d.row.mid100;
@@ -902,8 +914,8 @@
       rows.length = 0;
 
       if (latestSnapshot) {
-        displayState.taiex = Number(latestSnapshot.taiex.current);
-        displayState.futures = Number(latestSnapshot.futures.current);
+        displayState.taiex = normalizeMajorValue(latestSnapshot.taiex.current);
+        displayState.futures = normalizeMajorValue(latestSnapshot.futures.current);
         displayState.support = latestSnapshot.row.support;
         displayState.weight50 = latestSnapshot.row.weight50;
         displayState.mid100 = latestSnapshot.row.mid100;
