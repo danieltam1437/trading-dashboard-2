@@ -3,810 +3,1142 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>現貨結構時間表｜自動抓資料版</title>
+  <title>操盤儀表板 PRO - 免費資料自動抓取版</title>
   <style>
     :root{
-      --bg:#020b1a;
-      --panel:#041631;
-      --panel-2:#031126;
-      --line:#11386e;
-      --text:#e8f1ff;
-      --muted:#8fb3e8;
-      --yellow:#ffcc00;
-      --red:#ff4d57;
-      --green:#22c55e;
-      --blue:#3aa0ff;
-      --cyan:#21d4fd;
+      --bg:#0b1020;
+      --panel:#131a2e;
+      --panel-2:#1b2440;
+      --line:#2c365c;
+      --text:#eaf0ff;
+      --muted:#9fb0df;
+      --up:#ff4d4f;
+      --down:#2ecc71;
+      --flat:#f5c542;
+      --blue:#4ea1ff;
+      --purple:#8b7dff;
+      --shadow:0 10px 25px rgba(0,0,0,.25);
+      --radius:18px;
     }
-
-    *{ box-sizing:border-box; }
-
+    *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:"Segoe UI","Microsoft JhengHei",Arial,sans-serif;
-      background:#000;
+      background:
+        radial-gradient(circle at top left, rgba(78,161,255,.15), transparent 25%),
+        radial-gradient(circle at top right, rgba(139,125,255,.14), transparent 25%),
+        var(--bg);
       color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Microsoft JhengHei",sans-serif;
     }
-
-    .wrap{
-      width:100%;
-      min-height:100vh;
-      padding:8px;
-      background:linear-gradient(180deg,#000 0%, #010714 100%);
-    }
-
-    .board{
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:10px;
-      background:var(--bg);
-      box-shadow:0 0 0 1px rgba(58,160,255,.08) inset, 0 0 30px rgba(0,0,0,.35);
-    }
-
+    .wrap{max-width:1600px;margin:0 auto;padding:20px}
     .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:16px;
-      margin-bottom:10px;
+      display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px;
     }
-
-    .title{
-      color:var(--yellow);
-      font-weight:900;
-      font-size:18px;
-      letter-spacing:1px;
+    .titlebox h1{margin:0;font-size:30px;letter-spacing:1px}
+    .subtitle{margin-top:6px;color:var(--muted);font-size:14px}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .btn,.select,.input{
+      background:var(--panel);color:var(--text);border:1px solid var(--line);
+      border-radius:12px;padding:10px 14px;font-size:14px;outline:none;
     }
-
-    .status-right{
-      text-align:right;
-      font-size:13px;
-      line-height:1.5;
-      color:#ff8f8f;
-      white-space:nowrap;
+    .btn{cursor:pointer;transition:.2s}
+    .btn:hover{transform:translateY(-1px);border-color:var(--blue)}
+    .status-badge{
+      display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:var(--panel);
+      border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--muted);
     }
-
-    .status-right.ok{
-      color:#85ffb0;
-    }
-
     .dot{
-      display:inline-block;
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:var(--red);
-      margin-right:8px;
-      vertical-align:middle;
-      box-shadow:0 0 10px rgba(255,77,87,.7);
+      width:10px;height:10px;border-radius:50%;background:#57d657;box-shadow:0 0 12px rgba(87,214,87,.8);
     }
-
-    .status-right.ok .dot{
-      background:var(--green);
-      box-shadow:0 0 10px rgba(34,197,94,.7);
-    }
-
-    .grid-top{
-      display:grid;
-      grid-template-columns:1.25fr .95fr .95fr 1fr;
-      gap:10px;
-      margin-bottom:10px;
-    }
-
-    .grid-mid{
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:10px;
-      margin-bottom:12px;
-    }
-
-    .grid-chart{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-bottom:10px;
-    }
-
+    .grid{display:grid;gap:16px}
+    .grid-4{grid-template-columns:repeat(4,1fr)}
+    .grid-3{grid-template-columns:repeat(3,1fr)}
+    .grid-2{grid-template-columns:repeat(2,1fr)}
     .card{
-      background:linear-gradient(180deg,var(--panel) 0%, var(--panel-2) 100%);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px 14px;
-      min-height:92px;
-      position:relative;
-      overflow:hidden;
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01)), var(--panel);
+      border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+      padding:16px;min-width:0;
     }
-
     .card h3{
-      margin:0 0 8px;
-      font-size:13px;
-      color:#d7e7ff;
+      margin:0 0 12px 0;font-size:16px;color:#dfe8ff;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .mini{color:var(--muted);font-size:12px}
+    .big-number{font-size:34px;font-weight:800;line-height:1.1;margin:8px 0 4px}
+    .delta{font-size:16px;font-weight:700}
+    .up{color:var(--up)}
+    .down{color:var(--down)}
+    .flat{color:var(--flat)}
+    .muted{color:var(--muted)}
+    .subrow{
+      display:flex;justify-content:space-between;gap:12px;margin-top:10px;flex-wrap:wrap;color:var(--muted);font-size:13px;
+    }
+    .panel-title{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;
+    }
+    .judge-box{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .judge-item{
+      background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:14px;
+    }
+    .judge-label{color:var(--muted);font-size:13px;margin-bottom:10px}
+    .judge-value{font-size:22px;font-weight:800}
+    .judge-desc{margin-top:8px;font-size:13px;color:var(--muted);line-height:1.5}
+    .signal-box{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    .summary-box{
+      padding:18px;border-radius:16px;background:linear-gradient(135deg, rgba(78,161,255,.18), rgba(139,125,255,.16));
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .summary-title{font-size:14px;color:#dbe5ff;margin-bottom:10px}
+    .summary-main{font-size:24px;font-weight:900;line-height:1.5}
+    .summary-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .tag{
+      padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);font-size:12px;color:#e8eeff;
+    }
+    .alerts{display:flex;flex-direction:column;gap:10px}
+    .alert-item{
+      border-radius:14px;padding:12px 14px;border:1px solid var(--line);
+      background:var(--panel-2);font-size:14px;line-height:1.5;
+    }
+    .alert-high{border-color:rgba(255,77,79,.45);background:rgba(255,77,79,.08)}
+    .alert-mid{border-color:rgba(245,197,66,.4);background:rgba(245,197,66,.08)}
+    .alert-low{border-color:rgba(78,161,255,.35);background:rgba(78,161,255,.08)}
+    .table-wrap{overflow:auto;border-radius:14px;border:1px solid var(--line)}
+    table{width:100%;border-collapse:collapse;min-width:700px}
+    th,td{
+      padding:12px 10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:center;font-size:14px;
+    }
+    th{
+      background:rgba(255,255,255,.03);color:#dbe5ff;position:sticky;top:0;z-index:1;
+    }
+    tr:hover td{background:rgba(255,255,255,.025)}
+    .bar-chart{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:12px;height:260px;
+      padding:18px 12px 28px;border-radius:16px;background:var(--panel-2);
+      border:1px solid var(--line);position:relative;margin-top:8px;
+    }
+    .bar-chart::before{
+      content:"";position:absolute;left:0;right:0;top:50%;border-top:1px dashed rgba(255,255,255,.12);
+    }
+    .axis-y{
+      position:absolute;left:10px;top:8px;bottom:28px;width:40px;pointer-events:none;
+      color:var(--muted);font-size:11px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;
+    }
+    .axis-x{display:flex;justify-content:space-between;gap:12px;padding:8px 10px 0 56px;color:var(--muted);font-size:12px}
+    .bar-group{flex:1;display:flex;align-items:flex-end;justify-content:center;height:100%;position:relative}
+    .bar{
+      width:60%;border-radius:10px 10px 0 0;min-height:2px;transition:.3s;position:relative;
+    }
+    .bar.positive{
+      background:linear-gradient(180deg, rgba(255,77,79,.95), rgba(255,77,79,.45));
+      box-shadow:0 0 12px rgba(255,77,79,.15);
+    }
+    .bar.negative{
+      background:linear-gradient(180deg, rgba(46,204,113,.95), rgba(46,204,113,.45));
+      box-shadow:0 0 12px rgba(46,204,113,.15);
+    }
+    .bar-value{
+      position:absolute;top:-24px;left:50%;transform:translateX(-50%);
+      font-size:12px;white-space:nowrap;color:#dfe7ff;
+    }
+    .bar.negative .bar-value{top:auto;bottom:-24px}
+    .section-spacer{height:16px}
+    .footer-note{margin-top:16px;color:var(--muted);font-size:12px;line-height:1.7}
+    .pill{
+      padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid var(--line);
+      color:var(--muted);background:rgba(255,255,255,.02);
+    }
+    .warn{
+      color:#ffd36b;
       font-weight:700;
     }
-
-    .card .label-yellow{
-      display:inline-block;
-      color:var(--yellow);
-      font-size:12px;
-      font-weight:900;
-      margin-bottom:10px;
-    }
-
-    .big{
-      font-size:18px;
-      font-weight:900;
-      color:#fff;
-      margin-bottom:6px;
-    }
-
-    .sub{
-      font-size:13px;
-      color:#bcd2f6;
-    }
-
-    .chart-card{
-      background:linear-gradient(180deg,var(--panel) 0%, var(--panel-2) 100%);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:12px 12px 18px;
-      min-height:270px;
-    }
-
-    .chart-title{
-      color:var(--yellow);
-      font-weight:900;
-      font-size:14px;
-      margin-bottom:10px;
-    }
-
-    .chart-box{
-      height:210px;
-      border-radius:12px;
-      background:#02112b;
-      border:1px solid rgba(17,56,110,.55);
-      padding:8px;
-      position:relative;
-    }
-
-    canvas{
-      width:100%;
-      height:100%;
-      display:block;
-    }
-
-    .table-card{
-      background:linear-gradient(180deg,var(--panel) 0%, var(--panel-2) 100%);
-      border:1px solid var(--line);
-      border-radius:16px;
-      overflow:hidden;
-      margin-top:8px;
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      table-layout:fixed;
-    }
-
-    thead th{
-      background:#061a3a;
-      color:var(--yellow);
-      padding:14px 8px;
-      font-size:16px;
-      border-bottom:1px solid rgba(17,56,110,.8);
-    }
-
-    tbody td{
-      text-align:center;
-      padding:16px 8px;
-      border-bottom:1px solid rgba(17,56,110,.35);
-      color:#d9e8ff;
-      font-size:15px;
-    }
-
-    tbody tr:last-child td{
-      border-bottom:none;
-    }
-
-    .error-row td{
-      color:var(--red);
-      font-weight:800;
-    }
-
-    .up{ color:var(--red); font-weight:800; }
-    .down{ color:var(--green); font-weight:800; }
-    .flat{ color:#fff; font-weight:800; }
-
-    .tiny{
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    .mini-note{
-      margin-top:6px;
-      font-size:12px;
-      color:#89a9d9;
-      word-break:break-all;
-    }
-
     @media (max-width:1200px){
-      .grid-top{ grid-template-columns:1fr 1fr; }
-      .grid-mid{ grid-template-columns:repeat(2,1fr); }
-      .grid-chart{ grid-template-columns:1fr; }
+      .grid-4{grid-template-columns:repeat(2,1fr)}
+      .grid-3{grid-template-columns:1fr}
+      .grid-2{grid-template-columns:1fr}
+      .judge-box{grid-template-columns:1fr}
+      .signal-box{grid-template-columns:1fr}
     }
-
-    @media (max-width:768px){
-      .topbar{
-        flex-direction:column;
-        align-items:flex-start;
-      }
-      .grid-top, .grid-mid{
-        grid-template-columns:1fr;
-      }
-      thead th, tbody td{
-        font-size:13px;
-        padding:10px 6px;
-      }
+    @media (max-width:720px){
+      .grid-4{grid-template-columns:1fr}
+      .topbar{align-items:flex-start}
+      .big-number{font-size:28px}
+      .summary-main{font-size:20px}
+      .bar-chart{height:220px}
     }
   </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="board">
+  <div class="wrap">
     <div class="topbar">
-      <div class="title">現貨結構時間表｜自動抓資料版</div>
-      <div id="statusBox" class="status-right">
-        <span class="dot"></span>
-        <span id="statusText">初始化中...</span>
+      <div class="titlebox">
+        <h1>操盤儀表板 PRO</h1>
+        <div class="subtitle">免費資料自動抓取版｜TWSE / TAIFEX 公開來源優先｜失敗自動 fallback</div>
+      </div>
+
+      <div class="controls">
+        <div class="status-badge">
+          <span class="dot"></span>
+          <span id="statusText">初始化中</span>
+        </div>
+
+        <select id="modeSelect" class="select">
+          <option value="auto">自動抓取（免費）</option>
+          <option value="demo">示範資料</option>
+        </select>
+
+        <button class="btn" id="refreshBtn">立即刷新</button>
       </div>
     </div>
 
-    <div class="grid-top">
+    <div class="grid grid-4">
       <div class="card">
-        <div class="label-yellow">盤勢總結</div>
-        <div class="big" id="summaryMain">讀取中...</div>
-        <div class="sub" id="summarySub">操作建議：讀取中...</div>
-      </div>
-
-      <div class="card">
-        <h3>三核心判斷</h3>
-        <div class="big" id="coreMain">讀取中...</div>
-        <div class="sub" id="coreSub">權值 / 電子 / 金融</div>
-      </div>
-
-      <div class="card">
-        <h3>最新支撐結構</h3>
-        <div class="big" id="supportMain">--</div>
-        <div class="sub" id="supportTime">時間：--</div>
-      </div>
-
-      <div class="card">
-        <h3>資料來源 / 指數</h3>
-        <div class="big" id="sourceMain">--</div>
-        <div class="sub" id="indexMain">--</div>
-        <div class="mini-note" id="debugUrl">目前 URL：--</div>
-      </div>
-    </div>
-
-    <div class="grid-mid">
-      <div class="card">
-        <h3>支撐 分數</h3>
-        <div class="big" id="scoreSupport">--</div>
-      </div>
-      <div class="card">
-        <h3>權值50 分數</h3>
-        <div class="big" id="scoreWeight">--</div>
-      </div>
-      <div class="card">
-        <h3>中型100 分數</h3>
-        <div class="big" id="scoreMid">--</div>
-      </div>
-      <div class="card">
-        <h3>電子 分數</h3>
-        <div class="big" id="scoreElec">--</div>
-      </div>
-      <div class="card">
-        <h3>金融 分數</h3>
-        <div class="big" id="scoreFin">--</div>
-      </div>
-    </div>
-
-    <div class="grid-chart">
-      <div class="chart-card">
-        <div class="chart-title">趨勢量能柱狀圖</div>
-        <div class="chart-box">
-          <canvas id="powerChart"></canvas>
+        <h3>
+          <span>加權指數</span>
+          <span class="pill" id="marketBiasPill">判讀中</span>
+        </h3>
+        <div id="tseIndex" class="big-number">--</div>
+        <div id="tseChange" class="delta muted">--</div>
+        <div class="subrow">
+          <span>成交量：<b id="tseVolume">--</b></span>
+          <span>時間：<b id="updateTime1">--</b></span>
         </div>
       </div>
 
-      <div class="chart-card">
-        <div class="chart-title">電子 / 金融 分離柱狀圖</div>
-        <div class="chart-box">
-          <canvas id="sectorChart"></canvas>
+      <div class="card">
+        <h3>
+          <span>台指期近月</span>
+          <span class="pill" id="futureBiasPill">判讀中</span>
+        </h3>
+        <div id="txfIndex" class="big-number">--</div>
+        <div id="txfChange" class="delta muted">--</div>
+        <div class="subrow">
+          <span>期現差：<b id="basisValue">--</b></span>
+          <span>來源：<b id="futureSource">--</b></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>
+          <span>觀察家數</span>
+          <span class="pill" id="breadthPill">判讀中</span>
+        </h3>
+        <div id="advDecline" class="big-number">--</div>
+        <div id="breadthRatio" class="delta muted">--</div>
+        <div class="subrow">
+          <span>上漲：<b id="advancers">--</b></span>
+          <span>下跌：<b id="decliners">--</b></span>
+          <span>平盤：<b id="unchanged">--</b></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>
+          <span>盤勢總分</span>
+          <span class="pill" id="scorePill">綜合判讀</span>
+        </h3>
+        <div id="marketScore" class="big-number">--</div>
+        <div id="marketScoreText" class="delta muted">--</div>
+        <div class="subrow">
+          <span>電子分數：<b id="electronicsWeight">--</b></span>
+          <span>金融分數：<b id="financeWeight">--</b></span>
         </div>
       </div>
     </div>
 
-    <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>時間</th>
-            <th>支撐</th>
-            <th>權值50</th>
-            <th>中型100</th>
-            <th>電子</th>
-            <th>金融</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <tr>
-            <td colspan="6">讀取中...</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="section-spacer"></div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="panel-title">
+          <h3 style="margin:0;">三核心判斷</h3>
+          <span class="mini">趨勢 / 量能 / 結構</span>
+        </div>
+
+        <div class="judge-box">
+          <div class="judge-item">
+            <div class="judge-label">核心一：趨勢方向</div>
+            <div id="trendValue" class="judge-value">--</div>
+            <div id="trendDesc" class="judge-desc">--</div>
+          </div>
+          <div class="judge-item">
+            <div class="judge-label">核心二：量能強弱</div>
+            <div id="volumeValue" class="judge-value">--</div>
+            <div id="volumeDesc" class="judge-desc">--</div>
+          </div>
+          <div class="judge-item">
+            <div class="judge-label">核心三：市場結構</div>
+            <div id="structureValue" class="judge-value">--</div>
+            <div id="structureDesc" class="judge-desc">--</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="signal-box">
+          <div class="summary-box">
+            <div class="summary-title">自動一句話結論</div>
+            <div id="summaryMain" class="summary-main">系統尚未判讀</div>
+            <div class="summary-tags" id="summaryTags"></div>
+          </div>
+
+          <div>
+            <h3 style="margin-bottom:10px;">警報訊號</h3>
+            <div class="alerts" id="alertsBox"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="panel-title">
+          <h3 style="margin:0;">電子 / 金融 分流觀察</h3>
+          <span class="mini">由觀察權值股自動計算</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>族群</th>
+                <th>分數</th>
+                <th>平均漲跌幅</th>
+                <th>量能分數</th>
+                <th>強弱判斷</th>
+                <th>備註</th>
+              </tr>
+            </thead>
+            <tbody id="sectorTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="panel-title">
+          <h3 style="margin:0;">盤勢量能柱狀圖</h3>
+          <span class="mini">依觀察股即時計算</span>
+        </div>
+
+        <div class="bar-chart" id="barChart">
+          <div class="axis-y">
+            <span>+100</span>
+            <span>+50</span>
+            <span>0</span>
+            <span>-50</span>
+            <span>-100</span>
+          </div>
+        </div>
+        <div class="axis-x" id="axisX"></div>
+      </div>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <div class="card">
+      <div class="panel-title">
+        <h3 style="margin:0;">權值股觀察清單</h3>
+        <span class="mini">免費版家數與族群分數以此名單計算</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>股票</th>
+              <th>代號</th>
+              <th>成交價</th>
+              <th>漲跌</th>
+              <th>漲跌幅</th>
+              <th>累積量</th>
+              <th>族群</th>
+              <th>權重</th>
+              <th>影響分數</th>
+              <th>狀態</th>
+            </tr>
+          </thead>
+          <tbody id="stockTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <div>目前模式：<span id="modeNote" class="warn">自動抓取（免費）</span></div>
+      <div>說明 1：免費版的「觀察家數」是根據觀察名單計算，不是全市場逐筆家數。</div>
+      <div>說明 2：若官方站台臨時擋跨站，系統會自動改走 proxy；若仍失敗，該欄位改用示範值，不會整頁掛掉。</div>
+      <div>說明 3：你之後若拿到券商 API，只要替換 <code>fetchFreeDashboardData()</code> 即可升級成真正即時版。</div>
     </div>
   </div>
-</div>
-
-<script>
-const CONFIG = {
-  AUTO_REFRESH_MS: 28000,
-  DATA_URL: "./data/spot_structure_time.json"
-};
-
-const el = {
-  statusBox: document.getElementById("statusBox"),
-  statusText: document.getElementById("statusText"),
-  summaryMain: document.getElementById("summaryMain"),
-  summarySub: document.getElementById("summarySub"),
-  coreMain: document.getElementById("coreMain"),
-  coreSub: document.getElementById("coreSub"),
-  supportMain: document.getElementById("supportMain"),
-  supportTime: document.getElementById("supportTime"),
-  sourceMain: document.getElementById("sourceMain"),
-  indexMain: document.getElementById("indexMain"),
-  debugUrl: document.getElementById("debugUrl"),
-  scoreSupport: document.getElementById("scoreSupport"),
-  scoreWeight: document.getElementById("scoreWeight"),
-  scoreMid: document.getElementById("scoreMid"),
-  scoreElec: document.getElementById("scoreElec"),
-  scoreFin: document.getElementById("scoreFin"),
-  tableBody: document.getElementById("tableBody"),
-  powerChart: document.getElementById("powerChart"),
-  sectorChart: document.getElementById("sectorChart")
-};
-
-let historyRows = [];
-let refreshTimer = null;
-
-function scoreClassText(v){
-  if (v > 0) return `<span class="up">${v}</span>`;
-  if (v < 0) return `<span class="down">${v}</span>`;
-  return `<span class="flat">${v}</span>`;
-}
-
-function signalText(v){
-  if (v >= 75) return "強多";
-  if (v >= 60) return "偏多";
-  if (v >= 45) return "震盪";
-  if (v >= 30) return "偏空";
-  return "弱空";
-}
-
-function suggestText(avg){
-  if (avg >= 75) return "盤勢強，多方主導，可順勢操作";
-  if (avg >= 60) return "偏多看待，可找拉回承接";
-  if (avg >= 45) return "多空拉鋸，避免過度追價";
-  if (avg >= 30) return "偏空看待，反彈宜保守";
-  return "空方主導，避免逆勢進場";
-}
-
-function calcCore(row){
-  const weight = Number(row.weight50 || 0);
-  const elec = Number(row.elec || 0);
-  const fin = Number(row.fin || 0);
-  const avg = Math.round((weight + elec + fin) / 3);
-  return {
-    avg,
-    text: signalText(avg)
-  };
-}
-
-function setStatus(ok, text){
-  el.statusBox.classList.toggle("ok", ok);
-  el.statusText.textContent = text;
-}
-
-function normalizeData(raw){
-  let rows = [];
-
-  if (Array.isArray(raw)) {
-    rows = raw.map(item => ({
-      time: item.time ?? "--:--",
-      support: Number(item.support ?? 0),
-      weight50: Number(item.weight50 ?? 0),
-      mid100: Number(item.mid100 ?? 0),
-      elec: Number(item.elec ?? item.electronic ?? 0),
-      fin: Number(item.fin ?? item.finance ?? 0)
-    }));
-  } else if (raw && Array.isArray(raw.rows)) {
-    rows = raw.rows.map(item => ({
-      time: item.time ?? "--:--",
-      support: Number(item.support ?? 0),
-      weight50: Number(item.weight50 ?? 0),
-      mid100: Number(item.mid100 ?? 0),
-      elec: Number(item.elec ?? item.electronic ?? 0),
-      fin: Number(item.fin ?? item.finance ?? 0)
-    }));
-  }
-
-  return {
-    source: raw?.source ?? "local-json",
-    index_name: raw?.index_name ?? "加權指數",
-    last_update: raw?.last_update ?? new Date().toLocaleTimeString("zh-TW", { hour12:false }),
-    next_update_in_sec: raw?.next_update_in_sec ?? Math.floor(CONFIG.AUTO_REFRESH_MS / 1000),
-    latest_support_structure: raw?.latest_support_structure ?? "資料讀取成功",
-    rows
-  };
-}
-
-async function fetchData(){
-  const response = await fetch(CONFIG.DATA_URL, { cache: "no-store" });
-
-  if (!response.ok) {
-    const err = new Error(`HTTP ${response.status}`);
-    err.url = CONFIG.DATA_URL;
-    throw err;
-  }
-
-  const json = await response.json();
-  return {
-    data: normalizeData(json),
-    url: CONFIG.DATA_URL
-  };
-}
-
-function renderCards(data){
-  const latest = data.rows[data.rows.length - 1] || {
-    time: "--:--",
-    support: 0,
-    weight50: 0,
-    mid100: 0,
-    elec: 0,
-    fin: 0
-  };
-
-  const core = calcCore(latest);
-  const avg = Math.round(
-    (latest.support + latest.weight50 + latest.mid100 + latest.elec + latest.fin) / 5
-  );
-
-  el.summaryMain.textContent = signalText(avg);
-  el.summarySub.textContent = `操作建議：${suggestText(avg)}`;
-
-  el.coreMain.textContent = core.text;
-  el.coreSub.textContent = `權值 / 電子 / 金融：${core.avg} 分`;
-
-  el.supportMain.textContent = data.latest_support_structure;
-  el.supportTime.textContent = `時間：${latest.time}`;
-
-  el.sourceMain.textContent = `來源：${data.source}`;
-  el.indexMain.textContent = `${data.index_name}｜更新 ${data.last_update}`;
-
-  el.scoreSupport.innerHTML = scoreClassText(latest.support);
-  el.scoreWeight.innerHTML = scoreClassText(latest.weight50);
-  el.scoreMid.innerHTML = scoreClassText(latest.mid100);
-  el.scoreElec.innerHTML = scoreClassText(latest.elec);
-  el.scoreFin.innerHTML = scoreClassText(latest.fin);
-}
-
-function renderTable(rows){
-  if (!rows.length) {
-    el.tableBody.innerHTML = `
-      <tr class="error-row">
-        <td colspan="6">沒有可顯示的資料</td>
-      </tr>
-    `;
-    return;
-  }
-
-  el.tableBody.innerHTML = rows.map(r => `
-    <tr>
-      <td>${r.time}</td>
-      <td>${scoreClassText(r.support)}</td>
-      <td>${scoreClassText(r.weight50)}</td>
-      <td>${scoreClassText(r.mid100)}</td>
-      <td>${scoreClassText(r.elec)}</td>
-      <td>${scoreClassText(r.fin)}</td>
-    </tr>
-  `).join("");
-}
-
-function setupCanvasHiDPI(canvas){
-  const rect = canvas.getBoundingClientRect();
-  const ratio = window.devicePixelRatio || 1;
-  canvas.width = Math.max(300, Math.floor(rect.width * ratio));
-  canvas.height = Math.max(180, Math.floor(rect.height * ratio));
-}
-
-function clearCanvas(canvas){
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-function roundRect(ctx, x, y, w, h, r, fill, stroke){
-  if (w < 2 * r) r = w / 2;
-  if (h < 2 * r) r = h / 2;
-
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-
-  if (fill) ctx.fill();
-  if (stroke) ctx.stroke();
-}
-
-function drawAxes(ctx, w, h, left, top, right, bottom, yMax, yMin, yTitle, xLabels){
-  ctx.save();
-  ctx.strokeStyle = "rgba(143,179,232,.35)";
-  ctx.fillStyle = "#9cc0ef";
-  ctx.lineWidth = 1;
-
-  ctx.beginPath();
-  ctx.moveTo(left, top);
-  ctx.lineTo(left, h - bottom);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(left, h - bottom);
-  ctx.lineTo(w - right, h - bottom);
-  ctx.stroke();
-
-  const steps = 5;
-  for (let i = 0; i <= steps; i++) {
-    const y = top + ((h - top - bottom) / steps) * i;
-    const value = Math.round(yMax - ((yMax - yMin) / steps) * i);
-
-    ctx.strokeStyle = "rgba(143,179,232,.12)";
-    ctx.beginPath();
-    ctx.moveTo(left, y);
-    ctx.lineTo(w - right, y);
-    ctx.stroke();
-
-    ctx.fillStyle = "#89a9d9";
-    ctx.font = "12px Segoe UI, Microsoft JhengHei";
-    ctx.textAlign = "right";
-    ctx.fillText(String(value), left - 8, y + 4);
-  }
-
-  ctx.fillStyle = "#89a9d9";
-  ctx.font = "12px Segoe UI, Microsoft JhengHei";
-  ctx.textAlign = "center";
-
-  const count = xLabels.length || 1;
-  const plotW = w - left - right;
-
-  xLabels.forEach((lb, i) => {
-    const x = left + plotW * ((i + 0.5) / count);
-    ctx.fillText(lb, x, h - bottom + 18);
-  });
-
-  ctx.save();
-  ctx.translate(18, h / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillStyle = "#c7ddff";
-  ctx.font = "13px Segoe UI, Microsoft JhengHei";
-  ctx.textAlign = "center";
-  ctx.fillText(yTitle, 0, 0);
-  ctx.restore();
-
-  ctx.fillStyle = "#c7ddff";
-  ctx.font = "13px Segoe UI, Microsoft JhengHei";
-  ctx.textAlign = "center";
-  ctx.fillText("時間", (left + (w - right)) / 2, h - 6);
-
-  ctx.restore();
-}
-
-function drawBars(canvas, labels, values, options = {}){
-  setupCanvasHiDPI(canvas);
-  const ctx = canvas.getContext("2d");
-  clearCanvas(canvas);
-
-  const w = canvas.width;
-  const h = canvas.height;
-  const left = 46;
-  const right = 14;
-  const top = 12;
-  const bottom = 34;
-
-  const maxVal = Math.max(...values, 100);
-  const minVal = Math.min(0, ...values);
-
-  drawAxes(ctx, w, h, left, top, right, bottom, maxVal, minVal, options.yTitle || "分數", labels);
-
-  const plotW = w - left - right;
-  const plotH = h - top - bottom;
-  const count = values.length || 1;
-  const groupW = plotW / count;
-  const barW = Math.min(42 * (window.devicePixelRatio || 1), groupW * 0.55);
-
-  values.forEach((v, i) => {
-    const x = left + groupW * i + (groupW - barW) / 2;
-    const y0 = top + (maxVal / (maxVal - minVal)) * plotH;
-    const yv = top + ((maxVal - v) / (maxVal - minVal)) * plotH;
-    const barTop = Math.min(y0, yv);
-    const barH = Math.abs(yv - y0);
-
-    ctx.save();
-    ctx.fillStyle = v >= 0 ? "rgba(255,77,87,.9)" : "rgba(34,197,94,.9)";
-    roundRect(ctx, x, barTop, barW, Math.max(barH, 2), 6, true, false);
-
-    ctx.fillStyle = "#e8f1ff";
-    ctx.font = `${12 * (window.devicePixelRatio || 1)}px Segoe UI, Microsoft JhengHei`;
-    ctx.textAlign = "center";
-    ctx.fillText(String(v), x + barW / 2, barTop - 6);
-    ctx.restore();
-  });
-}
-
-function drawDualBars(canvas, labels, seriesA, seriesB, nameA = "電子", nameB = "金融"){
-  setupCanvasHiDPI(canvas);
-  const ctx = canvas.getContext("2d");
-  clearCanvas(canvas);
-
-  const w = canvas.width;
-  const h = canvas.height;
-  const left = 46;
-  const right = 14;
-  const top = 12;
-  const bottom = 34;
-
-  const allValues = [...seriesA, ...seriesB];
-  const maxVal = Math.max(...allValues, 100);
-  const minVal = Math.min(0, ...allValues);
-
-  drawAxes(ctx, w, h, left, top, right, bottom, maxVal, minVal, "分數", labels);
-
-  const plotW = w - left - right;
-  const plotH = h - top - bottom;
-  const count = labels.length || 1;
-  const groupW = plotW / count;
-  const barW = Math.min(18 * (window.devicePixelRatio || 1), groupW * 0.24);
-
-  labels.forEach((lb, i) => {
-    const centerX = left + groupW * (i + 0.5);
-
-    [
-      { v: seriesA[i], dx: -barW * 0.7, color: "rgba(58,160,255,.95)" },
-      { v: seriesB[i], dx:  barW * 0.7, color: "rgba(255,204,0,.95)" }
-    ].forEach(item => {
-      const x = centerX + item.dx - barW / 2;
-      const y0 = top + (maxVal / (maxVal - minVal)) * plotH;
-      const yv = top + ((maxVal - item.v) / (maxVal - minVal)) * plotH;
-      const barTop = Math.min(y0, yv);
-      const barH = Math.abs(yv - y0);
-
-      ctx.save();
-      ctx.fillStyle = item.color;
-      roundRect(ctx, x, barTop, barW, Math.max(barH, 2), 4, true, false);
-
-      ctx.fillStyle = "#dcecff";
-      ctx.font = `${11 * (window.devicePixelRatio || 1)}px Segoe UI, Microsoft JhengHei`;
-      ctx.textAlign = "center";
-      ctx.fillText(String(item.v), x + barW / 2, barTop - 6);
-      ctx.restore();
-    });
-  });
-
-  ctx.save();
-  ctx.font = `${12 * (window.devicePixelRatio || 1)}px Segoe UI, Microsoft JhengHei`;
-  ctx.textAlign = "left";
-
-  ctx.fillStyle = "rgba(58,160,255,.95)";
-  ctx.fillRect(left, top + 2, 14, 8);
-  ctx.fillStyle = "#cfe2ff";
-  ctx.fillText(nameA, left + 20, top + 10);
-
-  ctx.fillStyle = "rgba(255,204,0,.95)";
-  ctx.fillRect(left + 70, top + 2, 14, 8);
-  ctx.fillStyle = "#cfe2ff";
-  ctx.fillText(nameB, left + 90, top + 10);
-  ctx.restore();
-}
-
-function renderCharts(rows){
-  if (!rows.length) {
-    setupCanvasHiDPI(el.powerChart);
-    setupCanvasHiDPI(el.sectorChart);
-    clearCanvas(el.powerChart);
-    clearCanvas(el.sectorChart);
-    return;
-  }
-
-  const latestRows = rows.slice(-6);
-  const labels = latestRows.map(r => r.time);
-  const supportValues = latestRows.map(r => r.support);
-  const elecValues = latestRows.map(r => r.elec);
-  const finValues = latestRows.map(r => r.fin);
-
-  drawBars(el.powerChart, labels, supportValues, { yTitle: "支撐分數" });
-  drawDualBars(el.sectorChart, labels, elecValues, finValues, "電子", "金融");
-}
-
-function renderError(err){
-  const msg = err?.message || "未知錯誤";
-  const url = err?.url || CONFIG.DATA_URL;
-
-  el.summaryMain.textContent = "更新失敗";
-  el.summarySub.textContent = "操作建議：請檢查 JSON 路徑或格式";
-  el.coreMain.textContent = "讀取失敗";
-  el.coreSub.textContent = "請檢查 data/spot_structure_time.json";
-  el.supportMain.textContent = "--";
-  el.supportTime.textContent = "時間：--";
-  el.sourceMain.textContent = "來源：失敗";
-  el.indexMain.textContent = msg;
-  el.debugUrl.textContent = `失敗 URL：${url}`;
-
-  el.scoreSupport.textContent = "--";
-  el.scoreWeight.textContent = "--";
-  el.scoreMid.textContent = "--";
-  el.scoreElec.textContent = "--";
-  el.scoreFin.textContent = "--";
-
-  el.tableBody.innerHTML = `
-    <tr class="error-row">
-      <td colspan="6">資料讀取失敗：${msg}</td>
-    </tr>
-  `;
-
-  setupCanvasHiDPI(el.powerChart);
-  setupCanvasHiDPI(el.sectorChart);
-  clearCanvas(el.powerChart);
-  clearCanvas(el.sectorChart);
-}
-
-async function refreshData(){
-  try {
-    setStatus(false, "更新中...");
-
-    const { data, url } = await fetchData();
-    historyRows = data.rows;
-
-    renderCards(data);
-    renderTable(data.rows);
-    renderCharts(data.rows);
-
-    const sec = Math.floor(CONFIG.AUTO_REFRESH_MS / 1000);
-    el.debugUrl.textContent = `成功 URL：${url}`;
-    setStatus(true, `最後更新：${data.last_update}　下次更新：${sec}秒後`);
-  } catch (err) {
-    console.error(err);
-    renderError(err);
-
-    const sec = Math.floor(CONFIG.AUTO_REFRESH_MS / 1000);
-    setStatus(false, `更新失敗：${err.message}　下次更新：${sec}秒後`);
-  }
-}
-
-function startAutoRefresh(){
-  if (refreshTimer) clearInterval(refreshTimer);
-  refreshTimer = setInterval(refreshData, CONFIG.AUTO_REFRESH_MS);
-}
-
-window.addEventListener("resize", () => {
-  renderCharts(historyRows);
-});
-
-(async function init(){
-  await refreshData();
-  startAutoRefresh();
-})();
-</script>
+
+  <script>
+    /********************************************************
+     * 0) 設定區
+     ********************************************************/
+    const REFRESH_INTERVAL_MS = 10000;
+
+    // 觀察名單：你之後可自行加減
+    const WATCHLIST = [
+      { symbol: "2330", name: "台積電", sector: "電子", weight: 12 },
+      { symbol: "2317", name: "鴻海", sector: "電子", weight: 7 },
+      { symbol: "2454", name: "聯發科", sector: "電子", weight: 6 },
+      { symbol: "2308", name: "台達電", sector: "電子", weight: 4 },
+      { symbol: "2382", name: "廣達", sector: "電子", weight: 4 },
+      { symbol: "2881", name: "富邦金", sector: "金融", weight: 4 },
+      { symbol: "2882", name: "國泰金", sector: "金融", weight: 4 },
+      { symbol: "2891", name: "中信金", sector: "金融", weight: 3 },
+      { symbol: "2886", name: "兆豐金", sector: "金融", weight: 2 },
+      { symbol: "2884", name: "玉山金", sector: "金融", weight: 2 }
+    ];
+
+    // 嘗試使用的 proxy，前面兩個若失敗就換下一個
+    // 注意：免費 proxy 不是 100% 穩，因此程式寫成多層 fallback
+    const PROXIES = [
+      (url) => url,
+      (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      (url) => `https://cors.isomorphic-git.org/${url}`
+    ];
+
+    // TWSE MIS 常用組合
+    const TWSE_INDEX_CH = "tse_t00.tw";
+    const TWSE_TW50_CH = "tse_0050.tw";
+
+    // TAIFEX 行情頁
+    const TAIFEX_FUTURES_PAGE = "https://mis.taifex.com.tw/futures/";
+
+    let autoTimer = null;
+    let rollingPowerBars = [10, 18, 26, 20, 14, 12, 8, 6];
+
+    /********************************************************
+     * 1) 示範資料（失敗時保底）
+     ********************************************************/
+    const demoBaseData = {
+      index: {
+        tse: 20386.52,
+        tseChange: 86.34,
+        tseChangePct: 0.43,
+        tseVolume: 3187,
+        txf: 20412,
+        txfChange: 102,
+        txfChangePct: 0.50,
+        futureSource: "示範"
+      },
+      breadth: {
+        advancers: 6,
+        decliners: 3,
+        unchanged: 1
+      },
+      sectors: [
+        { name: "電子", score: 72, change: 0.88, volume: 81, note: "權值股帶動明顯" },
+        { name: "金融", score: 44, change: 0.21, volume: 55, note: "跟漲但強度普通" }
+      ],
+      stocks: [
+        { symbol:"2330", name:"台積電", sector:"電子", price:958, change:12, volume:28541, weight:12 },
+        { symbol:"2317", name:"鴻海", sector:"電子", price:167.5, change:1.5, volume:42015, weight:7 },
+        { symbol:"2454", name:"聯發科", sector:"電子", price:1365, change:20, volume:9654, weight:6 },
+        { symbol:"2308", name:"台達電", sector:"電子", price:382.5, change:4.0, volume:8166, weight:4 },
+        { symbol:"2382", name:"廣達", sector:"電子", price:271.5, change:1.5, volume:18005, weight:4 },
+        { symbol:"2881", name:"富邦金", sector:"金融", price:82.4, change:0.3, volume:12044, weight:4 },
+        { symbol:"2882", name:"國泰金", sector:"金融", price:66.1, change:-0.2, volume:16421, weight:4 },
+        { symbol:"2891", name:"中信金", sector:"金融", price:41.2, change:0.1, volume:19350, weight:3 },
+        { symbol:"2886", name:"兆豐金", sector:"金融", price:40.0, change:0.0, volume:7032, weight:2 },
+        { symbol:"2884", name:"玉山金", sector:"金融", price:29.1, change:-0.1, volume:9855, weight:2 }
+      ],
+      powerBars: [22, 36, 58, 44, 70, -18, 12, 48],
+      timeLabels: ["09:00","09:15","09:30","09:45","10:00","10:15","10:30","10:45"]
+    };
+
+    /********************************************************
+     * 2) 基本工具
+     ********************************************************/
+    function nowTimeString() {
+      const d = new Date();
+      return d.toLocaleTimeString("zh-TW", { hour12:false });
+    }
+
+    function formatNumber(n) {
+      return Number(n).toLocaleString("zh-TW");
+    }
+
+    function addSign(n, fixed = 2) {
+      const num = Number(n);
+      const txt = num.toFixed(fixed);
+      return num > 0 ? `+${txt}` : txt;
+    }
+
+    function addSignInt(n) {
+      const num = Number(n);
+      return num > 0 ? `+${num}` : `${num}`;
+    }
+
+    function getColorClass(value) {
+      if (value > 0) return "up";
+      if (value < 0) return "down";
+      return "flat";
+    }
+
+    function scoreText(score) {
+      if (score >= 75) return "強多";
+      if (score >= 60) return "偏多";
+      if (score >= 45) return "震盪偏多";
+      if (score >= 35) return "震盪";
+      if (score >= 20) return "震盪偏空";
+      return "偏空";
+    }
+
+    function scoreClass(score) {
+      if (score >= 60) return "up";
+      if (score <= 30) return "down";
+      return "flat";
+    }
+
+    function safeNumber(v, fallback = 0) {
+      const n = Number(String(v).replace(/,/g, "").trim());
+      return Number.isFinite(n) ? n : fallback;
+    }
+
+    function lastPriceFromMis(item) {
+      // z = 最新成交價；若無成交有時會是 "-"
+      const z = item.z && item.z !== "-" ? safeNumber(item.z, NaN) : NaN;
+      if (Number.isFinite(z) && z > 0) return z;
+
+      // 退而求其次：用買一賣一中間值
+      const bid1 = item.b ? safeNumber(String(item.b).split("_")[0], NaN) : NaN;
+      const ask1 = item.g ? safeNumber(String(item.g).split("_")[0], NaN) : NaN;
+      if (Number.isFinite(bid1) && Number.isFinite(ask1) && bid1 > 0 && ask1 > 0) {
+        return +( (bid1 + ask1) / 2 ).toFixed(2);
+      }
+
+      // 再不行就用昨收
+      return safeNumber(item.y, 0);
+    }
+
+    function pctChange(price, prevClose) {
+      if (!prevClose) return 0;
+      return +(((price - prevClose) / prevClose) * 100).toFixed(2);
+    }
+
+    function normalizeVolume(v) {
+      // MIS 累積成交量通常是股數或張數字串，這裡保留數字即可
+      return safeNumber(v, 0);
+    }
+
+    /********************************************************
+     * 3) 安全抓取：直接抓 -> 代理抓
+     ********************************************************/
+    async function fetchTextWithFallback(url) {
+      let lastError = null;
+
+      for (const makeProxyUrl of PROXIES) {
+        const finalUrl = makeProxyUrl(url);
+        try {
+          const res = await fetch(finalUrl, { cache: "no-store" });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return await res.text();
+        } catch (err) {
+          lastError = err;
+        }
+      }
+      throw lastError || new Error("fetchTextWithFallback failed");
+    }
+
+    async function fetchJsonWithFallback(url) {
+      const text = await fetchTextWithFallback(url);
+      return JSON.parse(text);
+    }
+
+    /********************************************************
+     * 4) 免費來源抓取
+     ********************************************************/
+    async function fetchTwseMisQuotes() {
+      // 1 個 request 一次抓指數 + 觀察股
+      const exCh = [
+        TWSE_INDEX_CH,
+        TWSE_TW50_CH,
+        ...WATCHLIST.map(s => `tse_${s.symbol}.tw`)
+      ].join("|");
+
+      const url = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${encodeURIComponent(exCh)}&json=1&delay=0&_=${Date.now()}`;
+
+      const json = await fetchJsonWithFallback(url);
+      const arr = Array.isArray(json.msgArray) ? json.msgArray : [];
+      if (!arr.length) throw new Error("TWSE MIS msgArray empty");
+      return arr;
+    }
+
+    async function fetchTaifexFutureText() {
+      // 抓 TAIFEX 行情頁文字，盡量從頁面中拆出「臺股期貨」附近的數字
+      // 這種方式很脆弱，但免費且不需要私有 API
+      const text = await fetchTextWithFallback(TAIFEX_FUTURES_PAGE);
+      return text;
+    }
+
+    /********************************************************
+     * 5) 解析免費來源
+     ********************************************************/
+    function parseTwseData(arr) {
+      const byCode = new Map();
+
+      for (const item of arr) {
+        const code = String(item.c || "").trim();
+        if (code) byCode.set(code, item);
+      }
+
+      // 找加權指數那筆
+      // MIS 裡加權指數常會是 c = "t00"
+      let indexItem = arr.find(x => String(x.c || "").toLowerCase() === "t00") || arr[0];
+
+      const tse = lastPriceFromMis(indexItem);
+      const tsePrev = safeNumber(indexItem.y, tse);
+      const tseChange = +(tse - tsePrev).toFixed(2);
+      const tseChangePct = pctChange(tse, tsePrev);
+
+      // 指數成交量欄位不同來源可能不一致，這裡容錯取值
+      const tseVolume = safeNumber(indexItem.v, 0) || safeNumber(indexItem.tv, 0) || 0;
+
+      const stocks = WATCHLIST.map(meta => {
+        const raw = byCode.get(meta.symbol);
+        if (!raw) {
+          return {
+            ...meta,
+            price: 0,
+            change: 0,
+            pct: 0,
+            volume: 0,
+            missing: true
+          };
+        }
+
+        const price = lastPriceFromMis(raw);
+        const prevClose = safeNumber(raw.y, price);
+        const change = +(price - prevClose).toFixed(2);
+        const pct = pctChange(price, prevClose);
+        const volume = normalizeVolume(raw.v || raw.tv || 0);
+
+        return {
+          ...meta,
+          price,
+          change,
+          pct,
+          volume,
+          missing: false
+        };
+      });
+
+      return {
+        tse,
+        tseChange,
+        tseChangePct,
+        tseVolume,
+        stocks
+      };
+    }
+
+    function parseTaifexTextToFuture(text, fallbackTse) {
+      // 頁面文字可能長這樣：臺股期貨, 35,470, ▽
+      // 我們嘗試找「臺股期貨」後面的第一個數字
+      const normalized = text.replace(/\s+/g, " ");
+      const match = normalized.match(/臺股期貨[^0-9]*([\d,]+(?:\.\d+)?)/);
+      if (!match) {
+        return {
+          txf: fallbackTse,
+          txfChange: 0,
+          txfChangePct: 0,
+          futureSource: "TAIFEX 解析失敗，改示意"
+        };
+      }
+
+      const txf = safeNumber(match[1], fallbackTse);
+
+      // 免費頁面不一定好拆到昨收，先用與現貨差估計，避免亂算
+      const estChange = +(txf - fallbackTse).toFixed(2);
+      const estPct = fallbackTse ? +((estChange / fallbackTse) * 100).toFixed(2) : 0;
+
+      return {
+        txf,
+        txfChange: estChange,
+        txfChangePct: estPct,
+        futureSource: "TAIFEX 免費行情頁"
+      };
+    }
+
+    function buildSectorStats(stocks) {
+      const groups = {
+        電子: stocks.filter(s => s.sector === "電子"),
+        金融: stocks.filter(s => s.sector === "金融")
+      };
+
+      const sectors = [];
+
+      for (const [name, list] of Object.entries(groups)) {
+        const valid = list.filter(s => !s.missing && s.price > 0);
+
+        const avgPct = valid.length
+          ? +(valid.reduce((sum, s) => sum + s.pct, 0) / valid.length).toFixed(2)
+          : 0;
+
+        const avgVol = valid.length
+          ? valid.reduce((sum, s) => sum + s.volume, 0) / valid.length
+          : 0;
+
+        const weightedMomentum = valid.reduce((sum, s) => sum + (s.pct * s.weight), 0);
+        let score = 50 + weightedMomentum * 2;
+        score = Math.max(0, Math.min(100, Math.round(score)));
+
+        let volScore = avgVol > 30000 ? 85 : avgVol > 18000 ? 70 : avgVol > 8000 ? 55 : 35;
+        volScore = Math.max(0, Math.min(100, Math.round(volScore)));
+
+        let note = "中性整理";
+        if (score >= 70) note = "明顯轉強";
+        else if (score >= 58) note = "偏多領漲";
+        else if (score <= 30) note = "明顯偏弱";
+        else if (score <= 42) note = "偏空拖累";
+
+        sectors.push({
+          name,
+          score,
+          change: avgPct,
+          volume: volScore,
+          note
+        });
+      }
+
+      return sectors;
+    }
+
+    function buildBreadth(stocks) {
+      let advancers = 0, decliners = 0, unchanged = 0;
+      stocks.forEach(s => {
+        if (s.pct > 0.1) advancers++;
+        else if (s.pct < -0.1) decliners++;
+        else unchanged++;
+      });
+      return { advancers, decliners, unchanged };
+    }
+
+    function updatePowerBarsFromStocks(stocks) {
+      const valid = stocks.filter(s => !s.missing && s.price > 0);
+      const power = valid.reduce((sum, s) => sum + s.pct * s.weight, 0);
+      const normalized = Math.max(-100, Math.min(100, Math.round(power * 3)));
+
+      rollingPowerBars.push(normalized);
+      if (rollingPowerBars.length > 8) rollingPowerBars.shift();
+
+      const labels = [];
+      const now = new Date();
+      for (let i = rollingPowerBars.length - 1; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * 5 * 60 * 1000);
+        labels.push(d.toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit", hour12:false }));
+      }
+      return { powerBars: [...rollingPowerBars], timeLabels: labels };
+    }
+
+    async function fetchFreeDashboardData() {
+      const statusText = document.getElementById("statusText");
+      statusText.textContent = "抓取 TWSE 免費資料中";
+
+      // 先抓股票與指數
+      const misArr = await fetchTwseMisQuotes();
+      const twse = parseTwseData(misArr);
+
+      // 再抓台指期
+      let future;
+      try {
+        statusText.textContent = "抓取 TAIFEX 免費資料中";
+        const futureText = await fetchTaifexFutureText();
+        future = parseTaifexTextToFuture(futureText, twse.tse);
+      } catch (err) {
+        future = {
+          txf: twse.tse,
+          txfChange: 0,
+          txfChangePct: 0,
+          futureSource: "TAIFEX 失敗，改示意"
+        };
+      }
+
+      const breadth = buildBreadth(twse.stocks);
+      const sectors = buildSectorStats(twse.stocks);
+      const bars = updatePowerBarsFromStocks(twse.stocks);
+
+      return {
+        index: {
+          tse: twse.tse,
+          tseChange: twse.tseChange,
+          tseChangePct: twse.tseChangePct,
+          tseVolume: twse.tseVolume,
+          txf: future.txf,
+          txfChange: future.txfChange,
+          txfChangePct: future.txfChangePct,
+          futureSource: future.futureSource
+        },
+        breadth,
+        sectors,
+        stocks: twse.stocks,
+        powerBars: bars.powerBars,
+        timeLabels: bars.timeLabels
+      };
+    }
+
+    /********************************************************
+     * 6) 失敗保底示範資料
+     ********************************************************/
+    function randomRange(min, max, fixed = 2) {
+      return +(Math.random() * (max - min) + min).toFixed(fixed);
+    }
+
+    function generateDemoData() {
+      const clone = JSON.parse(JSON.stringify(demoBaseData));
+
+      clone.index.tse += randomRange(-35, 35);
+      clone.index.tseChange += randomRange(-15, 15);
+      clone.index.tseChangePct = +(clone.index.tseChange / Math.max(1, (clone.index.tse - clone.index.tseChange)) * 100).toFixed(2);
+      clone.index.txf += randomRange(-25, 25);
+      clone.index.txfChange = +(clone.index.txf - clone.index.tse).toFixed(2);
+      clone.index.txfChangePct = +(clone.index.txfChange / Math.max(1, clone.index.tse) * 100).toFixed(2);
+
+      clone.stocks = clone.stocks.map(s => {
+        const newChange = +(s.change + randomRange(-1.5, 1.5)).toFixed(2);
+        const price = +(s.price + newChange).toFixed(2);
+        return {
+          ...s,
+          price: price > 1 ? price : s.price,
+          change: newChange,
+          pct: +((newChange / Math.max(1, s.price - newChange)) * 100).toFixed(2),
+          volume: Math.max(500, s.volume + Math.floor(randomRange(-3000, 3000, 0)))
+        };
+      });
+
+      clone.breadth = buildBreadth(clone.stocks);
+      clone.sectors = buildSectorStats(clone.stocks);
+
+      const bars = updatePowerBarsFromStocks(clone.stocks);
+      clone.powerBars = bars.powerBars;
+      clone.timeLabels = bars.timeLabels;
+
+      return clone;
+    }
+
+    /********************************************************
+     * 7) 分析邏輯
+     ********************************************************/
+    function analyzeMarket(data) {
+      const basis = +(data.index.txf - data.index.tse).toFixed(2);
+      const breadthRatio = +(data.breadth.advancers / Math.max(1, data.breadth.decliners)).toFixed(2);
+
+      const electronics = data.sectors.find(s => s.name === "電子") || { score:50, change:0, volume:50, note:"" };
+      const finance = data.sectors.find(s => s.name === "金融") || { score:50, change:0, volume:50, note:"" };
+
+      let trendScore = 50;
+      trendScore += data.index.tseChange > 0 ? 18 : -18;
+      trendScore += basis > 0 ? 10 : -10;
+      trendScore += electronics.change > 0 ? 10 : -10;
+      trendScore = Math.max(0, Math.min(100, trendScore));
+
+      let volumeScore = 25;
+      volumeScore += data.index.tseVolume > 800000 ? 25 : data.index.tseVolume > 200000 ? 15 : 8;
+      volumeScore += Math.round(electronics.volume * 0.35);
+      volumeScore += Math.round(finance.volume * 0.2);
+      volumeScore = Math.max(0, Math.min(100, volumeScore));
+
+      let structureScore = 50;
+      structureScore += breadthRatio >= 1.5 ? 18 : breadthRatio >= 1.1 ? 10 : breadthRatio < 0.8 ? -18 : -5;
+      structureScore += electronics.score >= 65 ? 12 : electronics.score < 35 ? -12 : 0;
+      structureScore += finance.score >= 60 ? 8 : finance.score < 30 ? -8 : 0;
+      structureScore = Math.max(0, Math.min(100, structureScore));
+
+      const totalScore = Math.round(trendScore * 0.4 + volumeScore * 0.25 + structureScore * 0.35);
+
+      const trendText = scoreText(trendScore);
+      const volumeText = scoreText(volumeScore);
+      const structureText = scoreText(structureScore);
+
+      const trendDesc =
+        trendScore >= 65
+          ? "加權與觀察權值股同向偏強，趨勢面有利多方。"
+          : trendScore <= 35
+          ? "加權與主要權值股同步轉弱，短線先偏保守。"
+          : "方向還不夠一致，先視為拉鋸震盪。";
+
+      const volumeDesc =
+        volumeScore >= 65
+          ? "量能有跟上，續航力較佳。"
+          : volumeScore <= 35
+          ? "量能偏弱，容易出現假突破。"
+          : "量能一般，追價要保守。";
+
+      const structureDesc =
+        structureScore >= 65
+          ? "電子 / 金融 / 觀察家數結構偏健康。"
+          : structureScore <= 35
+          ? "結構偏弱，可能只剩少數個股撐盤。"
+          : "結構中性，注意輪動與回測。";
+
+      const tags = [];
+      if (basis > 0) tags.push("期強於現");
+      else if (basis < 0) tags.push("期弱於現");
+      else tags.push("期現接近");
+
+      if (breadthRatio >= 1.3) tags.push("觀察名單偏多");
+      else if (breadthRatio < 0.9) tags.push("觀察名單偏空");
+      else tags.push("觀察名單中性");
+
+      if (electronics.score >= 65) tags.push("電子領軍");
+      if (finance.score >= 60) tags.push("金融助攻");
+      if (electronics.score < 35) tags.push("電子疲弱");
+      if (finance.score < 30) tags.push("金融拖累");
+
+      let summary = "";
+      if (totalScore >= 70) {
+        summary = "盤勢明顯偏多，適合順勢思考，拉回找支撐，不宜亂空。";
+      } else if (totalScore >= 55) {
+        summary = "盤勢偏多但不是全面噴出，重點看電子是否續強。";
+      } else if (totalScore >= 40) {
+        summary = "目前屬震盪整理盤，追高殺低都容易吃虧，等確認再進。";
+      } else {
+        summary = "盤勢偏空或結構脆弱，若沒有翻多訊號，先保守防守。";
+      }
+
+      const alerts = [];
+      if (basis > 20) {
+        alerts.push({ level:"high", text:"期現差偏正且擴大，多方預期較強。" });
+      } else if (basis < -20) {
+        alerts.push({ level:"high", text:"期現差偏負且擴大，小心高檔轉弱。" });
+      }
+
+      if (breadthRatio >= 1.5) {
+        alerts.push({ level:"mid", text:"觀察名單內上漲家數明顯優勢，結構偏健康。" });
+      } else if (breadthRatio < 0.8) {
+        alerts.push({ level:"mid", text:"觀察名單內下跌家數偏多，小心只有少數權值股撐盤。" });
+      }
+
+      if (electronics.score >= 70 && electronics.volume >= 70) {
+        alerts.push({ level:"low", text:"電子同步放量轉強，可視為主攻軸。" });
+      }
+
+      if (finance.score >= 60 && finance.change > 0) {
+        alerts.push({ level:"low", text:"金融有跟上，盤勢穩定度提高。" });
+      }
+
+      if (alerts.length === 0) {
+        alerts.push({ level:"low", text:"暫無極端警報，維持紀律，等待更清楚訊號。" });
+      }
+
+      return {
+        basis,
+        breadthRatio,
+        trendScore, volumeScore, structureScore,
+        trendText, volumeText, structureText,
+        trendDesc, volumeDesc, structureDesc,
+        totalScore,
+        totalScoreText: scoreText(totalScore),
+        summary,
+        tags,
+        alerts,
+        electronicsWeight: `${electronics.score}/100`,
+        financeWeight: `${finance.score}/100`
+      };
+    }
+
+    /********************************************************
+     * 8) 畫面渲染
+     ********************************************************/
+    function renderBarChart(values, labels) {
+      const chart = document.getElementById("barChart");
+      const axisX = document.getElementById("axisX");
+
+      chart.querySelectorAll(".bar-group").forEach(el => el.remove());
+      axisX.innerHTML = "";
+
+      values.forEach(v => {
+        const group = document.createElement("div");
+        group.className = "bar-group";
+
+        const bar = document.createElement("div");
+        bar.className = `bar ${v >= 0 ? "positive" : "negative"}`;
+
+        const heightPercent = Math.max(4, Math.abs(v));
+        bar.style.height = `${heightPercent}%`;
+        bar.style.marginBottom = v >= 0 ? "50%" : "0";
+        bar.style.alignSelf = v >= 0 ? "flex-end" : "flex-start";
+        bar.style.transform = v < 0 ? "translateY(50%)" : "translateY(-50%)";
+
+        const value = document.createElement("div");
+        value.className = "bar-value";
+        value.textContent = addSignInt(v);
+
+        bar.appendChild(value);
+        group.appendChild(bar);
+        chart.appendChild(group);
+      });
+
+      labels.forEach(l => {
+        const d = document.createElement("div");
+        d.style.flex = "1";
+        d.style.textAlign = "center";
+        d.textContent = l;
+        axisX.appendChild(d);
+      });
+    }
+
+    function renderDashboard(data) {
+      const analysis = analyzeMarket(data);
+      const now = nowTimeString();
+
+      document.getElementById("tseIndex").textContent = formatNumber(Number(data.index.tse).toFixed(2));
+      document.getElementById("tseChange").innerHTML =
+        `<span class="${getColorClass(data.index.tseChange)}">${addSign(data.index.tseChange)} (${addSign(data.index.tseChangePct)}%)</span>`;
+      document.getElementById("tseVolume").textContent = formatNumber(data.index.tseVolume);
+      document.getElementById("updateTime1").textContent = now;
+
+      document.getElementById("txfIndex").textContent = formatNumber(Number(data.index.txf).toFixed(2));
+      document.getElementById("txfChange").innerHTML =
+        `<span class="${getColorClass(data.index.txfChange)}">${addSign(data.index.txfChange)} (${addSign(data.index.txfChangePct)}%)</span>`;
+      document.getElementById("basisValue").innerHTML =
+        `<span class="${getColorClass(analysis.basis)}">${addSign(analysis.basis)}</span>`;
+      document.getElementById("futureSource").textContent = data.index.futureSource || "--";
+
+      const breadthDiff = data.breadth.advancers - data.breadth.decliners;
+      document.getElementById("advDecline").innerHTML =
+        `<span class="${getColorClass(breadthDiff)}">${addSignInt(breadthDiff)}</span>`;
+      document.getElementById("breadthRatio").innerHTML =
+        `<span class="${analysis.breadthRatio >= 1 ? "up" : "down"}">上/下比 ${analysis.breadthRatio}</span>`;
+      document.getElementById("advancers").textContent = formatNumber(data.breadth.advancers);
+      document.getElementById("decliners").textContent = formatNumber(data.breadth.decliners);
+      document.getElementById("unchanged").textContent = formatNumber(data.breadth.unchanged);
+
+      document.getElementById("marketScore").innerHTML =
+        `<span class="${scoreClass(analysis.totalScore)}">${analysis.totalScore}</span>`;
+      document.getElementById("marketScoreText").innerHTML =
+        `<span class="${scoreClass(analysis.totalScore)}">${analysis.totalScoreText}</span>`;
+      document.getElementById("electronicsWeight").textContent = analysis.electronicsWeight;
+      document.getElementById("financeWeight").textContent = analysis.financeWeight;
+
+      document.getElementById("marketBiasPill").textContent = data.index.tseChange >= 0 ? "大盤偏多" : "大盤偏空";
+      document.getElementById("futureBiasPill").textContent = data.index.txfChange >= 0 ? "期貨偏多" : "期貨偏空";
+      document.getElementById("breadthPill").textContent = analysis.breadthRatio >= 1 ? "結構偏多" : "結構偏空";
+      document.getElementById("scorePill").textContent = analysis.totalScoreText;
+
+      document.getElementById("trendValue").innerHTML =
+        `<span class="${scoreClass(analysis.trendScore)}">${analysis.trendText}（${analysis.trendScore}）</span>`;
+      document.getElementById("volumeValue").innerHTML =
+        `<span class="${scoreClass(analysis.volumeScore)}">${analysis.volumeText}（${analysis.volumeScore}）</span>`;
+      document.getElementById("structureValue").innerHTML =
+        `<span class="${scoreClass(analysis.structureScore)}">${analysis.structureText}（${analysis.structureScore}）</span>`;
+
+      document.getElementById("trendDesc").textContent = analysis.trendDesc;
+      document.getElementById("volumeDesc").textContent = analysis.volumeDesc;
+      document.getElementById("structureDesc").textContent = analysis.structureDesc;
+
+      document.getElementById("summaryMain").textContent = analysis.summary;
+      const summaryTags = document.getElementById("summaryTags");
+      summaryTags.innerHTML = "";
+      analysis.tags.forEach(tag => {
+        const el = document.createElement("div");
+        el.className = "tag";
+        el.textContent = tag;
+        summaryTags.appendChild(el);
+      });
+
+      const alertsBox = document.getElementById("alertsBox");
+      alertsBox.innerHTML = "";
+      analysis.alerts.forEach(alert => {
+        const div = document.createElement("div");
+        div.className = `alert-item alert-${alert.level}`;
+        div.textContent = alert.text;
+        alertsBox.appendChild(div);
+      });
+
+      const sectorTbody = document.getElementById("sectorTableBody");
+      sectorTbody.innerHTML = "";
+      data.sectors.forEach(s => {
+        const strength = s.score >= 70 ? "強勢主攻" :
+                         s.score >= 55 ? "偏強" :
+                         s.score >= 40 ? "中性" : "偏弱";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${s.name}</td>
+          <td class="${scoreClass(s.score)}">${s.score}</td>
+          <td class="${getColorClass(s.change)}">${addSign(s.change)}%</td>
+          <td>${s.volume}</td>
+          <td class="${scoreClass(s.score)}">${strength}</td>
+          <td>${s.note}</td>
+        `;
+        sectorTbody.appendChild(tr);
+      });
+
+      renderBarChart(data.powerBars, data.timeLabels);
+
+      const stockTbody = document.getElementById("stockTableBody");
+      stockTbody.innerHTML = "";
+      data.stocks.forEach(s => {
+        const impact = +(s.pct * s.weight).toFixed(2);
+        const state = impact >= 4 ? "強力推升" :
+                      impact >= 1 ? "正向貢獻" :
+                      impact > -1 ? "中性" :
+                      impact > -4 ? "拖累盤勢" : "明顯拖累";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${s.name}</td>
+          <td>${s.symbol}</td>
+          <td>${s.price ? formatNumber(Number(s.price).toFixed(2)) : "--"}</td>
+          <td class="${getColorClass(s.change)}">${s.price ? addSign(Number(s.change)) : "--"}</td>
+          <td class="${getColorClass(s.pct)}">${s.price ? addSign(s.pct) + "%" : "--"}</td>
+          <td>${s.price ? formatNumber(s.volume) : "--"}</td>
+          <td>${s.sector}</td>
+          <td>${s.weight}</td>
+          <td class="${getColorClass(impact)}">${s.price ? addSign(impact) : "--"}</td>
+          <td class="${getColorClass(impact)}">${s.price ? state : "抓取失敗"}</td>
+        `;
+        stockTbody.appendChild(tr);
+      });
+    }
+
+    /********************************************************
+     * 9) 主流程
+     ********************************************************/
+    async function updateDashboard() {
+      const mode = document.getElementById("modeSelect").value;
+      const statusText = document.getElementById("statusText");
+      const modeNote = document.getElementById("modeNote");
+
+      try {
+        let data;
+        if (mode === "demo") {
+          statusText.textContent = "示範資料模式";
+          modeNote.textContent = "示範資料";
+          data = generateDemoData();
+        } else {
+          statusText.textContent = "自動抓取免費資料中";
+          modeNote.textContent = "自動抓取（免費）";
+          data = await fetchFreeDashboardData();
+          statusText.textContent = "免費資料抓取成功";
+        }
+
+        renderDashboard(data);
+      } catch (err) {
+        console.error(err);
+        statusText.textContent = "免費資料抓取失敗，改用示範資料";
+        modeNote.textContent = "免費來源失敗，已切回示範";
+        renderDashboard(generateDemoData());
+      }
+    }
+
+    function startAutoRefresh() {
+      if (autoTimer) clearInterval(autoTimer);
+      autoTimer = setInterval(updateDashboard, REFRESH_INTERVAL_MS);
+    }
+
+    /********************************************************
+     * 10) 事件
+     ********************************************************/
+    document.getElementById("refreshBtn").addEventListener("click", updateDashboard);
+    document.getElementById("modeSelect").addEventListener("change", updateDashboard);
+
+    /********************************************************
+     * 11) 初始化
+     ********************************************************/
+    updateDashboard();
+    startAutoRefresh();
+  </script>
 </body>
 </html>
