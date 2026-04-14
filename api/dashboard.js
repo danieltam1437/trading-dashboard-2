@@ -9,6 +9,7 @@ export default async function handler(req, res) {
         symbols: {
           tickers: [
             "TWSE:TAIEX",
+            "TAIFEX:TXF1!",
             "TWSE:2330",
             "TWSE:2317",
             "TWSE:2454",
@@ -28,59 +29,70 @@ export default async function handler(req, res) {
 
     const result = await response.json();
 
-    if (!result || !Array.isArray(result.data) || result.data.length === 0) {
+    if (!result || !Array.isArray(result.data) || result.data.length < 2) {
       throw new Error("TradingView returned empty data");
     }
 
-    const taiex = result.data[0];
-    const stocks = result.data.slice(1);
+    const taiexRaw = result.data[0];
+    const txfRaw = result.data[1];
+    const stocks = result.data.slice(2);
 
-    if (!taiex || !Array.isArray(taiex.d)) {
-      throw new Error("TAIEX data format invalid");
+    if (!taiexRaw?.d || !txfRaw?.d) {
+      throw new Error("Index or futures data format invalid");
     }
 
-    let indexPrice = Number(taiex.d[0] ?? 0);
-    let indexChangePct = Number(taiex.d[1] ?? 0);
-    let indexChangeAbs = Number(taiex.d[2] ?? 0);
+    let taiexCurrent = Number(taiexRaw.d[0] ?? 0);
+    let taiexPct = Number(taiexRaw.d[1] ?? 0);
+    let taiexChangeAbs = Number(taiexRaw.d[2] ?? 0);
 
-    // 修正加權指數縮放問題：若回傳 2055，改成 20550
-    if (indexPrice > 0 && indexPrice < 10000) {
-      indexPrice = indexPrice * 10;
-      indexChangeAbs = indexChangeAbs * 10;
+    let txfCurrent = Number(txfRaw.d[0] ?? 0);
+    let txfPct = Number(txfRaw.d[1] ?? 0);
+    let txfChangeAbs = Number(txfRaw.d[2] ?? 0);
+
+    // 修正縮放問題：若回傳 2055 -> 20550
+    if (taiexCurrent > 0 && taiexCurrent < 10000) {
+      taiexCurrent *= 10;
+      taiexChangeAbs *= 10;
     }
 
-    const validStocks = stocks.filter(item => {
-      return item && Array.isArray(item.d) && typeof item.d[1] === "number";
-    });
+    if (txfCurrent > 0 && txfCurrent < 10000) {
+      txfCurrent *= 10;
+      txfChangeAbs *= 10;
+    }
 
+    const validStocks = stocks.filter(item => item && Array.isArray(item.d) && typeof item.d[1] === "number");
     const upCount = validStocks.filter(item => item.d[1] > 0).length;
-    const support = validStocks.length
-      ? Math.round((upCount / validStocks.length) * 100)
-      : 0;
+    const support = validStocks.length ? Math.round((upCount / validStocks.length) * 100) : 0;
 
     const clamp = (v, min = 0, max = 100) => Math.max(min, Math.min(max, v));
 
-    const weight50 = clamp(Math.round(50 + indexChangePct * 8));
-    const mid100 = clamp(Math.round(50 + indexChangePct * 6));
-    const electronics = clamp(Math.round(55 + indexChangePct * 9));
-    const finance = clamp(Math.round(45 + indexChangePct * 5));
+    const weight50 = clamp(Math.round(50 + taiexPct * 8));
+    const mid100 = clamp(Math.round(50 + taiexPct * 6));
+    const electronics = clamp(Math.round(55 + taiexPct * 9));
+    const finance = clamp(Math.round(45 + taiexPct * 5));
 
     const avgScore = Math.round(
       (support + weight50 + mid100 + electronics + finance) / 5
     );
 
+    const futuresBasis = Number((txfCurrent - taiexCurrent).toFixed(2));
+
     let marketStatus = "震盪整理";
     let strategyText = "先觀望，等方向確認";
     let signalText = "訊號：結構中性";
 
-    if (avgScore >= 70) {
+    if (avgScore >= 70 && txfPct >= taiexPct - 0.3) {
       marketStatus = "強勢偏多";
       strategyText = "主攻順勢，拉回找多";
-      signalText = "訊號：結構偏多，電子領先";
-    } else if (avgScore <= 40) {
+      signalText = "訊號：結構偏多，期現同步";
+    } else if (avgScore <= 40 && txfPct <= taiexPct + 0.3) {
       marketStatus = "弱勢偏空";
       strategyText = "反彈保守，不追多";
-      signalText = "訊號：結構偏弱，先看風控";
+      signalText = "訊號：結構偏弱，期現同步偏空";
+    } else {
+      marketStatus = "震盪整理";
+      strategyText = "等期現方向一致再出手";
+      signalText = "訊號：期現分歧，避免追單";
     }
 
     const now = new Date();
@@ -97,9 +109,16 @@ export default async function handler(req, res) {
       ok: true,
       updatedAt: Date.now(),
       taiex: {
-        current: Number(indexPrice.toFixed(2)),
-        pct: Number(indexChangePct.toFixed(2)),
-        changeAbs: Number(indexChangeAbs.toFixed(2))
+        current: Number(taiexCurrent.toFixed(2)),
+        pct: Number(taiexPct.toFixed(2)),
+        changeAbs: Number(taiexChangeAbs.toFixed(2))
+      },
+      futures: {
+        symbol: "TXF1!",
+        current: Number(txfCurrent.toFixed(2)),
+        pct: Number(txfPct.toFixed(2)),
+        changeAbs: Number(txfChangeAbs.toFixed(2)),
+        basis: futuresBasis
       },
       dashboard: {
         marketStatus,
