@@ -3,19 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>台股實戰儀表板</title>
+  <title>大盤多空結構儀表板｜真實資料版</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
     html, body {
       margin: 0;
       padding: 0;
+      width: 100%;
+      height: 100%;
       background: #000;
       color: #fff;
       font-family: Arial, "Microsoft JhengHei", sans-serif;
-      width: 100%;
-      height: 100%;
       overflow: hidden;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top, rgba(80,0,0,0.22), transparent 28%),
+        #000;
     }
 
     .app {
@@ -27,19 +33,19 @@
     }
 
     .topbar {
-      height: 74px;
-      background: linear-gradient(to bottom, #450000, #180000);
-      border-bottom: 1px solid #5c1a1a;
+      height: 72px;
+      background: linear-gradient(to bottom, #420000, #150000);
+      border-bottom: 1px solid #5a1a1a;
       display: grid;
-      grid-template-columns: 150px 330px 320px 1fr 220px;
+      grid-template-columns: 140px 360px 330px 1fr 220px;
       gap: 3px;
       padding: 3px;
       flex-shrink: 0;
     }
 
     .topbox {
-      background: linear-gradient(to bottom, #171717, #060606);
-      border: 1px solid #3a1919;
+      background: linear-gradient(to bottom, #191919, #070707);
+      border: 1px solid #341616;
       padding: 6px 10px;
       overflow: hidden;
       display: flex;
@@ -49,82 +55,142 @@
 
     .topbox-title {
       font-size: 10px;
-      color: #ccc;
+      color: #c9c9c9;
+      line-height: 1.1;
       margin-bottom: 3px;
       white-space: nowrap;
+      opacity: 0.95;
     }
 
     .topbox-value {
       font-size: 15px;
       font-weight: 700;
-      line-height: 1.2;
+      line-height: 1.15;
       white-space: nowrap;
     }
 
     .status-box {
-      background: linear-gradient(to bottom, #d40000, #790000);
-      border: 1px solid #ff6464;
-      text-align: center;
+      background: linear-gradient(to bottom, #d00000, #750000);
+      border: 1px solid #ff6161;
       align-items: center;
+      text-align: center;
     }
 
     .status-box .topbox-title {
       color: #fff;
       font-size: 11px;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
+      font-weight: 700;
     }
 
     .status-box .topbox-value {
       color: #fff;
       font-size: 24px;
       font-weight: 900;
+      letter-spacing: 1px;
     }
 
     .main-index {
-      color: #ff5252;
+      color: #ff4a4a;
       font-size: 28px;
       font-weight: 900;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.4px;
     }
 
     .subline {
-      color: #ffd54f;
+      color: #ffd95a;
       font-size: 11px;
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
-    .scores {
+    .structure-values {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       align-items: center;
+      flex-wrap: nowrap;
       font-size: 24px;
       font-weight: 900;
-      color: #ff4d4d;
-      overflow: hidden;
+      color: #ff2d2d;
     }
 
-    .scores span {
+    .structure-values span {
       min-width: 28px;
-      text-align: center;
       display: inline-block;
+      text-align: center;
+    }
+
+    .top-right {
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    .top-right .topbox-value {
+      font-size: 14px;
+      color: #fff;
     }
 
     .signal-line {
       font-size: 12px;
       font-weight: 800;
-      margin-top: 4px;
-      color: #00ff66;
+      margin-top: 2px;
     }
 
-    .top-right {
-      text-align: right;
-      align-items: flex-end;
+    .signal-bull { color: #00ff66; }
+    .signal-bear { color: #ff5252; }
+    .signal-neutral { color: #ffd54f; }
+
+    .controlbar {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      background: linear-gradient(to bottom, #121212, #060606);
+      border-bottom: 1px solid #212121;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+
+    .control-left,
+    .control-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .badge {
+      border: 1px solid #414141;
+      background: #0a0a0a;
+      color: #ddd;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .badge.red { color: #ff5959; border-color: #5b2323; }
+    .badge.green { color: #3cff75; border-color: #1f5a34; }
+    .badge.yellow { color: #ffd54f; border-color: #665319; }
+
+    button.ctrl-btn {
+      background: linear-gradient(to bottom, #181818, #0a0a0a);
+      border: 1px solid #404040;
+      color: #eaeaea;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    button.ctrl-btn:hover {
+      border-color: #6e6e6e;
     }
 
     .main {
       flex: 1;
       display: grid;
-      grid-template-columns: 1fr 290px;
+      grid-template-columns: 1fr 275px;
       gap: 6px;
       padding: 6px;
       min-height: 0;
@@ -132,39 +198,69 @@
 
     .left-panel {
       display: grid;
-      grid-template-rows: 1fr 180px;
+      grid-template-rows: 1fr 200px;
       gap: 6px;
       min-height: 0;
     }
 
-    .card {
-      background: linear-gradient(to bottom, #040404, #010101);
-      border: 1px solid #333;
-      overflow: hidden;
+    .chart-card {
       position: relative;
+      background: linear-gradient(to bottom, #040404, #010101);
+      border: 1px solid #353535;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
     }
 
-    .card-header {
+    .chart-header {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
       height: 28px;
+      padding: 0 8px;
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 0 10px;
-      background: linear-gradient(to bottom, #131313, #060606);
-      border-bottom: 1px solid #242424;
+      z-index: 5;
+      background: linear-gradient(to bottom, #111, #060606);
+      border-bottom: 1px solid #262626;
       font-size: 11px;
-      color: #ddd;
+      color: #d9d9d9;
     }
 
-    .tag {
-      border: 1px solid #444;
+    .mini-tag {
+      padding: 2px 7px;
+      border: 1px solid #464646;
       background: #111;
       border-radius: 4px;
-      padding: 2px 7px;
+      color: #eee;
       font-size: 10px;
     }
 
-    .chart-wrap {
+    .legend-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-right: 6px;
+      color: #ddd;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-red { background: #ff2e2e; }
+    .dot-green { background: #00ff66; }
+    .dot-yellow { background: #ffd400; }
+    .dot-cyan { background: #37d7ff; }
+    .dot-pink { background: #ff76ff; }
+
+    .chart-inner {
       position: absolute;
       inset: 28px 0 0 0;
       padding: 6px 8px 8px 8px;
@@ -183,6 +279,26 @@
       min-height: 0;
     }
 
+    .summary-card,
+    .table-card {
+      background: linear-gradient(to bottom, #050505, #010101);
+      border: 1px solid #353535;
+      overflow: hidden;
+    }
+
+    .summary-head,
+    .table-head {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      background: linear-gradient(to bottom, #151515, #070707);
+      border-bottom: 1px solid #252525;
+      font-size: 11px;
+      color: #ddd;
+      font-weight: 700;
+    }
+
     .summary-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -191,79 +307,81 @@
     }
 
     .mini-box {
-      background: #090909;
       border: 1px solid #262626;
-      padding: 8px;
+      background: #090909;
+      padding: 6px;
+      min-height: 42px;
     }
 
-    .mini-title {
+    .mini-box-title {
       font-size: 10px;
       color: #aaa;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
-    .mini-value {
+    .mini-box-value {
       font-size: 18px;
       font-weight: 900;
     }
 
-    .table-head-row {
-      height: 32px;
+    .table-header-row {
+      height: 28px;
       display: grid;
-      grid-template-columns: 72px repeat(5, 1fr);
-      gap: 4px;
+      grid-template-columns: 62px repeat(5, 1fr);
       align-items: center;
-      padding: 0 8px;
-      border-bottom: 1px solid #262626;
-      background: linear-gradient(to bottom, #111, #060606);
+      gap: 4px;
+      padding: 0 6px;
+      border-bottom: 1px solid #242424;
+      background: linear-gradient(to bottom, #111, #050505);
       font-size: 11px;
       color: #ddd;
       font-weight: 700;
     }
 
     .time-table {
-      height: calc(100% - 32px);
+      height: calc(100% - 28px);
       overflow-y: auto;
-      padding: 4px 8px 8px;
+      padding: 2px 6px 6px;
       font-size: 12px;
     }
 
     .row {
       display: grid;
-      grid-template-columns: 72px repeat(5, 1fr);
+      grid-template-columns: 62px repeat(5, 1fr);
       gap: 4px;
+      min-height: 22px;
       align-items: center;
-      min-height: 24px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
       padding: 2px 0;
     }
 
     .cell {
       text-align: right;
-      white-space: nowrap;
       font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
     .time {
       text-align: left;
-      color: #d0d0d0;
+      color: #cfcfcf;
     }
 
-    .red { color: #ff5252; font-weight: 800; }
-    .green { color: #2fff70; font-weight: 800; }
-    .yellow { color: #ffd54f; font-weight: 800; }
-    .white { color: #fff; }
+    .red-text { color: #ff4747; font-weight: 800; }
+    .green-text { color: #45da68; font-weight: 800; }
+    .yellow-text { color: #ffd54f; font-weight: 800; }
+    .white-text { color: #fff; }
 
-    .footer {
+    .footer-strip {
       height: 22px;
+      flex-shrink: 0;
+      background: linear-gradient(to bottom, #121212, #050505);
       border-top: 1px solid #232323;
-      background: linear-gradient(to bottom, #111, #050505);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 10px;
-      color: #bbb;
-      flex-shrink: 0;
+      color: #bdbdbd;
+      letter-spacing: 0.5px;
     }
 
     ::-webkit-scrollbar {
@@ -277,6 +395,9 @@
       background: #333;
       border-radius: 8px;
     }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
   </style>
 </head>
 <body>
@@ -288,14 +409,14 @@
       </div>
 
       <div class="topbox">
-        <div class="topbox-title">加權指數 / 漲跌幅</div>
+        <div class="topbox-title">加權指數 / 漲跌幅 / 漲跌點</div>
         <div class="main-index" id="mainIndexText">--</div>
         <div class="subline" id="mainSubText">--</div>
       </div>
 
       <div class="topbox">
         <div class="topbox-title">五大結構數值</div>
-        <div class="scores" id="breadthNumbers">
+        <div class="structure-values" id="breadthNumbers">
           <span>--</span><span>--</span><span>--</span><span>--</span><span>--</span>
         </div>
         <div class="subline">支撐 / 權值50 / 中型100 / 電子 / 金融</div>
@@ -304,66 +425,83 @@
       <div class="topbox">
         <div class="topbox-title">實戰判斷</div>
         <div class="topbox-value" id="strategyText" style="color:#ffd54f;">讀取中</div>
-        <div class="signal-line" id="signalText">訊號：等待資料</div>
+        <div class="signal-line signal-neutral" id="signalText">訊號：等待資料</div>
       </div>
 
       <div class="topbox top-right">
         <div class="topbox-title">資料狀態</div>
         <div class="topbox-value" id="updateTime">尚未更新</div>
-        <div class="subline">真實 API 已接上</div>
+        <div class="subline" id="nextRefreshText">下一次更新：--</div>
+      </div>
+    </div>
+
+    <div class="controlbar">
+      <div class="control-left">
+        <div class="badge red" id="trendBadge">趨勢：--</div>
+        <div class="badge yellow" id="structureBadge">結構：--</div>
+        <div class="badge green" id="entryBadge">進場：--</div>
+      </div>
+      <div class="control-right">
+        <button class="ctrl-btn" id="pauseBtn">暫停</button>
+        <button class="ctrl-btn" id="resumeBtn">繼續</button>
+        <button class="ctrl-btn" id="resetBtn">清空歷史</button>
       </div>
     </div>
 
     <div class="main">
       <div class="left-panel">
-        <div class="card">
-          <div class="card-header">
-            <span class="tag">主圖｜加權指數</span>
-            <span>綠線：指數</span>
-            <span>黃線：短均線</span>
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="mini-tag">主圖｜加權指數</span>
+            <span class="legend-line"><span class="dot dot-green"></span>指數線</span>
+            <span class="legend-line"><span class="dot dot-yellow"></span>短均線</span>
           </div>
-          <div class="chart-wrap">
+          <div class="chart-inner">
             <canvas id="priceChart"></canvas>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-header">
-            <span class="tag">五結構同步監控</span>
-            <span>支撐 / 權值50 / 中型100 / 電子 / 金融</span>
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="mini-tag">五結構同步監控</span>
+            <span class="legend-line"><span class="dot dot-red"></span>支撐</span>
+            <span class="legend-line"><span class="dot dot-yellow"></span>權值50</span>
+            <span class="legend-line"><span class="dot dot-cyan"></span>中型100</span>
+            <span class="legend-line"><span class="dot dot-green"></span>電子</span>
+            <span class="legend-line"><span class="dot dot-pink"></span>金融</span>
           </div>
-          <div class="chart-wrap">
+          <div class="chart-inner">
             <canvas id="structureChart"></canvas>
           </div>
         </div>
       </div>
 
       <div class="right-panel">
-        <div class="card">
-          <div class="card-header">即時摘要</div>
+        <div class="summary-card">
+          <div class="summary-head">即時摘要</div>
           <div class="summary-grid">
             <div class="mini-box">
-              <div class="mini-title">平均結構</div>
-              <div class="mini-value yellow" id="avgScore">--</div>
+              <div class="mini-box-title">平均結構</div>
+              <div class="mini-box-value yellow-text" id="avgScore">--</div>
             </div>
             <div class="mini-box">
-              <div class="mini-title">支撐強度</div>
-              <div class="mini-value red" id="supportScore">--</div>
+              <div class="mini-box-title">支撐強度</div>
+              <div class="mini-box-value red-text" id="supportScore">--</div>
             </div>
             <div class="mini-box">
-              <div class="mini-title">電子</div>
-              <div class="mini-value green" id="elecScore">--</div>
+              <div class="mini-box-title">電子</div>
+              <div class="mini-box-value green-text" id="elecScore">--</div>
             </div>
             <div class="mini-box">
-              <div class="mini-title">金融</div>
-              <div class="mini-value white" id="finScore">--</div>
+              <div class="mini-box-title">金融</div>
+              <div class="mini-box-value white-text" id="finScore">--</div>
             </div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-header">現貨結構時間表</div>
-          <div class="table-head-row">
+        <div class="table-card">
+          <div class="table-head">現貨結構時間表</div>
+          <div class="table-header-row">
             <div>時間</div>
             <div style="text-align:right;">支撐</div>
             <div style="text-align:right;">權50</div>
@@ -376,11 +514,17 @@
       </div>
     </div>
 
-    <div class="footer">台股實戰儀表板｜真實資料版</div>
+    <div class="footer-strip">大盤多空結構儀表板｜真實資料版</div>
   </div>
 
   <script>
     const MAX_POINTS = 120;
+    const POLL_MS = 2000;
+
+    let isPaused = false;
+    let pollTimer = null;
+    let countdownTimer = null;
+    let nextUpdateAt = 0;
 
     const labels = [];
     const priceData = [];
@@ -409,10 +553,10 @@
       if (arr.length > limit) arr.shift();
     }
 
-    function colorClass(v) {
-      if (v >= 70) return "red";
-      if (v <= 40) return "green";
-      return "yellow";
+    function valueClass(v) {
+      if (v >= 70) return "red-text";
+      if (v <= 40) return "green-text";
+      return "yellow-text";
     }
 
     const priceChart = new Chart(document.getElementById("priceChart"), {
@@ -453,7 +597,10 @@
             grid: { color: "rgba(255,255,255,0.08)" }
           },
           y: {
-            ticks: { color: "#ff5a5a" },
+            ticks: {
+              color: "#ff5a5a",
+              callback: (value) => Number(value).toLocaleString("en-US")
+            },
             grid: { color: "rgba(255,255,255,0.08)" }
           }
         }
@@ -535,16 +682,35 @@
       document.getElementById("timeTable").innerHTML = rows.map(r => `
         <div class="row">
           <div class="cell time">${r.time}</div>
-          <div class="cell ${colorClass(r.support)}">${r.support}</div>
-          <div class="cell ${colorClass(r.weight50)}">${r.weight50}</div>
-          <div class="cell ${colorClass(r.mid100)}">${r.mid100}</div>
-          <div class="cell ${colorClass(r.electronics)}">${r.electronics}</div>
-          <div class="cell ${colorClass(r.finance)}">${r.finance}</div>
+          <div class="cell ${valueClass(r.support)}">${r.support}</div>
+          <div class="cell ${valueClass(r.weight50)}">${r.weight50}</div>
+          <div class="cell ${valueClass(r.mid100)}">${r.mid100}</div>
+          <div class="cell ${valueClass(r.electronics)}">${r.electronics}</div>
+          <div class="cell ${valueClass(r.finance)}">${r.finance}</div>
         </div>
       `).join("");
     }
 
+    function updateSignalClass(status) {
+      const signalEl = document.getElementById("signalText");
+      signalEl.className = "signal-line";
+      if (status.includes("強勢偏多")) signalEl.classList.add("signal-bull");
+      else if (status.includes("弱勢偏空")) signalEl.classList.add("signal-bear");
+      else signalEl.classList.add("signal-neutral");
+    }
+
+    function updateCountdownText() {
+      if (!nextUpdateAt) {
+        document.getElementById("nextRefreshText").textContent = "下一次更新：--";
+        return;
+      }
+      const sec = Math.max(0, Math.ceil((nextUpdateAt - Date.now()) / 1000));
+      document.getElementById("nextRefreshText").textContent = `下一次更新：${sec} 秒內`;
+    }
+
     async function updateDashboard() {
+      if (isPaused) return;
+
       try {
         const res = await fetch(`/api/dashboard?t=${Date.now()}`, {
           cache: "no-store"
@@ -559,12 +725,13 @@
         document.getElementById("marketStatusText").textContent = d.dashboard.marketStatus;
         document.getElementById("strategyText").textContent = d.dashboard.strategyText;
         document.getElementById("signalText").textContent = d.dashboard.signalText;
+        updateSignalClass(d.dashboard.marketStatus);
 
         document.getElementById("mainIndexText").textContent =
-          `${Number(t.current).toFixed(2)} (${Number(t.pct).toFixed(2)}%)`;
+          `${Number(t.current).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${Number(t.pct).toFixed(2)}%)`;
 
         document.getElementById("mainSubText").textContent =
-          `時間 ${row.time}`;
+          `時間 ${row.time} ｜ 漲跌點 ${Number(t.changeAbs).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
         document.getElementById("breadthNumbers").innerHTML = `
           <span>${row.support}</span>
@@ -575,9 +742,20 @@
         `;
 
         document.getElementById("avgScore").textContent = d.dashboard.avgScore;
+        document.getElementById("avgScore").className = `mini-box-value ${valueClass(d.dashboard.avgScore)}`;
+
         document.getElementById("supportScore").textContent = row.support;
+        document.getElementById("supportScore").className = `mini-box-value ${valueClass(row.support)}`;
+
         document.getElementById("elecScore").textContent = row.electronics;
+        document.getElementById("elecScore").className = `mini-box-value ${valueClass(row.electronics)}`;
+
         document.getElementById("finScore").textContent = row.finance;
+        document.getElementById("finScore").className = `mini-box-value ${valueClass(row.finance)}`;
+
+        document.getElementById("trendBadge").textContent = `趨勢：${d.dashboard.marketStatus}`;
+        document.getElementById("structureBadge").textContent = `結構：平均 ${d.dashboard.avgScore}`;
+        document.getElementById("entryBadge").textContent = `進場：${d.dashboard.strategyText}`;
         document.getElementById("updateTime").textContent = `即時更新 ${row.time}`;
 
         pushLimit(labels, row.time);
@@ -596,14 +774,56 @@
         priceChart.update();
         structureChart.update();
         renderTable();
+
+        nextUpdateAt = Date.now() + POLL_MS;
+        updateCountdownText();
       } catch (err) {
         console.error(err);
         document.getElementById("updateTime").textContent = "更新失敗";
       }
     }
 
-    setInterval(updateDashboard, 5000);
-    updateDashboard();
+    function startPolling() {
+      stopPolling();
+      updateDashboard();
+      pollTimer = setInterval(updateDashboard, POLL_MS);
+      countdownTimer = setInterval(updateCountdownText, 300);
+    }
+
+    function stopPolling() {
+      if (pollTimer) clearInterval(pollTimer);
+      if (countdownTimer) clearInterval(countdownTimer);
+    }
+
+    document.getElementById("pauseBtn").addEventListener("click", () => {
+      isPaused = true;
+      document.getElementById("updateTime").textContent = "已暫停";
+    });
+
+    document.getElementById("resumeBtn").addEventListener("click", () => {
+      isPaused = false;
+      nextUpdateAt = Date.now() + POLL_MS;
+      updateDashboard();
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      labels.length = 0;
+      priceData.length = 0;
+      maData.length = 0;
+      supportData.length = 0;
+      weight50Data.length = 0;
+      mid100Data.length = 0;
+      electronicsData.length = 0;
+      financeData.length = 0;
+      rows.length = 0;
+
+      priceChart.update();
+      structureChart.update();
+      renderTable();
+      updateDashboard();
+    });
+
+    startPolling();
   </script>
 </body>
 </html>
