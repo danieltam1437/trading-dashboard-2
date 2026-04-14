@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>大盤多空結構儀表板｜真實資料版</title>
+  <title>大盤多空結構儀表板｜完整版</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -20,7 +20,7 @@
 
     body {
       background:
-        radial-gradient(circle at top, rgba(80,0,0,0.22), transparent 28%),
+        radial-gradient(circle at top, rgba(80,0,0,0.18), transparent 28%),
         #000;
     }
 
@@ -33,19 +33,19 @@
     }
 
     .topbar {
-      height: 72px;
-      background: linear-gradient(to bottom, #420000, #150000);
-      border-bottom: 1px solid #5a1a1a;
+      height: 76px;
+      background: linear-gradient(to bottom, #4a0000, #180000);
+      border-bottom: 1px solid #661919;
       display: grid;
-      grid-template-columns: 140px 360px 330px 1fr 220px;
+      grid-template-columns: 150px 390px 350px 1fr 230px;
       gap: 3px;
       padding: 3px;
       flex-shrink: 0;
     }
 
     .topbox {
-      background: linear-gradient(to bottom, #191919, #070707);
-      border: 1px solid #341616;
+      background: linear-gradient(to bottom, #161616, #050505);
+      border: 1px solid #3b1515;
       padding: 6px 10px;
       overflow: hidden;
       display: flex;
@@ -55,9 +55,9 @@
 
     .topbox-title {
       font-size: 10px;
-      color: #c9c9c9;
+      color: #d2d2d2;
       line-height: 1.1;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
       white-space: nowrap;
       opacity: 0.95;
     }
@@ -70,8 +70,8 @@
     }
 
     .status-box {
-      background: linear-gradient(to bottom, #d00000, #750000);
-      border: 1px solid #ff6161;
+      background: linear-gradient(to bottom, #d10000, #780000);
+      border: 1px solid #ff6767;
       align-items: center;
       text-align: center;
     }
@@ -79,28 +79,28 @@
     .status-box .topbox-title {
       color: #fff;
       font-size: 11px;
-      margin-bottom: 1px;
+      margin-bottom: 2px;
       font-weight: 700;
     }
 
     .status-box .topbox-value {
       color: #fff;
-      font-size: 24px;
+      font-size: 25px;
       font-weight: 900;
       letter-spacing: 1px;
     }
 
     .main-index {
-      color: #ff4a4a;
-      font-size: 28px;
+      color: #ff4e4e;
+      font-size: 30px;
       font-weight: 900;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.3px;
     }
 
     .subline {
       color: #ffd95a;
       font-size: 11px;
-      margin-top: 3px;
+      margin-top: 4px;
     }
 
     .structure-values {
@@ -110,7 +110,7 @@
       flex-wrap: nowrap;
       font-size: 24px;
       font-weight: 900;
-      color: #ff2d2d;
+      color: #ff3838;
     }
 
     .structure-values span {
@@ -125,28 +125,28 @@
     }
 
     .top-right .topbox-value {
-      font-size: 14px;
+      font-size: 15px;
       color: #fff;
     }
 
     .signal-line {
       font-size: 12px;
       font-weight: 800;
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
     .signal-bull { color: #00ff66; }
-    .signal-bear { color: #ff5252; }
+    .signal-bear { color: #ff5a5a; }
     .signal-neutral { color: #ffd54f; }
 
     .controlbar {
-      height: 34px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 8px;
-      background: linear-gradient(to bottom, #121212, #060606);
-      border-bottom: 1px solid #212121;
+      background: linear-gradient(to bottom, #101010, #050505);
+      border-bottom: 1px solid #222;
       flex-shrink: 0;
       gap: 8px;
     }
@@ -160,7 +160,7 @@
     }
 
     .badge {
-      border: 1px solid #414141;
+      border: 1px solid #404040;
       background: #0a0a0a;
       color: #ddd;
       padding: 4px 8px;
@@ -169,28 +169,28 @@
       white-space: nowrap;
     }
 
-    .badge.red { color: #ff5959; border-color: #5b2323; }
-    .badge.green { color: #3cff75; border-color: #1f5a34; }
-    .badge.yellow { color: #ffd54f; border-color: #665319; }
+    .badge.red { color: #ff5b5b; border-color: #612020; }
+    .badge.green { color: #3cff75; border-color: #1d5a33; }
+    .badge.yellow { color: #ffd54f; border-color: #5e4b18; }
 
     button.ctrl-btn {
-      background: linear-gradient(to bottom, #181818, #0a0a0a);
-      border: 1px solid #404040;
-      color: #eaeaea;
-      padding: 4px 10px;
+      background: linear-gradient(to bottom, #181818, #090909);
+      border: 1px solid #434343;
+      color: #f0f0f0;
+      padding: 5px 11px;
       border-radius: 4px;
       font-size: 12px;
       cursor: pointer;
     }
 
     button.ctrl-btn:hover {
-      border-color: #6e6e6e;
+      border-color: #757575;
     }
 
     .main {
       flex: 1;
       display: grid;
-      grid-template-columns: 1fr 275px;
+      grid-template-columns: 1fr 300px;
       gap: 6px;
       padding: 6px;
       min-height: 0;
@@ -198,7 +198,7 @@
 
     .left-panel {
       display: grid;
-      grid-template-rows: 1fr 200px;
+      grid-template-rows: 1fr 235px 190px;
       gap: 6px;
       min-height: 0;
     }
@@ -216,21 +216,21 @@
       left: 0;
       right: 0;
       top: 0;
-      height: 28px;
+      height: 30px;
       padding: 0 8px;
       display: flex;
       align-items: center;
       gap: 8px;
       z-index: 5;
       background: linear-gradient(to bottom, #111, #060606);
-      border-bottom: 1px solid #262626;
+      border-bottom: 1px solid #252525;
       font-size: 11px;
-      color: #d9d9d9;
+      color: #ddd;
     }
 
     .mini-tag {
       padding: 2px 7px;
-      border: 1px solid #464646;
+      border: 1px solid #484848;
       background: #111;
       border-radius: 4px;
       color: #eee;
@@ -262,7 +262,7 @@
 
     .chart-inner {
       position: absolute;
-      inset: 28px 0 0 0;
+      inset: 30px 0 0 0;
       padding: 6px 8px 8px 8px;
     }
 
@@ -274,7 +274,7 @@
 
     .right-panel {
       display: grid;
-      grid-template-rows: 150px 1fr;
+      grid-template-rows: 178px 1fr;
       gap: 6px;
       min-height: 0;
     }
@@ -288,7 +288,7 @@
 
     .summary-head,
     .table-head {
-      height: 28px;
+      height: 30px;
       display: flex;
       align-items: center;
       padding: 0 8px;
@@ -309,14 +309,14 @@
     .mini-box {
       border: 1px solid #262626;
       background: #090909;
-      padding: 6px;
-      min-height: 42px;
+      padding: 8px;
+      min-height: 54px;
     }
 
     .mini-box-title {
       font-size: 10px;
       color: #aaa;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     .mini-box-value {
@@ -325,9 +325,9 @@
     }
 
     .table-header-row {
-      height: 28px;
+      height: 30px;
       display: grid;
-      grid-template-columns: 62px repeat(5, 1fr);
+      grid-template-columns: 68px repeat(5, 1fr);
       align-items: center;
       gap: 4px;
       padding: 0 6px;
@@ -339,7 +339,7 @@
     }
 
     .time-table {
-      height: calc(100% - 28px);
+      height: calc(100% - 30px);
       overflow-y: auto;
       padding: 2px 6px 6px;
       font-size: 12px;
@@ -347,9 +347,9 @@
 
     .row {
       display: grid;
-      grid-template-columns: 62px repeat(5, 1fr);
+      grid-template-columns: 68px repeat(5, 1fr);
       gap: 4px;
-      min-height: 22px;
+      min-height: 23px;
       align-items: center;
       border-bottom: 1px solid rgba(255,255,255,0.04);
       padding: 2px 0;
@@ -444,7 +444,7 @@
       <div class="control-right">
         <button class="ctrl-btn" id="pauseBtn">暫停</button>
         <button class="ctrl-btn" id="resumeBtn">繼續</button>
-        <button class="ctrl-btn" id="resetBtn">清空歷史</button>
+        <button class="ctrl-btn" id="resetBtn">重置</button>
       </div>
     </div>
 
@@ -474,6 +474,18 @@
             <canvas id="structureChart"></canvas>
           </div>
         </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="mini-tag">類股分流監控</span>
+            <span class="legend-line"><span class="dot dot-green"></span>電子</span>
+            <span class="legend-line"><span class="dot dot-pink"></span>金融</span>
+            <span class="legend-line"><span class="dot dot-red"></span>整體量能</span>
+          </div>
+          <div class="chart-inner">
+            <canvas id="sectorChart"></canvas>
+          </div>
+        </div>
       </div>
 
       <div class="right-panel">
@@ -496,6 +508,14 @@
               <div class="mini-box-title">金融</div>
               <div class="mini-box-value white-text" id="finScore">--</div>
             </div>
+            <div class="mini-box">
+              <div class="mini-box-title">電子-金融差</div>
+              <div class="mini-box-value" id="leadDiff">--</div>
+            </div>
+            <div class="mini-box">
+              <div class="mini-box-title">短線節奏</div>
+              <div class="mini-box-value white-text" id="paceText">--</div>
+            </div>
           </div>
         </div>
 
@@ -514,11 +534,11 @@
       </div>
     </div>
 
-    <div class="footer-strip">大盤多空結構儀表板｜真實資料版</div>
+    <div class="footer-strip">大盤多空結構儀表板｜完整版｜真實資料版</div>
   </div>
 
   <script>
-    const MAX_POINTS = 120;
+    const MAX_POINTS = 180;
     const POLL_MS = 2000;
 
     let isPaused = false;
@@ -535,6 +555,7 @@
     const mid100Data = [];
     const electronicsData = [];
     const financeData = [];
+    const sectorPowerData = [];
 
     const rows = [];
 
@@ -587,9 +608,7 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            labels: { color: "#ccc" }
-          }
+          legend: { labels: { color: "#ccc" } }
         },
         scales: {
           x: {
@@ -599,7 +618,7 @@
           y: {
             ticks: {
               color: "#ff5a5a",
-              callback: (value) => Number(value).toLocaleString("en-US")
+              callback: (v) => Number(v).toLocaleString("en-US")
             },
             grid: { color: "rgba(255,255,255,0.08)" }
           }
@@ -659,9 +678,65 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            labels: { color: "#ccc" }
+          legend: { labels: { color: "#ccc" } }
+        },
+        scales: {
+          x: {
+            ticks: { color: "#999", maxTicksLimit: 10 },
+            grid: { color: "rgba(255,255,255,0.08)" }
+          },
+          y: {
+            min: 0,
+            max: 100,
+            ticks: { color: "#ff5a5a" },
+            grid: { color: "rgba(255,255,255,0.08)" }
           }
+        }
+      }
+    });
+
+    const sectorChart = new Chart(document.getElementById("sectorChart"), {
+      data: {
+        labels,
+        datasets: [
+          {
+            type: "bar",
+            label: "整體量能",
+            data: sectorPowerData,
+            backgroundColor: "#ff1d1d",
+            borderWidth: 0,
+            barPercentage: 1.0,
+            categoryPercentage: 1.0,
+            yAxisID: "y"
+          },
+          {
+            type: "line",
+            label: "電子",
+            data: electronicsData,
+            borderColor: "#00ff66",
+            borderWidth: 1.5,
+            pointRadius: 0,
+            tension: 0.15,
+            yAxisID: "y"
+          },
+          {
+            type: "line",
+            label: "金融",
+            data: financeData,
+            borderColor: "#ff76ff",
+            borderWidth: 1.3,
+            pointRadius: 0,
+            tension: 0.15,
+            yAxisID: "y"
+          }
+        ]
+      },
+      options: {
+        animation: false,
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: "#ccc" } }
         },
         scales: {
           x: {
@@ -753,6 +828,11 @@
         document.getElementById("finScore").textContent = row.finance;
         document.getElementById("finScore").className = `mini-box-value ${valueClass(row.finance)}`;
 
+        const diff = row.electronics - row.finance;
+        document.getElementById("leadDiff").textContent = `${diff >= 0 ? "+" : ""}${diff}`;
+        document.getElementById("leadDiff").className = `mini-box-value ${diff >= 0 ? "green-text" : "red-text"}`;
+
+        document.getElementById("paceText").textContent = d.dashboard.marketStatus;
         document.getElementById("trendBadge").textContent = `趨勢：${d.dashboard.marketStatus}`;
         document.getElementById("structureBadge").textContent = `結構：平均 ${d.dashboard.avgScore}`;
         document.getElementById("entryBadge").textContent = `進場：${d.dashboard.strategyText}`;
@@ -768,11 +848,15 @@
         pushLimit(electronicsData, row.electronics);
         pushLimit(financeData, row.finance);
 
+        const sectorPower = Math.round((row.electronics * 0.55 + row.finance * 0.25 + row.support * 0.20));
+        pushLimit(sectorPowerData, sectorPower);
+
         rows.unshift(row);
-        if (rows.length > 120) rows.pop();
+        if (rows.length > 180) rows.pop();
 
         priceChart.update();
         structureChart.update();
+        sectorChart.update();
         renderTable();
 
         nextUpdateAt = Date.now() + POLL_MS;
@@ -815,10 +899,12 @@
       mid100Data.length = 0;
       electronicsData.length = 0;
       financeData.length = 0;
+      sectorPowerData.length = 0;
       rows.length = 0;
 
       priceChart.update();
       structureChart.update();
+      sectorChart.update();
       renderTable();
       updateDashboard();
     });
