@@ -46,44 +46,48 @@ export default async function handler(req, res) {
       return Number.isFinite(n) ? n : 0;
     }
 
-    function normalizeMajorIndexPrice(price, changeAbs) {
-      let p = toNum(price);
-      let c = toNum(changeAbs);
+    let taiexCurrent = toNum(taiexRaw.d[0]);
+    let taiexPct = toNum(taiexRaw.d[1]);
+    let taiexChangeAbs = toNum(taiexRaw.d[2]);
 
-      // 修正 2055 -> 20550 這種情況
-      if (p > 0 && p < 10000) {
-        p = p * 10;
-        c = c * 10;
-      }
+    let txfCurrent = toNum(txfRaw.d[0]);
+    let txfPct = toNum(txfRaw.d[1]);
+    let txfChangeAbs = toNum(txfRaw.d[2]);
 
-      return {
-        current: Number(p.toFixed(2)),
-        changeAbs: Number(c.toFixed(2))
-      };
+    // 先修正加權指數縮放
+    if (taiexCurrent > 0 && taiexCurrent < 10000) {
+      taiexCurrent *= 10;
+      taiexChangeAbs *= 10;
     }
 
-    const taiexNormalized = normalizeMajorIndexPrice(
-      taiexRaw.d[0],
-      taiexRaw.d[2]
-    );
+    // 再修正台指期縮放
+    // 規則 1：若台指期本身小於 10000，先乘 10
+    if (txfCurrent > 0 && txfCurrent < 10000) {
+      txfCurrent *= 10;
+      txfChangeAbs *= 10;
+    }
 
-    const txfNormalized = normalizeMajorIndexPrice(
-      txfRaw.d[0],
-      txfRaw.d[2]
-    );
+    // 規則 2：若修正後仍遠小於加權（例如只有一半以下），再補乘 10
+    if (taiexCurrent > 10000 && txfCurrent > 0 && txfCurrent < taiexCurrent * 0.5) {
+      txfCurrent *= 10;
+      txfChangeAbs *= 10;
+    }
 
-    const taiexCurrent = taiexNormalized.current;
-    const taiexPct = Number(toNum(taiexRaw.d[1]).toFixed(2));
-    const taiexChangeAbs = taiexNormalized.changeAbs;
+    // 規則 3：若台指期遠大於加權很多倍，避免過度放大，縮回來
+    if (taiexCurrent > 10000 && txfCurrent > taiexCurrent * 5) {
+      txfCurrent /= 10;
+      txfChangeAbs /= 10;
+    }
 
-    const txfCurrent = txfNormalized.current;
-    const txfPct = Number(toNum(txfRaw.d[1]).toFixed(2));
-    const txfChangeAbs = txfNormalized.changeAbs;
+    taiexCurrent = Number(taiexCurrent.toFixed(2));
+    taiexPct = Number(taiexPct.toFixed(2));
+    taiexChangeAbs = Number(taiexChangeAbs.toFixed(2));
 
-    const validStocks = stocks.filter(item => {
-      return item && Array.isArray(item.d) && typeof item.d[1] === "number";
-    });
+    txfCurrent = Number(txfCurrent.toFixed(2));
+    txfPct = Number(txfPct.toFixed(2));
+    txfChangeAbs = Number(txfChangeAbs.toFixed(2));
 
+    const validStocks = stocks.filter(item => item && Array.isArray(item.d) && typeof item.d[1] === "number");
     const upCount = validStocks.filter(item => item.d[1] > 0).length;
     const support = validStocks.length
       ? Math.round((upCount / validStocks.length) * 100)
