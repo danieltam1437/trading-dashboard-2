@@ -2,58 +2,17 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>台股實戰儀表板（真實資料）</title>
+<title>實戰操盤儀表板</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body {
-  background:#000;
-  color:#fff;
-  font-family:Arial;
-  margin:0;
-}
-
-.top {
-  background:#300;
-  padding:10px;
-  display:flex;
-  justify-content:space-between;
-}
-
-.box {
-  padding:10px;
-}
-
-.big {
-  font-size:28px;
-  font-weight:bold;
-  color:#ff4d4d;
-}
-
-.status {
-  font-size:24px;
-  font-weight:bold;
-}
-
-.chart {
-  height:300px;
-}
-
-.table {
-  height:300px;
-  overflow:auto;
-}
-
-.row {
-  display:flex;
-  justify-content:space-between;
-  border-bottom:1px solid #222;
-  padding:3px;
-}
-
-.red { color:#ff4444; }
-.green { color:#00ff66; }
-.yellow { color:#ffd54f; }
+body{background:#000;color:#fff;font-family:Arial;margin:0}
+.top{display:flex;justify-content:space-between;background:#200;padding:10px}
+.big{font-size:28px;color:#ff4d4d}
+.status{font-size:22px}
+.chart{height:300px}
+.table{height:250px;overflow:auto}
+.row{display:flex;justify-content:space-between;border-bottom:1px solid #222;padding:3px}
 </style>
 </head>
 
@@ -61,59 +20,37 @@ body {
 
 <div class="top">
   <div>
-    <div class="status" id="status">讀取中...</div>
+    <div id="status" class="status">--</div>
     <div id="strategy"></div>
+    <div id="signal"></div>
   </div>
 
   <div>
-    <div class="big" id="index">--</div>
+    <div id="index" class="big">--</div>
     <div id="time"></div>
   </div>
 
-  <div id="scores">
-    --
-  </div>
+  <div id="scores">--</div>
 </div>
 
 <canvas id="chart" class="chart"></canvas>
-
-<div class="table" id="table"></div>
+<div id="table" class="table"></div>
 
 <script>
-const labels = [];
-const priceData = [];
-const tableRows = [];
+const labels=[],priceData=[],rows=[];
 
-const chart = new Chart(document.getElementById('chart'), {
+const chart=new Chart(document.getElementById('chart'),{
   type:'line',
-  data:{
-    labels:labels,
-    datasets:[{
-      data:priceData,
-      borderColor:'#00ff66',
-      borderWidth:2,
-      pointRadius:0
-    }]
-  },
-  options:{
-    animation:false,
-    responsive:true,
-    maintainAspectRatio:false
-  }
+  data:{labels,datasets:[{data:priceData,borderColor:'#0f0',pointRadius:0}]},
+  options:{animation:false,responsive:true,maintainAspectRatio:false}
 });
 
-function color(v){
-  if(v>=70) return "red";
-  if(v<=40) return "green";
-  return "yellow";
-}
-
-function renderTable(){
+function render(){
   document.getElementById("table").innerHTML =
-    tableRows.map(r=>`
+    rows.map(r=>`
       <div class="row">
         <div>${r.time}</div>
-        <div class="${color(r.support)}">${r.support}</div>
+        <div>${r.support}</div>
         <div>${r.weight50}</div>
         <div>${r.mid100}</div>
         <div>${r.electronics}</div>
@@ -123,52 +60,39 @@ function renderTable(){
 }
 
 async function update(){
-  try{
-    const res = await fetch(`/api/dashboard?t=${Date.now()}`);
-    const data = await res.json();
+  const res=await fetch('/api/dashboard?t='+Date.now());
+  const d=await res.json();
 
-    const row = data.row;
-    const taiex = data.taiex;
+  const row=d.row;
+  const t=d.taiex;
 
-    // 上方
-    document.getElementById("status").textContent = data.dashboard.marketStatus;
-    document.getElementById("strategy").textContent = data.dashboard.strategyText;
+  document.getElementById("status").textContent=d.dashboard.marketStatus;
+  document.getElementById("strategy").textContent=d.dashboard.strategyText;
+  document.getElementById("signal").textContent=d.dashboard.signalText;
 
-    document.getElementById("index").textContent =
-      taiex.current.toFixed(2) + " (" + taiex.pct.toFixed(2) + "%)";
+  document.getElementById("index").textContent =
+    t.current.toFixed(2)+" ("+t.pct.toFixed(2)+"%)";
 
-    document.getElementById("time").textContent = row.time;
+  document.getElementById("time").textContent=row.time;
 
-    document.getElementById("scores").innerHTML =
-      `${row.support} / ${row.weight50} / ${row.mid100} / ${row.electronics} / ${row.finance}`;
+  document.getElementById("scores").textContent =
+    `${row.support}/${row.weight50}/${row.mid100}/${row.electronics}/${row.finance}`;
 
-    // 圖
-    labels.push(row.time);
-    priceData.push(taiex.current);
+  labels.push(row.time);
+  priceData.push(t.current);
 
-    if(labels.length>100){
-      labels.shift();
-      priceData.shift();
-    }
+  if(labels.length>100){labels.shift();priceData.shift();}
 
-    chart.update();
+  chart.update();
 
-    // 表
-    tableRows.unshift(row);
-    if(tableRows.length>100) tableRows.pop();
+  rows.unshift(row);
+  if(rows.length>100)rows.pop();
 
-    renderTable();
-
-  }catch(e){
-    console.error(e);
-    document.getElementById("status").textContent="錯誤";
-  }
+  render();
 }
 
-// 每5秒更新
 setInterval(update,5000);
 update();
-
 </script>
 
 </body>
