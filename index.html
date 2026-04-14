@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>台指期同步版 3.6｜左三右三</title>
+  <title>台指期同步版 3.7｜左三右三</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -210,9 +210,34 @@
       min-height: 0;
     }
 
-    .span-left-two {
-      grid-row: 1 / span 2;
+    .main-chart-left {
       grid-column: 1;
+      grid-row: 1;
+    }
+
+    .support-left {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .electronics-left {
+      grid-column: 1;
+      grid-row: 3;
+    }
+
+    .weight50-right {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .mid100-right {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    .finance-right {
+      grid-column: 2;
+      grid-row: 3;
     }
 
     .chart-card {
@@ -459,7 +484,7 @@
 
     <div class="main">
       <div class="left-panel">
-        <div class="chart-card span-left-two">
+        <div class="chart-card main-chart-left">
           <div class="chart-header">
             <span class="mini-tag">主圖｜加權 + 台指期</span>
             <span class="legend-line"><span class="dot dot-green"></span>加權</span>
@@ -471,7 +496,7 @@
           </div>
         </div>
 
-        <div class="chart-card">
+        <div class="chart-card weight50-right">
           <div class="chart-header">
             <span class="mini-tag">權50</span>
             <span class="legend-line"><span class="dot dot-yellow"></span>權50</span>
@@ -481,7 +506,7 @@
           </div>
         </div>
 
-        <div class="chart-card">
+        <div class="chart-card support-left">
           <div class="chart-header">
             <span class="mini-tag">支撐</span>
             <span class="legend-line"><span class="dot dot-red"></span>支撐</span>
@@ -491,7 +516,7 @@
           </div>
         </div>
 
-        <div class="chart-card">
+        <div class="chart-card mid100-right">
           <div class="chart-header">
             <span class="mini-tag">中100</span>
             <span class="legend-line"><span class="dot dot-cyan"></span>中100</span>
@@ -501,7 +526,7 @@
           </div>
         </div>
 
-        <div class="chart-card">
+        <div class="chart-card electronics-left">
           <div class="chart-header">
             <span class="mini-tag">電子</span>
             <span class="legend-line"><span class="dot dot-green"></span>電子</span>
@@ -511,7 +536,7 @@
           </div>
         </div>
 
-        <div class="chart-card">
+        <div class="chart-card finance-right">
           <div class="chart-header">
             <span class="mini-tag">金融</span>
             <span class="legend-line"><span class="dot dot-pink"></span>金融</span>
@@ -568,7 +593,7 @@
       </div>
     </div>
 
-    <div class="footer-strip">台指期同步版 3.6｜左三右三 + 修正文字/漲跌點</div>
+    <div class="footer-strip">台指期同步版 3.7｜左三右三</div>
   </div>
 
   <script>
@@ -642,8 +667,7 @@
     }
 
     function normalizeChangeAbs(v) {
-      const n = Number(v || 0);
-      return n;
+      return Number(v || 0);
     }
 
     function commonXAxis() {
