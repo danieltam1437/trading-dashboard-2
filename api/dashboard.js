@@ -41,28 +41,53 @@ export default async function handler(req, res) {
       throw new Error("Index or futures data format invalid");
     }
 
-    let taiexCurrent = Number(taiexRaw.d[0] ?? 0);
-    let taiexPct = Number(taiexRaw.d[1] ?? 0);
-    let taiexChangeAbs = Number(taiexRaw.d[2] ?? 0);
-
-    let txfCurrent = Number(txfRaw.d[0] ?? 0);
-    let txfPct = Number(txfRaw.d[1] ?? 0);
-    let txfChangeAbs = Number(txfRaw.d[2] ?? 0);
-
-    // 修正縮放問題：若回傳 2055 -> 20550
-    if (taiexCurrent > 0 && taiexCurrent < 10000) {
-      taiexCurrent *= 10;
-      taiexChangeAbs *= 10;
+    function toNum(v) {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : 0;
     }
 
-    if (txfCurrent > 0 && txfCurrent < 10000) {
-      txfCurrent *= 10;
-      txfChangeAbs *= 10;
+    function normalizeMajorIndexPrice(price, changeAbs) {
+      let p = toNum(price);
+      let c = toNum(changeAbs);
+
+      // 修正 2055 -> 20550 這種情況
+      if (p > 0 && p < 10000) {
+        p = p * 10;
+        c = c * 10;
+      }
+
+      return {
+        current: Number(p.toFixed(2)),
+        changeAbs: Number(c.toFixed(2))
+      };
     }
 
-    const validStocks = stocks.filter(item => item && Array.isArray(item.d) && typeof item.d[1] === "number");
+    const taiexNormalized = normalizeMajorIndexPrice(
+      taiexRaw.d[0],
+      taiexRaw.d[2]
+    );
+
+    const txfNormalized = normalizeMajorIndexPrice(
+      txfRaw.d[0],
+      txfRaw.d[2]
+    );
+
+    const taiexCurrent = taiexNormalized.current;
+    const taiexPct = Number(toNum(taiexRaw.d[1]).toFixed(2));
+    const taiexChangeAbs = taiexNormalized.changeAbs;
+
+    const txfCurrent = txfNormalized.current;
+    const txfPct = Number(toNum(txfRaw.d[1]).toFixed(2));
+    const txfChangeAbs = txfNormalized.changeAbs;
+
+    const validStocks = stocks.filter(item => {
+      return item && Array.isArray(item.d) && typeof item.d[1] === "number";
+    });
+
     const upCount = validStocks.filter(item => item.d[1] > 0).length;
-    const support = validStocks.length ? Math.round((upCount / validStocks.length) * 100) : 0;
+    const support = validStocks.length
+      ? Math.round((upCount / validStocks.length) * 100)
+      : 0;
 
     const clamp = (v, min = 0, max = 100) => Math.max(min, Math.min(max, v));
 
@@ -109,15 +134,15 @@ export default async function handler(req, res) {
       ok: true,
       updatedAt: Date.now(),
       taiex: {
-        current: Number(taiexCurrent.toFixed(2)),
-        pct: Number(taiexPct.toFixed(2)),
-        changeAbs: Number(taiexChangeAbs.toFixed(2))
+        current: taiexCurrent,
+        pct: taiexPct,
+        changeAbs: taiexChangeAbs
       },
       futures: {
         symbol: "TXF1!",
-        current: Number(txfCurrent.toFixed(2)),
-        pct: Number(txfPct.toFixed(2)),
-        changeAbs: Number(txfChangeAbs.toFixed(2)),
+        current: txfCurrent,
+        pct: txfPct,
+        changeAbs: txfChangeAbs,
         basis: futuresBasis
       },
       dashboard: {
