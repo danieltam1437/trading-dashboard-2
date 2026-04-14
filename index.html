@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>台指期同步版 3.1</title>
+  <title>台指期同步版 3.2</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -546,13 +546,14 @@
       </div>
     </div>
 
-    <div class="footer-strip">台指期同步版 3.1｜真實資料 + 每分鐘更新 + 流暢補點</div>
+    <div class="footer-strip">台指期同步版 3.2｜固定時間軸版</div>
   </div>
 
   <script>
     const MAX_POINTS = 240;
     const API_POLL_MS = 60000;
     const INTERPOLATE_MS = 1000;
+    const FIXED_TICK_COUNT = 10; // 固定顯示 10 個時間刻度
 
     let isPaused = false;
     let apiTimer = null;
@@ -564,13 +565,11 @@
     const taiexData = [];
     const futuresData = [];
     const maData = [];
-
     const supportData = [];
     const electronicsData = [];
     const weight50Data = [];
     const mid100Data = [];
     const financeData = [];
-
     const rows = [];
 
     let latestSnapshot = null;
@@ -627,6 +626,34 @@
       return n;
     }
 
+    function pushTimeLabel() {
+      labels.push(formatNowTime());
+      if (labels.length > MAX_POINTS) labels.shift();
+    }
+
+    function commonXAxis() {
+      return {
+        ticks: {
+          color: "#999",
+          autoSkip: false,
+          maxRotation: 0,
+          minRotation: 0,
+          callback: function(value, index) {
+            const total = this.getLabels().length;
+            if (total <= 1) return this.getLabelForValue(value);
+
+            const step = Math.max(1, Math.floor(total / FIXED_TICK_COUNT));
+            const isLast = index === total - 1;
+            if (index % step === 0 || isLast) {
+              return this.getLabelForValue(value);
+            }
+            return "";
+          }
+        },
+        grid: { color: "rgba(255,255,255,0.08)" }
+      };
+    }
+
     function createSmallChart(canvasId, label, color, dataArr, min = 0, max = 100) {
       return new Chart(document.getElementById(canvasId), {
         type: "line",
@@ -651,10 +678,7 @@
             legend: { display: false }
           },
           scales: {
-            x: {
-              ticks: { color: "#999", maxTicksLimit: 12, autoSkip: true },
-              grid: { color: "rgba(255,255,255,0.08)" }
-            },
+            x: commonXAxis(),
             y: {
               min,
               max,
@@ -703,10 +727,7 @@
         maintainAspectRatio: false,
         plugins: { legend: { labels: { color: "#ccc" } } },
         scales: {
-          x: {
-            ticks: { color: "#999", maxTicksLimit: 10 },
-            grid: { color: "rgba(255,255,255,0.08)" }
-          },
+          x: commonXAxis(),
           y: {
             ticks: {
               color: "#ff5a5a",
@@ -723,6 +744,15 @@
     const weight50Chart = createSmallChart("weight50Chart", "權50", "#ffd400", weight50Data, 0, 100);
     const mid100Chart = createSmallChart("mid100Chart", "中100", "#37d7ff", mid100Data, 0, 100);
     const financeChart = createSmallChart("financeChart", "金融", "#ff76ff", financeData, 0, 100);
+
+    function updateAllCharts() {
+      priceChart.update();
+      supportChart.update();
+      electronicsChart.update();
+      weight50Chart.update();
+      mid100Chart.update();
+      financeChart.update();
+    }
 
     function renderTable() {
       document.getElementById("timeTable").innerHTML = rows.map(r => `
@@ -759,7 +789,6 @@
 
       const taiexCurrent = normalizeMajorValue(snapshot.taiex.current);
       const taiexChangeAbs = normalizeMajorValue(snapshot.taiex.changeAbs);
-
       const futuresCurrent = normalizeMajorValue(snapshot.futures.current);
       const futuresChangeAbs = normalizeMajorValue(snapshot.futures.changeAbs);
       const futuresBasis = Number((futuresCurrent - taiexCurrent).toFixed(2));
@@ -831,7 +860,8 @@
       displayState.mid100 = smoothStep(displayState.mid100, row.mid100, 0.30) + tinyNoise(0.18);
       displayState.finance = smoothStep(displayState.finance, row.finance, 0.30) + tinyNoise(0.18);
 
-      pushLimit(labels, formatNowTime());
+      pushTimeLabel();
+
       pushLimit(taiexData, Number(displayState.taiex.toFixed(2)));
       pushLimit(futuresData, Number(displayState.futures.toFixed(2)));
       pushLimit(maData, Number(calcMA(taiexData, 10).toFixed(2)));
@@ -842,12 +872,7 @@
       pushLimit(mid100Data, Number(displayState.mid100.toFixed(2)));
       pushLimit(financeData, Number(displayState.finance.toFixed(2)));
 
-      priceChart.update();
-      supportChart.update();
-      electronicsChart.update();
-      weight50Chart.update();
-      mid100Chart.update();
-      financeChart.update();
+      updateAllCharts();
     }
 
     async function fetchSnapshot() {
@@ -950,12 +975,7 @@
       }
 
       renderTable();
-      priceChart.update();
-      supportChart.update();
-      electronicsChart.update();
-      weight50Chart.update();
-      mid100Chart.update();
-      financeChart.update();
+      updateAllCharts();
     });
 
     startTimers();
