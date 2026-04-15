@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>台指期同步版 3.7｜左三右三</title>
+  <title>台指期同步版 4.0｜聽診器風格</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -593,28 +593,30 @@
       </div>
     </div>
 
-    <div class="footer-strip">台指期同步版 3.7｜左三右三</div>
+    <div class="footer-strip">台指期同步版 4.0｜聽診器風格</div>
   </div>
 
   <script>
     const API_POLL_MS = 60000;
     const INTERPOLATE_MS = 1000;
 
-    const FIXED_SESSION_LABELS = [
-      "08:45","09:00","09:15","09:30","09:45",
-      "10:00","10:15","10:30","10:45",
-      "11:00","11:15","11:30","11:45",
-      "12:00","12:15","12:30","12:45",
-      "13:00","13:15","13:30","13:45"
-    ];
+    // 早盤固定時間軸：08:45 ~ 13:45，每分鐘一格
+    function buildMinuteLabels() {
+      const out = [];
+      const start = new Date(2025, 0, 1, 8, 45, 0);
+      const end = new Date(2025, 0, 1, 13, 45, 0);
+      const cur = new Date(start);
+      while (cur <= end) {
+        const hh = String(cur.getHours()).padStart(2, "0");
+        const mm = String(cur.getMinutes()).padStart(2, "0");
+        out.push(`${hh}:${mm}`);
+        cur.setMinutes(cur.getMinutes() + 1);
+      }
+      return out;
+    }
 
-    let isPaused = false;
-    let apiTimer = null;
-    let interpTimer = null;
-    let countdownTimer = null;
-    let nextUpdateAt = 0;
+    const labels = buildMinuteLabels();
 
-    const labels = [...FIXED_SESSION_LABELS];
     const taiexData = new Array(labels.length).fill(null);
     const futuresData = new Array(labels.length).fill(null);
     const maData = new Array(labels.length).fill(null);
@@ -626,6 +628,12 @@
 
     let currentSlot = 0;
     const rows = [];
+
+    let isPaused = false;
+    let apiTimer = null;
+    let interpTimer = null;
+    let countdownTimer = null;
+    let nextUpdateAt = 0;
 
     let latestSnapshot = null;
     let displayState = {
@@ -651,7 +659,7 @@
       return "yellow-text";
     }
 
-    function smoothStep(current, target, factor = 0.22) {
+    function smoothStep(current, target, factor = 0.18) {
       if (current === null || current === undefined) return target;
       return current + (target - current) * factor;
     }
@@ -670,19 +678,39 @@
       return Number(v || 0);
     }
 
-    function commonXAxis() {
+    function getCurrentMorningSlot() {
+      const now = new Date();
+      const mins = now.getHours() * 60 + now.getMinutes();
+      const startMins = 8 * 60 + 45;
+      const slot = mins - startMins;
+      return Math.max(0, Math.min(labels.length - 1, slot));
+    }
+
+    function commonXAxis(showDense = false) {
       return {
         ticks: {
           color: "#999",
           autoSkip: false,
           maxRotation: 0,
-          minRotation: 0
+          minRotation: 0,
+          callback: function(value, index) {
+            const txt = this.getLabelForValue(value);
+            if (showDense) {
+              const mm = txt.slice(3, 5);
+              if (mm === "00" || mm === "30" || txt === "08:45" || txt === "13:45") return txt;
+              return "";
+            }
+            const mm = txt.slice(3, 5);
+            if (mm === "00" || mm === "15" || mm === "30" || mm === "45" || txt === "08:45") return txt;
+            return "";
+          }
         },
         grid: { color: "rgba(255,255,255,0.08)" }
       };
     }
 
-    function createSmallChart(canvasId, label, color, dataArr, min = 0, max = 100) {
+    function createStethoscopeChart(canvasId, label, color, dataArr, mode = "line") {
+      const areaFill = mode === "area";
       return new Chart(document.getElementById(canvasId), {
         type: "line",
         data: {
@@ -692,10 +720,32 @@
               label,
               data: dataArr,
               borderColor: color,
-              borderWidth: 1.8,
+              backgroundColor: areaFill ? "rgba(255,40,40,0.95)" : color,
+              fill: areaFill ? "origin" : false,
+              borderWidth: areaFill ? 1.2 : 1.8,
               pointRadius: 0,
               tension: 0.15
-            }
+            },
+            ...(areaFill ? [
+              {
+                label: "中線",
+                data: new Array(labels.length).fill(50),
+                borderColor: "#8a8a8a",
+                pointRadius: 0,
+                borderWidth: 1,
+                tension: 0,
+                fill: false
+              },
+              {
+                label: "下緣",
+                data: new Array(labels.length).fill(40),
+                borderColor: "#008f2f",
+                pointRadius: 0,
+                borderWidth: 1,
+                tension: 0,
+                fill: false
+              }
+            ] : [])
           ]
         },
         options: {
@@ -706,10 +756,10 @@
             legend: { display: false }
           },
           scales: {
-            x: commonXAxis(),
+            x: commonXAxis(true),
             y: {
-              min,
-              max,
+              min: 0,
+              max: 100,
               ticks: { color: "#ff5a5a" },
               grid: { color: "rgba(255,255,255,0.08)" }
             }
@@ -755,7 +805,7 @@
         maintainAspectRatio: false,
         plugins: { legend: { labels: { color: "#ccc" } } },
         scales: {
-          x: commonXAxis(),
+          x: commonXAxis(false),
           y: {
             ticks: {
               color: "#ff5a5a",
@@ -767,11 +817,11 @@
       }
     });
 
-    const supportChart = createSmallChart("supportChart", "支撐", "#ff2e2e", supportData, 0, 100);
-    const electronicsChart = createSmallChart("electronicsChart", "電子", "#00ff66", electronicsData, 0, 100);
-    const weight50Chart = createSmallChart("weight50Chart", "權50", "#ffd400", weight50Data, 0, 100);
-    const mid100Chart = createSmallChart("mid100Chart", "中100", "#37d7ff", mid100Data, 0, 100);
-    const financeChart = createSmallChart("financeChart", "金融", "#ff76ff", financeData, 0, 100);
+    const supportChart = createStethoscopeChart("supportChart", "支撐", "#ff2e2e", supportData, "area");
+    const electronicsChart = createStethoscopeChart("electronicsChart", "電子", "#00ff66", electronicsData, "area");
+    const weight50Chart = createStethoscopeChart("weight50Chart", "權50", "#ffd400", weight50Data, "area");
+    const mid100Chart = createStethoscopeChart("mid100Chart", "中100", "#37d7ff", mid100Data, "area");
+    const financeChart = createStethoscopeChart("financeChart", "金融", "#ff76ff", financeData, "area");
 
     function updateAllCharts() {
       priceChart.update();
@@ -877,28 +927,30 @@
 
     function pushInterpolatedPoint() {
       if (!latestSnapshot || isPaused) return;
-      if (currentSlot >= labels.length) return;
+
+      const targetSlot = getCurrentMorningSlot();
+      if (currentSlot > targetSlot) return;
 
       const row = latestSnapshot.row;
       const taiexTarget = normalizeMajorCurrent(latestSnapshot.taiex.current);
       const futuresTarget = normalizeMajorCurrent(latestSnapshot.futures.current);
 
-      displayState.taiex = smoothStep(displayState.taiex, taiexTarget, 0.22) + tinyNoise(2.2);
-      displayState.futures = smoothStep(displayState.futures, futuresTarget, 0.22) + tinyNoise(2.4);
-      displayState.support = smoothStep(displayState.support, row.support, 0.30) + tinyNoise(0.18);
-      displayState.electronics = smoothStep(displayState.electronics, row.electronics, 0.30) + tinyNoise(0.20);
-      displayState.weight50 = smoothStep(displayState.weight50, row.weight50, 0.30) + tinyNoise(0.18);
-      displayState.mid100 = smoothStep(displayState.mid100, row.mid100, 0.30) + tinyNoise(0.18);
-      displayState.finance = smoothStep(displayState.finance, row.finance, 0.30) + tinyNoise(0.18);
+      displayState.taiex = smoothStep(displayState.taiex, taiexTarget, 0.18) + tinyNoise(1.6);
+      displayState.futures = smoothStep(displayState.futures, futuresTarget, 0.18) + tinyNoise(1.7);
+      displayState.support = smoothStep(displayState.support, row.support, 0.28) + tinyNoise(0.45);
+      displayState.electronics = smoothStep(displayState.electronics, row.electronics, 0.28) + tinyNoise(0.55);
+      displayState.weight50 = smoothStep(displayState.weight50, row.weight50, 0.28) + tinyNoise(0.45);
+      displayState.mid100 = smoothStep(displayState.mid100, row.mid100, 0.28) + tinyNoise(0.45);
+      displayState.finance = smoothStep(displayState.finance, row.finance, 0.28) + tinyNoise(0.40);
 
       taiexData[currentSlot] = Number(displayState.taiex.toFixed(2));
       futuresData[currentSlot] = Number(displayState.futures.toFixed(2));
-      supportData[currentSlot] = Number(displayState.support.toFixed(2));
-      electronicsData[currentSlot] = Number(displayState.electronics.toFixed(2));
-      weight50Data[currentSlot] = Number(displayState.weight50.toFixed(2));
-      mid100Data[currentSlot] = Number(displayState.mid100.toFixed(2));
-      financeData[currentSlot] = Number(displayState.finance.toFixed(2));
-      maData[currentSlot] = Number((avgValid(taiexData, 3) || displayState.taiex).toFixed(2));
+      supportData[currentSlot] = Math.max(0, Math.min(100, Number(displayState.support.toFixed(2))));
+      electronicsData[currentSlot] = Math.max(0, Math.min(100, Number(displayState.electronics.toFixed(2))));
+      weight50Data[currentSlot] = Math.max(0, Math.min(100, Number(displayState.weight50.toFixed(2))));
+      mid100Data[currentSlot] = Math.max(0, Math.min(100, Number(displayState.mid100.toFixed(2))));
+      financeData[currentSlot] = Math.max(0, Math.min(100, Number(displayState.finance.toFixed(2))));
+      maData[currentSlot] = Number((avgValid(taiexData, 5) || displayState.taiex).toFixed(2));
 
       currentSlot++;
       updateAllCharts();
